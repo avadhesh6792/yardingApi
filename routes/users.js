@@ -24,8 +24,8 @@ router.get('/save-user', function(req, res, next) {
   
   var newUser = new User;
   newUser.name = 'Avadhesh';
-  newUser.lastname = 'Bhatt';
-  newUser.email = 'avadheshbhatt92@gmail.com';
+  //newUser.lastname = 'Bhatt';
+  //newUser.email = 'avadheshbhatt92@gmail.com';
   
   newUser.save(function(err){
       if(err){
