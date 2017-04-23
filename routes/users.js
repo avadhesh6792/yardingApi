@@ -23,7 +23,7 @@ router.get('/save-user', function(req, res, next) {
   var bind = {};
   
   var newUser = new User;
-  newUser.firstname = 'Avadhesh';
+  newUser.name = 'Avadhesh';
   newUser.lastname = 'Bhatt';
   newUser.email = 'avadheshbhatt92@gmail.com';
   
