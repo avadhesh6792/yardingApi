@@ -27,7 +27,7 @@ var upload = multer({storage: Storage}).single("display_pic");
 // user sign up doc
 router.get('/sign-up/doc', function(req, res, next){
     var bind = {};
-    bind.field_name = ['name', 'college', 'display_pic'];
+    bind.field_name = ['name', 'college', 'display_pic', 'phone_no'];
     bind.method = 'post';
     bind.type = 'multipart';
     res.json(bind);
