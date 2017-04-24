@@ -48,7 +48,7 @@ router.post('/sign-up', function (req, res, next) {
         var name        = req.body.name;
         var college     = req.body.college;
         var phone_no    = req.body.phone_no;
-        var display_pic = req.file ? 'uploads/display_pic/' + req.file.filename : 'uploads/default/default.png';
+        var display_pic = req.file ? 'uploads/display_pic/' + req.file.filename : 'uploads/default/default-user.png';
 
         var newUser         = new User;
         newUser.name        = name;
