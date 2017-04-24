@@ -48,7 +48,7 @@ router.post('/sign-up', function (req, res, next) {
         var name        = req.body.name;
         var college     = req.body.college;
         var phone_no    = req.body.phone_no;
-        var display_pic = req.file ? 'uploads/display_pic/' + req.file.filename : 'default/default.png';
+        var display_pic = req.file ? 'uploads/display_pic/' + req.file.filename : 'uploads/default/default.png';
 
         var newUser         = new User;
         newUser.name        = name;
@@ -58,12 +58,13 @@ router.post('/sign-up', function (req, res, next) {
 
         newUser.save(function (err) {
             if (err) {
-                bind.status = 0;
-                bind.message = 'Oops! error occur while sign up';
-                bind.error = err;
+                bind.status     = 0;
+                bind.message    = 'Oops! error occur while sign up';
+                bind.error      = err;
             } else {
-                bind.status = 1;
-                bind.message = 'Your are registered successfully';
+                bind.status     = 1;
+                bind.message    = 'Your are registered successfully';
+                bind.user       = newUser;
             }
             return res.json(bind);
         });
