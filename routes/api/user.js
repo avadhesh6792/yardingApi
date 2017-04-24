@@ -45,14 +45,16 @@ router.post('/sign-up', function (req, res, next) {
         }
 
 
-        var name = req.body.name;
-        var college = req.body.college;
-        var display_pic = req.file ? 'uploads/display_pic/' + req.file.filename : 'uploads/display_pic/default.png';
+        var name        = req.body.name;
+        var college     = req.body.college;
+        var phone_no    = req.body.phone_no;
+        var display_pic = req.file ? 'uploads/display_pic/' + req.file.filename : 'default/default.png';
 
-        var newUser = new User;
-        newUser.name = name;
-        newUser.college = college;
+        var newUser         = new User;
+        newUser.name        = name;
+        newUser.college     = college;
         newUser.display_pic = display_pic;
+        newUser.phone_no    = phone_no;
 
         newUser.save(function (err) {
             if (err) {
