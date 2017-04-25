@@ -61,5 +61,25 @@ router.post('/create-channel', function (req, res, next) {
     });
 });
 
+// get all channels
+router.get('/get-all-channels', function(req, res, next){
+    var bind = {};
+    Channel.find({}, function(err, channels){
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occur while fetching all channels';
+            bind.err = err;
+        } else if(channels.length > 0){
+            bind.status = 1;
+            bind.channels = channels;
+        } else {
+            bind.status = 0;
+            bind.message = 'No channels found';
+        }
+        return res.json(bind);
+        
+    });
+});
+
 
 module.exports = router;
