@@ -81,5 +81,29 @@ router.get('/get-all-channels', function(req, res, next){
     });
 });
 
+// search channel
+router.get('/search-channel/:term', function(req, res, next){
+    var bind = {};
+    var term = req.param('term');
+    var pattern = new RegExp(term, 'i');
+    
+    Channel.find({ channel_name : { $regex: pattern} }, function(err, channels){
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occur while fetching all channels';
+            bind.err = err;
+        } else if(channels.length > 0){
+            bind.status = 1;
+            bind.channels = channels;
+        } else {
+            bind.status = 0;
+            bind.message = 'No channels found';
+        }
+        return res.json(bind);
+    });
+    
+    
+});
+
 
 module.exports = router;
