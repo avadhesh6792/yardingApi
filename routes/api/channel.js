@@ -16,9 +16,9 @@ var Storage = multer.diskStorage({
 var upload = multer({storage: Storage}).single("channel_pic");
 
 // create new channel doc
-router.get('/create-channel/doc', function(req, res, next){
+router.get('/create-channel/doc', function (req, res, next) {
     var bind = {};
-    bind.field_name = ['channel_name', 'channel_description', 'channel_type' , 'user_id', 'channel_pic'];
+    bind.field_name = ['channel_name', 'channel_description', 'link', 'channel_type', 'user_id', 'channel_pic'];
     bind.method = 'post';
     bind.type = 'multipart';
     res.json(bind);
@@ -34,44 +34,60 @@ router.post('/create-channel', function (req, res, next) {
             bind.error = err;
             return res.json(bind);
         }
-        var channel_name        = req.body.channel_name;
+
+        var channel_name = req.body.channel_name;
         var channel_description = req.body.channel_description;
-        var channel_type     = req.body.channel_type; // 'public', 'private'
-        var user_id    = req.body.user_id;
+        var channel_type = req.body.channel_type; // 'public', 'private'
+        var user_id = req.body.user_id;
         var channel_pic = req.file ? 'uploads/channel_pic/' + req.file.filename : 'uploads/default/default-channel.jpg';
+        var link = req.body.link;
+        
+        Channel.find({link: link}, function (err, channels) {
 
-        var newChannel         = new Channel;
-        newChannel.channel_name        = channel_name;
-        newChannel.channel_description = channel_description;
-        newChannel.channel_type     = channel_type;
-        newChannel.channel_pic = channel_pic;
-        newChannel.user_id    = user_id;
+            if (channels) {
+                var newChannel = new Channel;
+                newChannel.channel_name = channel_name;
+                newChannel.channel_description = channel_description;
+                newChannel.channel_type = channel_type;
+                newChannel.channel_pic = channel_pic;
+                newChannel.user_id = user_id;
 
-        newChannel.save(function (err) {
-            if (err) {
-                bind.status     = 0;
-                bind.message    = 'Oops! error occur while creating new channel';
-                bind.error      = err;
+                newChannel.save(function (err) {
+                    if (err) {
+                        bind.status = 0;
+                        bind.message = 'Oops! error occur while creating new channel';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'Channel was created successfully';
+                        //bind.user       = newUser;
+                    }
+                    return res.json(bind);
+                });
             } else {
-                bind.status     = 1;
-                bind.message    = 'Channel was created successfully';
-                //bind.user       = newUser;
+                bind.status = 0;
+                bind.message = 'link is already exists!';
+
+                return res.json(bind);
             }
-            return res.json(bind);
+
+
         });
+
+
 
     });
 });
 
 // get all channels
-router.get('/get-all-channels', function(req, res, next){
+router.get('/get-all-channels', function (req, res, next) {
     var bind = {};
-    Channel.find({}, function(err, channels){
-        if(err){
+    Channel.find({}, function (err, channels) {
+        if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all channels';
             bind.err = err;
-        } else if(channels.length > 0){
+        } else if (channels.length > 0) {
             bind.status = 1;
             bind.channels = channels;
         } else {
@@ -79,22 +95,22 @@ router.get('/get-all-channels', function(req, res, next){
             bind.message = 'No channels found';
         }
         return res.json(bind);
-        
+
     });
 });
 
 // search channel
-router.get('/search-channel/:term', function(req, res, next){
+router.get('/search-channel/:term', function (req, res, next) {
     var bind = {};
     var term = req.param('term');
     var pattern = new RegExp(term, 'i');
-    
-    Channel.find({ channel_name : { $regex: pattern} }, function(err, channels){
-        if(err){
+
+    Channel.find({channel_name: {$regex: pattern}}, function (err, channels) {
+        if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all channels';
             bind.err = err;
-        } else if(channels.length > 0){
+        } else if (channels.length > 0) {
             bind.status = 1;
             bind.channels = channels;
         } else {
@@ -103,8 +119,8 @@ router.get('/search-channel/:term', function(req, res, next){
         }
         return res.json(bind);
     });
-    
-    
+
+
 });
 
 

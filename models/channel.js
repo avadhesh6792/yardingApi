@@ -8,7 +8,8 @@ var Channel = new Schema({
     channel_pic             : {type: String},
     channel_type            : {type: String, default: ''}, // public, private
     user_id                 : ObjectId,
-    members_id              : { type: Array}
+    //members_id              : { type: Array},
+    link                    : { type: String }
 });
 
 module.exports = mongoose.model('Channel', Channel);
