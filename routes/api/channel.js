@@ -18,7 +18,7 @@ var upload = multer({storage: Storage}).single("channel_pic");
 // create new channel doc
 router.get('/create-channel/doc', function(req, res, next){
     var bind = {};
-    bind.field_name = ['channel_name', 'channel_type' , 'user_id', 'channel_pic'];
+    bind.field_name = ['channel_name', 'channel_description', 'channel_type' , 'user_id', 'channel_pic'];
     bind.method = 'post';
     bind.type = 'multipart';
     res.json(bind);
@@ -35,12 +35,14 @@ router.post('/create-channel', function (req, res, next) {
             return res.json(bind);
         }
         var channel_name        = req.body.channel_name;
+        var channel_description = req.body.channel_description;
         var channel_type     = req.body.channel_type; // 'public', 'private'
         var user_id    = req.body.user_id;
         var channel_pic = req.file ? 'uploads/channel_pic/' + req.file.filename : 'uploads/default/default-channel.jpg';
 
         var newChannel         = new Channel;
         newChannel.channel_name        = channel_name;
+        newChannel.channel_description = channel_description;
         newChannel.channel_type     = channel_type;
         newChannel.channel_pic = channel_pic;
         newChannel.user_id    = user_id;
