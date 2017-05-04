@@ -123,5 +123,24 @@ router.get('/search-channel/:term', function (req, res, next) {
 
 });
 
+// remove channels of a user
+
+router.get('/remove-channels/:user_id', function(req, res, next){
+    var bind = {};
+    var user_id = req.param('user_id');
+    
+    Channel.remove({ user_id: user_id }, function(err){
+        if (err) {
+            bind.status = 0;
+            bind.message = 'Oops! error occur while deleting channels';
+            bind.err = err;
+        } else {
+            bind.status = 1;
+            bind.message = 'Channels was deleted successfully';
+        }
+        return res.json(bind);
+    });
+});
+
 
 module.exports = router;
