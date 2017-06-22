@@ -59,7 +59,7 @@ router.post('/sign-up', function (req, res, next) {
         newUser.phone_no        = phone_no;
         newUser.token_id        = token_id;
         newUser.cover_pic       = '';
-        newUser.status          = '';
+        newUser.status          = college;
         
 
         newUser.save(function (err) {

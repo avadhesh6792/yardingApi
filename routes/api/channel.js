@@ -60,7 +60,7 @@ router.post('/create-channel', function (req, res, next) {
                     } else {
                         bind.status = 1;
                         bind.message = 'Channel was created successfully';
-                        //bind.user       = newUser;
+                        bind.channel       = newChannel;
                     }
                     return res.json(bind);
                 });
