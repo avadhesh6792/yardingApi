@@ -139,6 +139,7 @@ router.get('/remove-channels/:user_id', function(req, res, next){
         }
         return res.json(bind);
     });
+});
 
 
 // delete a channel
