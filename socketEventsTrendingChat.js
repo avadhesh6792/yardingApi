@@ -11,7 +11,7 @@ module.exports = function (ioTrendingChat) {
         socket.on('send message', function (jsonData) {
             var room_name = jsonData.room_name;
             console.log('send message to channel : ' + room_name);
-            io.to(room_name).emit('get message', 'hey new msg');
+            ioTrendingChat.to(room_name).emit('get message', 'hey new msg');
         });
     });
 };
