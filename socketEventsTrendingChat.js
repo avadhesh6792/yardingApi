@@ -6,12 +6,13 @@ module.exports = function (ioTrendingChat) {
         socket.on('join channel', function (channel_id) {
             console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id);
             socket.join(channel_id);
+            
         });
 
         socket.on('send message', function (jsonData) {
             var channel_id = jsonData.channel_id;
             var message = jsonData.message;
-            console.log('send message to channel : ' + channel_id);
+            console.log('send message to channel : ' + channel_id + ' ' + message);
             ioTrendingChat.to(channel_id).emit('get message', message);
         });
         
