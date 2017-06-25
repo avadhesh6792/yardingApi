@@ -3,21 +3,21 @@ module.exports = function (ioTrendingChat) {
     ioTrendingChat.on('connection', function (socket) {
         console.log('ioTrendingChat :: someone connected');
 
-        socket.on('join channel', function (channel_name) {
-            console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_name);
-            socket.join(channel_name);
+        socket.on('join channel', function (channel_id) {
+            console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id);
+            socket.join(channel_id);
         });
 
         socket.on('send message', function (jsonData) {
-            var channel_name = jsonData.channel_name;
+            var channel_id = jsonData.channel_id;
             var message = jsonData.message;
-            console.log('send message to channel : ' + channel_name);
-            ioTrendingChat.to(channel_name).emit('get message', message);
+            console.log('send message to channel : ' + channel_id);
+            ioTrendingChat.to(channel_id).emit('get message', message);
         });
         
-        socket.on('leave channel', function (channel_name) {
-            console.log('** ** ** ioTrendingChat user disconnected to channel : ' + channel_name);
-            socket.leave(channel_name);
+        socket.on('leave channel', function (channel_id) {
+            console.log('** ** ** ioTrendingChat user disconnected to channel : ' + channel_id);
+            socket.leave(channel_id);
         });
         
     });
