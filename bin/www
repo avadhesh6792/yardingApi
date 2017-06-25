@@ -91,7 +91,7 @@ function onListening() {
     debug('Listening on ' + bind);
 }
 
-socketEventsTrendingChat(io.of('/')); //works only for trending chat
+socketEventsTrendingChat(io.of('/trending-chat')); //works only for trending chat
 
 // socket code
 
