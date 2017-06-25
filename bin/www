@@ -99,6 +99,8 @@ socketEventsTrendingChat(io.of('/trending-chat')); //works only for trending cha
 var users = {};
 io.sockets.on('connection', function (socket) {
     
+    console.log('wihtout namespance');
+    
     socket.on('server testing', function(data, callback){
         console.log('server received msg : '+ data);
         io.emit('client testing', 'this is your msg : '+data);
