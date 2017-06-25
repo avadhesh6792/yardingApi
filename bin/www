@@ -94,7 +94,7 @@ io.sockets.on('connection', function (socket) {
     
     socket.on('server testing', function(data, callback){
         console.log('server received msg : '+ data);
-        socket.emit('client testing', 'this is your msg : '+data);
+        io.emit('client testing', 'this is your msg : '+data);
     });
 
     socket.on('new user', function (data, callback) {
