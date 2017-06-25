@@ -4,7 +4,7 @@ module.exports = function (ioTrendingChat) {
         console.log('ioTrendingChat :: someone connected');
 
         socket.on('join channel', function (channel_name) {
-            console.log('** ** ** ioTrendingChat user connected to room : ' + channel_name);
+            console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_name);
             socket.join(channel_name);
         });
 
@@ -14,6 +14,12 @@ module.exports = function (ioTrendingChat) {
             console.log('send message to channel : ' + channel_name);
             ioTrendingChat.to(channel_name).emit('get message', message);
         });
+        
+        socket.on('leave channel', function (channel_name) {
+            console.log('** ** ** ioTrendingChat user disconnected to channel : ' + channel_name);
+            socket.leave(channel_name);
+        });
+        
     });
 };
 
