@@ -7,6 +7,11 @@
 var app = require('../app');
 var debug = require('debug')('ejsChatApp:server');
 var http = require('http');
+
+// socket
+var socketEventsTrendingChat = require('../socketEventsTrendingChat');
+
+
 /**
  * Get port from environment and store in Express.
  */
@@ -85,6 +90,8 @@ function onListening() {
             : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }
+
+socketEventsTrendingChat(io.of('/trending-chat')); //works only for trending chat
 
 // socket code
 
