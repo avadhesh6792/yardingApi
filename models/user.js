@@ -2,12 +2,12 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var User = new Schema({
-    name        : {type: String, required: true},
-    college     : {type: String, required: true},
-    status      : String,
-    display_pic : {type: String},
-    cover_pic   : String,
-    phone_no    : {type: String},
+    name        : {type: String, required: true, default: ''},
+    college     : {type: String, required: true, default: ''},
+    status      : {type: String, default: ''},
+    display_pic : {type: String, default: ''},
+    cover_pic   : {type: String, default: ''},
+    phone_no    : {type: String, default: ''},
     token_id    : {type: String, default: ''}
 });
 

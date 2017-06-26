@@ -44,13 +44,14 @@ router.post('/create-channel', function (req, res, next) {
         
         Channel.find({link: link}, function (err, channels) {
 
-            if (channels) {
+            if (!channels) {
                 var newChannel = new Channel;
                 newChannel.channel_name = channel_name;
                 newChannel.channel_description = channel_description;
                 newChannel.channel_type = channel_type;
                 newChannel.channel_pic = channel_pic;
                 newChannel.user_id = user_id;
+                newChannel.link = link;
 
                 newChannel.save(function (err) {
                     if (err) {
