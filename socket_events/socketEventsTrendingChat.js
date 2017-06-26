@@ -18,7 +18,7 @@ module.exports = function (ioTrendingChat) {
             
             channelController.getChannelMessages(jsonData, socket, function(response){
                 console.log('channelController.getChannelMessages response '+ JSON.stringify(response));
-                ioTrendingChat.to(channel_id).emit('get channel messages', response);
+                socket.emit('get channel messages', response);
             });
             
             channelController.joinChannel(jsonData, socket, function(response){
