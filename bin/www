@@ -9,7 +9,7 @@ var debug = require('debug')('ejsChatApp:server');
 var http = require('http');
 
 // socket
-var socketEventsTrendingChat = require('../sokcet_events/socketEventsTrendingChat');
+var socketEventsTrendingChat = require('../socket_events/socketEventsTrendingChat');
 
 
 /**
