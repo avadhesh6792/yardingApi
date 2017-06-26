@@ -17,18 +17,26 @@ exports.joinChannel = function (jsonData, socket, callback) {
             callback(bind);
         }
         if(channel){
-            channel.members_id.push(user_id);
-            channel.save(function(err){
-                if(err){
-                    bind.status = 0;
-                    bind.message = 'Oops! error occured while saving members id';
+            
+            var index = channel.members_id[user_id];
+            if(index == undefined){
+               channel.members_id.push(user_id);
+                channel.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while saving members id';
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'Members id was saved successfully';
+                    }
                     callback(bind);
-                } else {
-                    bind.status = 1;
-                    bind.message = 'Members id was saved successfully';
-                    callback(bind);
-                }
-            });
+                }); 
+            } else {
+                bind.status = 0;
+                bind.message = 'User is already channel member';
+                callback(bind);
+            }
+            
         } else {
             bind.status = 0;
             bind.message = 'Oops! channel not found';
@@ -61,6 +69,46 @@ exports.saveMessage = function(jsonData, socket, callback){
         }
         callback(bind);
     });
+    
+}
+
+exports.getChannelMessages = function(jsonData, socket, callback){
+    var channel_id = jsonData.channel_id;
+    var bind = {};
+    
+    Channel_chat.aggregate([
+        {
+            $match: {
+                channel_id: channel_id
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'user_id',
+                foreignField: '_id',
+                as: 'user'
+            }
+        },
+        {
+            $unwind: "$user"
+        }
+        
+    ], function(err, channel_chat){
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occured while fetching channel chats';
+            bind.error = err;
+        } else if(channel_chat) {
+            bind.status = 1;
+            bind.channel_chat = channel_chat;
+        } else {
+            bind.status = 0;
+            bind.message = 'No channel chats found';
+        }
+        callback(bind);
+    });
+    
     
 }
 

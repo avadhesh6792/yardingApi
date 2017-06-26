@@ -16,6 +16,11 @@ module.exports = function (ioTrendingChat) {
             console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
             socket.join(channel_id);
             
+            channelController.getChannelMessages(jsonData, socket, function(response){
+                console.log('channelController.getChannelMessages response '+ JSON.stringify(response));
+                ioTrendingChat.to(channel_id).emit('get channel messages', response);
+            });
+            
             channelController.joinChannel(jsonData, socket, function(response){
                 console.log('channelController.joinChannel response '+ JSON.stringify(response));
             });
