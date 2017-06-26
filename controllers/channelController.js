@@ -3,6 +3,7 @@ var path        = require('path');
 var cookieParser = require('cookie-parser');
 var User        = require('../models/user');
 var Channel = require('../models/channel');
+var Channel_chat = require('../models/channel_chat');
 
 exports.joinChannel = function (jsonData, socket, callback) {
     var user_id = jsonData.user_id;
@@ -35,6 +36,31 @@ exports.joinChannel = function (jsonData, socket, callback) {
         }
     });
     
+    
+}
+
+exports.saveMessage = function(jsonData, socket, callback){
+    var bind = {};
+    var newChannel_chat = new Channel_chat;
+    var channel_id = jsonData.channel_id;
+    var user_id = jsonData.user_id;
+    var message = jsonData.message;
+    var message_type = jsonData.message_type;
+    
+    newChannel_chat.channel_id = channel_id;
+    newChannel_chat.user_id = user_id;
+    newChannel_chat.message = message;
+    newChannel_chat.message_type = message_type;
+    newChannel_chat.save(function(err){
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occured while saving message';
+        } else {
+            bind.status = 1;
+            bind.message = 'Message was saved successfully';
+        }
+        callback(bind);
+    });
     
 }
 
