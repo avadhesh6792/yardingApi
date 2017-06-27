@@ -95,6 +95,9 @@ exports.getChannelMessages = function(jsonData, socket, callback){
         },
         {
             $unwind: "$user"
+        },
+        {
+            $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0 }
         }
         
     ], function(err, channel_chat){
