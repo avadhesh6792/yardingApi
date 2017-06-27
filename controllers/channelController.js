@@ -66,11 +66,46 @@ exports.saveMessage = function(jsonData, socket, callback){
         if(err){
             bind.status = 0;
             bind.message = 'Oops! error occured while saving message';
+            return callback(bind);
+           
         } else {
-            bind.status = 1;
-            bind.message = 'Message was saved successfully';
+            Channel_chat.aggregate([
+            {
+                $match: {
+                    _id: newChannel_chat._id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user_id',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: "$user"
+            },
+            {
+                $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0 }
+            }
+
+        ], function(err, channel_chat){
+            if(err){
+                bind.status = 0;
+                bind.message = 'Oops! error occured while fetching channel chats';
+                bind.error = err;
+            } else if(channel_chat) {
+                bind.status = 1;
+                bind.channel_chat = channel_chat;
+            } else {
+                bind.status = 0;
+                bind.message = 'No channel chats found';
+            }
+            return callback(bind);
+        });
         }
-        callback(bind);
+        
     });
     
 }
