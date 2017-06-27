@@ -38,10 +38,11 @@ module.exports = function (ioTrendingChat) {
             var message = jsonData.message;
             var user_id = jsonData.user_id;
             console.log('send message to channel : ' + channel_id + ' ' + message);
-            ioTrendingChat.to(channel_id).emit('get message', jsonData);
+            //ioTrendingChat.to(channel_id).emit('get message', jsonData);
             
             channelController.saveMessage(jsonData, socket, function(response){
                 console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                ioTrendingChat.to(channel_id).emit('get message', response);
             });
             
         });
