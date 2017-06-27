@@ -4,6 +4,9 @@ var cookieParser = require('cookie-parser');
 var User        = require('../models/user');
 var Channel = require('../models/channel');
 var Channel_chat = require('../models/channel_chat');
+var Mongoose = require('mongoose');
+var ObjectId = Mongoose.Types.ObjectId;
+
 
 exports.joinChannel = function (jsonData, socket, callback) {
     var user_id = jsonData.user_id;
@@ -79,7 +82,7 @@ exports.getChannelMessages = function(jsonData, socket, callback){
     Channel_chat.aggregate([
         {
             $match: {
-                channel_id: channel_id
+                channel_id: new ObjectId(channel_id)
             }
         },
         {
