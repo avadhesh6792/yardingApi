@@ -42,7 +42,7 @@ router.post('/create-channel', function (req, res, next) {
         var channel_pic = req.file ? 'uploads/channel_pic/' + req.file.filename : 'uploads/default/default-channel.jpg';
         var link = req.body.link;
         
-        Channel.find({link: link}, function (err, channels) {
+        Channel.findOne({link: link}, function (err, channels) {
 
             if (!channels) {
                 var newChannel = new Channel;

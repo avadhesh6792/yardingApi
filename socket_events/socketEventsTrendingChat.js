@@ -42,8 +42,7 @@ module.exports = function (ioTrendingChat) {
             
             channelController.saveMessage(jsonData, socket, function(response){
                 console.log('channelController.saveMessage response '+ JSON.stringify(response));
-                //ioTrendingChat.to(channel_id).emit('get message', response);
-                ioTrendingChat.emit('get message', response);
+                ioTrendingChat.to(channel_id).emit('get message', response);
             });
             
         });
