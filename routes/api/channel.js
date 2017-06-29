@@ -45,7 +45,7 @@ router.post('/upload-chat-media', function(req, res, next){
             bind.error = err;
         } else{
             bind.status = 1;
-            bind.media_url = 'uploads/channel_pic/' + req.file.filename;
+            bind.media_url = 'uploads/chat_media/' + req.file.filename;
         }
         return res.json(bind);
     });
