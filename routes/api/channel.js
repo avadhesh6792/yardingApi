@@ -15,6 +15,17 @@ var Storage = multer.diskStorage({
 
 var upload = multer({storage: Storage}).single("channel_pic");
 
+var chatStorage = multer.diskStorage({
+    destination: function(req, file, callback){
+     callback(null, "./public/uploads/chat_media");   
+    },
+    filename: function(req, file, callback){
+        callback(null, Date.now() + "_" + file.originalname);
+    }
+});
+
+var chatUpload = multer({ storage: chatStorage}).single("chat_media");
+
 // create new channel doc
 router.get('/create-channel/doc', function (req, res, next) {
     var bind = {};
@@ -22,6 +33,22 @@ router.get('/create-channel/doc', function (req, res, next) {
     bind.method = 'post';
     bind.type = 'multipart';
     res.json(bind);
+});
+
+// upload chat media
+router.post('/upload-chat-media', function(req, res, next){
+    var bind = {};
+    chatUpload(req, res, function(err){
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occur while uploading chat media.';
+            bind.error = err;
+        } else{
+            bind.status = 1;
+            bind.media_url = 'uploads/channel_pic/' + req.file.filename;
+        }
+        return res.json(bind);
+    });
 });
 
 // create new channel

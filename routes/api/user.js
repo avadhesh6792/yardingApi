@@ -11,6 +11,17 @@ var client  = new twilio.RestClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
 
 
+var chatStorage = multer.diskStorage({
+    destination: function(req, file, callback){
+     callback(null, "./public/uploads/chat_media");   
+    },
+    filename: function(req, file, callback){
+        callback(null, Date.now() + "_" + file.originalname);
+    }
+});
+
+var chatUpload = multer({ storage: chatStorage}).single("chat_media");
+
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, "./public/uploads/display_pic");
