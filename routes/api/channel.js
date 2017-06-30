@@ -192,7 +192,7 @@ router.get('/delete-channel/:channel_id', function(req, res, next){
 router.get('/testing', function(req, res, next){
     var bind = {};
     var channel_id = '594c5dfb3196d2399fb8ee9d';
-    var user_id = '5907fb6e2351d154a5339268';
+    var user_id = 'kjfkj';
     Channel.findOne({ _id: channel_id }, function(err, channel){
         if(err){
             bind.status = 0;
