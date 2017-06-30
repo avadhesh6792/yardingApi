@@ -9,8 +9,9 @@ var Channel = new Schema({
     channel_type            : {type: String, default: ''}, // public, private
     user_id                 : ObjectId,
     members_id              : { type: Array, default: []},
-    link                    : { type: String, default: '' }
-},  {timestamps: true} );
+    link                    : { type: String, default: '' },
+    createdAt               : {type: Date, default: Date.now()}
+});
 
 module.exports = mongoose.model('Channel', Channel);
 
