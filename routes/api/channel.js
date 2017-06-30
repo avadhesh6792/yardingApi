@@ -4,6 +4,7 @@ var multer = require('multer');
 var Channel = require('../../models/channel');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
+var moment = require('moment');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -193,7 +194,7 @@ router.post('/upload-chat-media', function(req, res, next){
 
 router.get('/get-channel-info/:channel_id', function(req, res){
     var bind = {};
-    var channel_id = req.param('channel_id');
+    var channel_id = req.params.channel_id;
     Channel.aggregate([
         {
             $match: { _id: ObjectId(channel_id)}
@@ -228,7 +229,8 @@ router.get('/get-channel-info/:channel_id', function(req, res){
 });
 
 router.get('/testing', function(req, res, next){
-    
+    var timestamp = moment.unix(1318781876406);
+    return res.json(Date.now());
 });
 
 
