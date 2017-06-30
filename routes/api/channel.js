@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var multer = require('multer');
 var Channel = require('../../models/channel');
+var Mongoose = require('mongoose');
+var ObjectId = Mongoose.Types.ObjectId;
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -35,22 +37,6 @@ router.get('/create-channel/doc', function (req, res, next) {
     res.json(bind);
 });
 
-// upload chat media
-router.post('/upload-chat-media', function(req, res, next){
-    var bind = {};
-    chatUpload(req, res, function(err){
-        if(err){
-            bind.status = 0;
-            bind.message = 'Oops! error occur while uploading chat media.';
-            bind.error = err;
-        } else{
-            bind.status = 1;
-            bind.media_url = 'uploads/chat_media/' + req.file.filename;
-        }
-        return res.json(bind);
-    });
-});
-
 // create new channel
 router.post('/create-channel', function (req, res, next) {
     var bind = {};
@@ -79,6 +65,7 @@ router.post('/create-channel', function (req, res, next) {
                 newChannel.channel_pic = channel_pic;
                 newChannel.user_id = user_id;
                 newChannel.link = link;
+                newChannel.members_id.push(new ObjectId(user_id));
 
                 newChannel.save(function (err) {
                     if (err) {
@@ -182,6 +169,22 @@ router.get('/delete-channel/:channel_id', function(req, res, next){
         } else {
             bind.status = 1;
             bind.message = 'Channel was deleted successfully';
+        }
+        return res.json(bind);
+    });
+});
+
+// upload chat media
+router.post('/upload-chat-media', function(req, res, next){
+    var bind = {};
+    chatUpload(req, res, function(err){
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occur while uploading chat media.';
+            bind.error = err;
+        } else{
+            bind.status = 1;
+            bind.media_url = 'uploads/chat_media/' + req.file.filename;
         }
         return res.json(bind);
     });
