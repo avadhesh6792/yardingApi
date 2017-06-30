@@ -10,7 +10,7 @@ var Channel = new Schema({
     user_id                 : ObjectId,
     members_id              : { type: Array, default: []},
     link                    : { type: String, default: '' }
-}, , {timestamps: true} );
+},  {timestamps: true} );
 
 module.exports = mongoose.model('Channel', Channel);
 
