@@ -190,31 +190,7 @@ router.get('/delete-channel/:channel_id', function(req, res, next){
 //router.get('/get-channel-info');
 
 router.get('/testing', function(req, res, next){
-    var bind = {};
-    var channel_id = '594c5dfb3196d2399fb8ee9d';
-    var user_id = 'kjfkj';
-    Channel.findOne({ _id: channel_id }, function(err, channel){
-        if(err){
-            bind.status = 0;
-            bind.message = 'Oops! error occured while fetching channel by channel id';
-            return res.json(err);
-        }
-        if(channel){
-            var index = channel.members_id.indexOf(user_id);
-            if(index == -1){
-                bind.status = 0;
-                bind.message = 'index is undefined';
-                bind.channel = channel;
-                bind.channel.index = channel.members_id[user_id];
-            } else {
-                bind.status = 0;
-                bind.message = 'index is not undefined';
-                bind.index = index;
-                bind.channel = channel;
-            }
-            return res.json(bind);
-        }
-    });
+    
 });
 
 
