@@ -229,8 +229,8 @@ router.get('/get-channel-info/:channel_id', function(req, res){
 });
 
 router.get('/testing', function(req, res, next){
-    var timestamp = moment.unix(1318781876406);
-    return res.json(Date.now());
+    var timestamp = moment().unix();
+    return res.json(typeof timestamp);
 });
 
 
