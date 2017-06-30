@@ -190,7 +190,42 @@ router.post('/upload-chat-media', function(req, res, next){
     });
 });
 
-//router.get('/get-channel-info');
+
+router.get('/get-channel-info/:channel_id', function(req, res){
+    var bind = {};
+    var channel_id = req.param('channel_id');
+    Channel.aggregate([
+        {
+            $match: { _id: ObjectId(channel_id)}
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'members_id',
+                foreignField: '_id',
+                as: 'members_info'
+                
+                }
+            },
+            {
+                $project: { members_id: 0, __v: 0, 'members_info.__v' : 0, 'members_info.token_id' : 0 }
+            }
+    ], function(err, channelInfo){
+        
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occured while fetching channel info';
+            bind.error = err;
+        } else {
+            bind.status = 1;
+            bind.channelInfo = channelInfo;
+        }
+        
+        return res.json(bind);
+        
+    });
+    
+});
 
 router.get('/testing', function(req, res, next){
     
