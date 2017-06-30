@@ -21,8 +21,8 @@ exports.joinChannel = function (jsonData, socket, callback) {
         }
         if(channel){
             
-            var index = channel.members_id[user_id];
-            if(index == undefined){
+            var index = channel.members_id.indexOf(user_id);
+            if(index == -1){
                channel.members_id.push(user_id);
                 channel.save(function(err){
                     if(err){

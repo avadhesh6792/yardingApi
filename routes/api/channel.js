@@ -201,7 +201,7 @@ router.get('/testing', function(req, res, next){
         }
         if(channel){
             var index = channel.members_id.indexOf(user_id);
-            if(index === undefined){
+            if(index == -1){
                 bind.status = 0;
                 bind.message = 'index is undefined';
                 bind.channel = channel;
