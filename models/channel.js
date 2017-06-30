@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
-require('mongoose-moment')(mongoose);
+//require('mongoose-moment')(mongoose);
 
 var Channel = new Schema({
     channel_name            : {type: String, default: ''},
