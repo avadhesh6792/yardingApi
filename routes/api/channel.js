@@ -204,10 +204,12 @@ router.get('/testing', function(req, res, next){
             if(index == undefined){
                 bind.status = 0;
                 bind.message = 'index is undefined';
+                bind.channel = channel;
             } else {
                 bind.status = 0;
                 bind.message = 'index is not undefined';
                 bind.index = index;
+                bind.channel = channel;
             }
             return res.json(bind);
         }
