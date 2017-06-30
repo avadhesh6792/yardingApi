@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
+require('mongoose-moment')(mongoose);
 
 var Channel = new Schema({
     channel_name            : {type: String, default: ''},
@@ -10,7 +11,7 @@ var Channel = new Schema({
     user_id                 : ObjectId,
     members_id              : { type: Array, default: []},
     link                    : { type: String, default: '' },
-    createdAt               : {type: Date, default: Date.now()}
+    createdAt               : 'Moment'
 });
 
 module.exports = mongoose.model('Channel', Channel);
