@@ -219,7 +219,7 @@ router.get('/get-channel-info/:channel_id', function(req, res){
             bind.error = err;
         } else if(channelInfo.length > 0){
             bind.status = 1;
-            bind.channelInfo = channelInfo;
+            bind.channelInfo = channelInfo[0];
         } else {
             bind.status = 0;
             bind.message = 'No channel info found';
@@ -231,8 +231,7 @@ router.get('/get-channel-info/:channel_id', function(req, res){
 });
 
 router.get('/testing', function(req, res, next){
-    var timestamp = moment().unix();
-    return res.json(typeof timestamp);
+   
 });
 
 

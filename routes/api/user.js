@@ -4,6 +4,8 @@ var multer = require('multer');
 var User = require('../../models/user');
 var twilio  = require('twilio');
 var find = require('array-find');
+var Mongoose = require('mongoose');
+var ObjectId = Mongoose.Types.ObjectId;
 
 var TWILIO_ACCOUNT_SID = 'AC07762a2e784bdfc2224c044620661ec2';
 var TWILIO_AUTH_TOKEN = 'b6e01cb00d70a1929ac0a22296e158e4';
@@ -197,6 +199,19 @@ router.post('/sms', function(req, res, next){
      res.json(message);
     }
   });
+});
+
+router.get('/testing', function(req, res, next){ 
+    User.find({ _id: new ObjectId('58fe35c46a1443119c23d567') }, function(err, user){
+        res.json(user);
+    });
+//   User.aggregate([
+//       {
+//         $match: { _id: new ObjectId('58fe35c46a1443119c23d567') }  
+//       }
+//   ], function(err, users){
+//       res.json(users);
+//   });
 });
 
 module.exports = router;
