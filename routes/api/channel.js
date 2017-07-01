@@ -4,7 +4,7 @@ var multer = require('multer');
 var Channel = require('../../models/channel');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
-var moment = require('moment');
+var Clear_chat = require('../../models/clear_chat');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -230,8 +230,51 @@ router.get('/get-channel-info/:channel_id', function(req, res){
     
 });
 
+// clear channel chat
+router.post('/clear-channel-chat', function(req, res){
+    var bind = {};
+    var channel_id = req.body.channel_id;
+    var user_id = req.body.user_id;
+    
+    Clear_chat.findOne({ 'channel_id' : ObjectId(channel_id), 'user_id' : ObjectId(user_id) }, function(err, clear_chat){
+        if(clear_chat){
+            clear_chat.date = Date.now();
+            clear_chat.save(function(err){
+                if(err){
+                  bind.status = 0;
+                  bind.message = 'Oops! error occured while clearing chat';
+                  bind.error = err;
+                } else {
+                    bind.status = 1;
+                    bind.message = 'Chat was cleared successfully';
+                }
+                return res.json(bind);
+            });
+            
+        } else {
+            newClear_chat = new Clear_chat;
+            newClear_chat.channel_id = channel_id;
+            newClear_chat.user_id = user_id;
+            newClear_chat.date = Date.now();
+            newClear_chat.save(function(err){
+                if(err){
+                  bind.status = 0;
+                  bind.message = 'Oops! error occured while clearing chat';
+                  bind.error = err;
+                } else {
+                    bind.status = 1;
+                    bind.message = 'Chat was cleared successfully';
+                }
+                return res.json(bind);
+            });
+        }
+    });
+    
+});
+
+// testing route
 router.get('/testing', function(req, res, next){
-   
+   res.json(Date.now());
 });
 
 
