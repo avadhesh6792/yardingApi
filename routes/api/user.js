@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var multer = require('multer');
 var User = require('../../models/user');
+var User_status = require('../../models/user_status');
 var twilio  = require('twilio');
 var find = require('array-find');
 var Mongoose = require('mongoose');
@@ -173,12 +174,104 @@ router.post('/edit-profile', edit_profile_upload.any(),   function(req, res, nex
             return res.json(bind);
         }
     });
+});
+
+// update user status
+router.post('/update-user-status', function(req, res){
+    var bind = {};
+    var user_id = req.body.user_id;
+    var status = req.body.status;
     
+    User.findOne({ _id: user_id }, function(err, user){
+        if(user){
+            user.status = status;
+            user.save(function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while updating user status';
+                } else {
+                    bind.status = 1;
+                    bind.message = 'Status was updated successfully';
+                    bind.user = user;
+                }
+                return res.json(bind);
+            });
+        } else {
+            bind.status = 0;
+            bind.message = 'Invalid user';
+            return res.json(bind);
+        }
+    })
+});
+
+// clear user status
+router.get('/clear-user-status/:user_id', function(req, res){
+    var bind = {};
+    var user_id = req.params.user_id;
+    User.findOne({ _id: user_id }, function(err, user){
+        if(user){
+            user.status = user.college;
+            user.save(function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while clearing user status';
+                } else {
+                    bind.status = 1;
+                    bind.message = 'Status was cleared successfully';
+                    bind.user = user;
+                }
+                return res.json(bind);
+            });
+        } else {
+            bind.status = 0;
+            bind.message = 'Invalid user';
+            return res.json(bind);
+        }
+    });
+});
+
+// add user status
+router.post('/add-user-status', function(req, res){
+    var bind = {};
+    var user_id = req.body.user_id;
+    var status = req.body.status;
     
-   //console.log(req.files);
-	//res.send(find_display_pic);
-    
-    
+    User.findOne({ _id: user_id }, function(err, user){
+        if(user){
+            user.status = status;
+            user.save(function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while adding user status';
+                } else {
+                    bind.status = 1;
+                    bind.message = 'Status was added successfully';
+                    //bind.user = user;
+                }
+                return res.json(bind);
+            });
+        } else {
+            bind.status = 0;
+            bind.message = 'Invalid user';
+            return res.json(bind);
+        }
+    })
+});
+
+// get user status
+router.get('/get-user-status/:user_id', function(req, res){
+    var bind = {};
+    var user_id = req.params.user_id;
+    User_status.find({ _id: ObjectId(user_id) }, function(err, user_status){
+        if(user_status.length){
+            bind.status = 1;
+            bind.user_status = user_status;
+        } else {
+            bind.status = 0;
+            bind.message = 'No status found';
+        }
+        return res.json(bind);
+    });
 });
 
 router.post('/sms', function(req, res, next){
