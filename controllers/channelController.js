@@ -95,7 +95,7 @@ exports.saveMessage = function(jsonData, socket, callback){
                 bind.status = 0;
                 bind.message = 'Oops! error occured while fetching channel chats';
                 bind.error = err;
-            } else if(channel_chat) {
+            } else if(channel_chat.length > 0) {
                 bind.status = 1;
                 bind.channel_chat = channel_chat;
             } else {
@@ -140,7 +140,7 @@ exports.getChannelMessages = function(jsonData, socket, callback){
             bind.status = 0;
             bind.message = 'Oops! error occured while fetching channel chats';
             bind.error = err;
-        } else if(channel_chat) {
+        } else if(channel_chat.length > 0) {
             bind.status = 1;
             bind.channel_chat = channel_chat;
         } else {
