@@ -258,14 +258,14 @@ router.post('/add-user-status', function(req, res){
     })
 });
 
-// get user status
-router.get('/get-user-status/:user_id', function(req, res){
+// get user status list
+router.get('/get-user-status-list/:user_id', function(req, res){
     var bind = {};
     var user_id = req.params.user_id;
-    User_status.find({ _id: ObjectId(user_id) }, function(err, user_status){
+    User_status.find({ _id: ObjectId(user_id) }, function(err, status_list){
         if(user_status.length){
             bind.status = 1;
-            bind.user_status = user_status;
+            bind.status_list = status_list;
         } else {
             bind.status = 0;
             bind.message = 'No status found';
