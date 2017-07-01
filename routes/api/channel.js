@@ -217,7 +217,7 @@ router.get('/get-channel-info/:channel_id', function(req, res){
             bind.status = 0;
             bind.message = 'Oops! error occured while fetching channel info';
             bind.error = err;
-        } else if(channelInfo){
+        } else if(channelInfo.length > 0){
             bind.status = 1;
             bind.channelInfo = channelInfo;
         } else {
