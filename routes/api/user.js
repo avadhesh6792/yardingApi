@@ -263,7 +263,7 @@ router.get('/get-user-status-list/:user_id', function(req, res){
     var bind = {};
     var user_id = req.params.user_id;
     User_status.find({ _id: ObjectId(user_id) }, function(err, status_list){
-        if(user_status.length){
+        if(status_list.length){
             bind.status = 1;
             bind.status_list = status_list;
         } else {
@@ -271,7 +271,7 @@ router.get('/get-user-status-list/:user_id', function(req, res){
             bind.message = 'No status found';
         }
         return res.json(bind);
-    }).sort({ _id: -1}).limit(5);
+    }).sort({ createdAt: -1}).limit(5);
 });
 
 router.post('/sms', function(req, res, next){
