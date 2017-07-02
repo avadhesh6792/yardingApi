@@ -272,6 +272,31 @@ router.post('/clear-channel-chat', function(req, res){
     
 });
 
+// exit channel
+router.post('/exit-channel', function(req, res){
+    var bind = {};
+    var user_id = req.body.user_id;
+    var channel_id = req.body.channel_id;
+    Channel.findOne({ _id: channel_id }, function(err, channel){
+        if(channel){
+            var index = channel.members_id.indexOf(user_id);
+            if(index > -1){
+                channel.members_id.splice(index, 1);
+                bind.status = 1;
+                bind.message = 'You were exited channel successfully';
+            } else {
+                bind.status = 0;
+                bind.message = 'User not found';
+            }
+            return res.json(bind);
+        } else{
+            bind.status = 0;
+            bind.message = 'No channel found';
+            return res.json(bind);
+        }
+    });
+});
+
 // testing route
 router.get('/testing', function(req, res, next){
    res.json(Date.now());
