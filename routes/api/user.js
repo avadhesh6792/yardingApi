@@ -236,33 +236,45 @@ router.post('/add-user-status', function(req, res){
     var user_id = req.body.user_id;
     var status = req.body.status;
     
-    User.findOne({ _id: user_id }, function(err, user){
-        if(user){
-            user.status = status;
-            user.save(function(err){
-                if(err){
-                    bind.status = 0;
-                    bind.message = 'Oops! error occured while adding user status';
-                } else {
-                    bind.status = 1;
-                    bind.message = 'Status was added successfully';
-                    //bind.user = user;
-                }
-                return res.json(bind);
-            });
-        } else {
+    var newUser_status = new User_status;
+    newUser_status.user_id = user_id;
+    newUser_status.status = status;
+    
+    newUser_status.save(function(err){
+        if(err){
             bind.status = 0;
-            bind.message = 'Invalid user';
-            return res.json(bind);
+            bind.message = 'Oops! error occured while adding user status';
+        } else {
+            bind.status = 1;
+            bind.message = 'Status was added successfully';
+            bind.status_info = newUser_status;
         }
-    })
+        return res.json(bind);
+    });
+});
+
+// delete user status
+router.get('/delete-user-status/:status_id', function(req, res){
+    var bind = {};
+    var status_id = req.params.status_id;
+    User_status.remove({ _id: status_id }, function(err){
+        if(err){
+            bind.status = 0;
+            bind.message = 'Oops! error occured while deleting user status';
+            bind.error = err;
+        } else {
+            bind.status = 1;
+            bind.message = 'Status was deleted successfully';
+        }
+        return res.bind(bind);
+    });
 });
 
 // get user status list
 router.get('/get-user-status-list/:user_id', function(req, res){
     var bind = {};
     var user_id = req.params.user_id;
-    User_status.find({ _id: ObjectId(user_id) }, function(err, status_list){
+    User_status.find({ user_id: ObjectId(user_id) }, function(err, status_list){
         if(status_list.length){
             bind.status = 1;
             bind.status_list = status_list;

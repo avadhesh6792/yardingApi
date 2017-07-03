@@ -65,6 +65,7 @@ router.post('/create-channel', function (req, res, next) {
                 newChannel.channel_type = channel_type;
                 newChannel.channel_pic = channel_pic;
                 newChannel.user_id = user_id;
+                newChannel.admin_id = user_id;
                 newChannel.link = link;
                 newChannel.members_id.push(new ObjectId(user_id));
 
@@ -282,11 +283,92 @@ router.post('/exit-channel', function(req, res){
             var index = channel.members_id.indexOf(user_id);
             if(index > -1){
                 channel.members_id.splice(index, 1);
-                bind.status = 1;
-                bind.message = 'You were exited channel successfully';
+                channel.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while exit from channel';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'You were exited channel successfully';
+                    }
+                    return res.json(bind);
+                });
             } else {
                 bind.status = 0;
-                bind.message = 'User not found';
+                bind.message = 'User is not a member of channel';
+            }
+            return res.json(bind);
+        } else{
+            bind.status = 0;
+            bind.message = 'No channel found';
+            return res.json(bind);
+        }
+    });
+});
+
+// make channel admin
+router.post('/make-channel-admin', function(req, res){
+    var bind = {};
+    var channel_id = req.body.channel_id;
+    var user_id = req.body.user_id;
+    
+    Channel.findOne({  _id: channel_id }, function(err, channel){
+        if(channel){
+            channel.admin_id = ObjectId(user_id);
+            var index = channel.members_id.indexOf(ObjectId(user_id));
+            
+            if(index > -1){
+                channel.members_id.splice(index, 1);
+                channel.members_id.unshift(ObjectId(user_id));
+                channel.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while making channel admin';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'Channel admin was created successfully';
+                    }
+                    return res.json(bind);
+                });
+            } else {
+                bind.status = 0;
+                bind.message = 'User is not a channel member';
+                return res.json(bind);
+            }
+        } else {
+            bind.status = 0;
+            bind.message = 'No channel found';
+        }
+    });
+    
+});
+
+// remove user from a channel
+router.post('/remove-user-from-channel', function(req, res){
+    var bind = {};
+    var user_id = req.body.user_id;
+    var channel_id = req.body.channel_id;
+    Channel.findOne({ _id: channel_id }, function(err, channel){
+        if(channel){
+            var index = channel.members_id.indexOf(user_id);
+            if(index > -1){
+                channel.members_id.splice(index, 1);
+                channel.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while removing user from channel';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'User was removed from channel successfully';
+                    }
+                    return res.json(bind);
+                });
+            } else {
+                bind.status = 0;
+                bind.message = 'User is not a member of channel';
             }
             return res.json(bind);
         } else{
