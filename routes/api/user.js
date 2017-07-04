@@ -286,6 +286,21 @@ router.get('/get-user-status-list/:user_id', function(req, res){
     }).sort({ createdAt: -1}).limit(5);
 });
 
+router.get('/get-users-list', function(req, res){
+    var bind = {};
+    
+    User.find({}, { name: 1, status: 1, display_pic: 1}, function(err, users){
+        if(users.length){
+            bind.status = 1;
+            bind.users = users;
+        } else {
+            bind.status = 0;
+            bind.message = 'No users list found';
+        }
+        return res.json(bind);
+    }).sort({ name: 1 }).limit(30);
+});
+
 router.post('/sms', function(req, res, next){
     var TWILIO_NUMBER = '+12057746424';
     var message = req.body.message;
