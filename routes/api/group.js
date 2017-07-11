@@ -5,6 +5,7 @@ var Group = require('../../models/group');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 //var Clear_chat = require('../../models/clear_chat');
+var moment = require('moment');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -39,7 +40,8 @@ router.post('/create-group', function (req, res, next) {
         newGroup.group_name = group_name;
         newGroup.group_pic = group_pic;
         newGroup.user_id = user_id;
-        
+        newGroup.created_timestamp = moment().unix();
+
         for(var i = 0; i< members_id.length ;i++){
             var member_id = members_id[i].trim();
             newGroup.members_id.push( ObjectId(member_id) );
