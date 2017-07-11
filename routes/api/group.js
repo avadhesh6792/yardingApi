@@ -136,6 +136,26 @@ router.post('/add-member-to-group', function(req, res){
         
 });
 
+// get all groups
+router.get('/get-all-groups', function (req, res, next) {
+    var bind = {};
+    Group.find({}, function (err, groups) {
+        if (err) {
+            bind.status = 0;
+            bind.message = 'Oops! error occur while fetching all groups';
+            bind.err = err;
+        } else if (groups.length > 0) {
+            bind.status = 1;
+            bind.groups = groups;
+        } else {
+            bind.status = 0;
+            bind.message = 'No groups found';
+        }
+        return res.json(bind);
+
+    });
+});
+
 
 
 // testing route
