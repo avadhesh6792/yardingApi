@@ -5,6 +5,7 @@ var Channel = require('../../models/channel');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../../models/clear_chat');
+var moment = require('moment');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -68,6 +69,7 @@ router.post('/create-channel', function (req, res, next) {
                 newChannel.admin_id = user_id;
                 newChannel.link = link;
                 newChannel.members_id.push(new ObjectId(user_id));
+                newChannel.created_timestamp = moment().unix();
 
                 newChannel.save(function (err) {
                     if (err) {
