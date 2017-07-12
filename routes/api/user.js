@@ -7,6 +7,8 @@ var twilio  = require('twilio');
 var find = require('array-find');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
+var Group = require('../../models/group');
+
 
 var TWILIO_ACCOUNT_SID = 'AC07762a2e784bdfc2224c044620661ec2';
 var TWILIO_AUTH_TOKEN = 'b6e01cb00d70a1929ac0a22296e158e4';
@@ -299,6 +301,31 @@ router.get('/get-users-list', function(req, res){
         }
         return res.json(bind);
     }).sort({ name: 1 }).limit(30);
+});
+
+router.get('/get-more-participants-list/:group_id', function(req, res){
+    var group_id = req.params.group_id;
+    var bind = {};
+    Group.findOne({ _id: group_id }, function(err, group){
+        if(group){
+            var members_id = group.members_id;
+            User.find({ _id: { $nin:  members_id} }, { name: 1, status: 1, display_pic: 1}, function(err, users){
+            if(users.length){
+                bind.status = 1;
+                bind.users = users;
+            } else {
+                bind.status = 0;
+                bind.message = 'No users list found';
+            }
+            return res.json(bind);
+        }).sort({ name: 1 }).limit(30);
+            
+        } else {
+            bind.status = 0;
+            bind.message = 'No group found';
+        }
+    });
+    
 });
 
 router.post('/sms', function(req, res, next){
