@@ -111,6 +111,11 @@ router.get('/get-all-channels', function (req, res, next) {
             }
         },
         {
+            $unwind: {
+                path : "$latest_chat"
+            }
+        },
+        {
             $sort: { 'latest_chat.createdAt': -1 }
         }
     ], function (err, channels) {
