@@ -13,6 +13,7 @@ module.exports = function (ioTrendingChat) {
         socket.on('join channel', function (jsonData) {
             var channel_id = jsonData.channel_id;
             var user_id = jsonData.user_id;
+            var room_type = jsonData.room_type; // 'channel, group'
             console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
             socket.join(channel_id);
             
@@ -21,9 +22,12 @@ module.exports = function (ioTrendingChat) {
                 socket.emit('get channel messages', response);
             });
             
-            channelController.joinChannel(jsonData, socket, function(response){
-                console.log('channelController.joinChannel response '+ JSON.stringify(response));
-            });
+            if(room_type == 'channel'){
+                channelController.joinChannel(jsonData, socket, function(response){
+                    console.log('channelController.joinChannel response '+ JSON.stringify(response));
+                });
+            }
+            
         });
         
         /**
