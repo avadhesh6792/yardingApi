@@ -101,7 +101,11 @@ router.post('/create-channel', function (req, res, next) {
 // get all channels
 router.get('/get-all-channels', function (req, res, next) {
     var bind = {};
-    Channel.aggregate([], function (err, channels) {
+    Channel.aggregate([
+        {
+            
+        }
+    ], function (err, channels) {
         if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all channels';
