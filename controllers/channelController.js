@@ -7,6 +7,8 @@ var express = require('express');
         var Mongoose = require('mongoose');
         var ObjectId = Mongoose.Types.ObjectId;
         var Clear_chat = require('../models/clear_chat');
+        var moment = require('moment');
+        
         exports.joinChannel = function (jsonData, socket, callback) {
         var user_id = jsonData.user_id;
                 var channel_id = jsonData.channel_id;
@@ -57,6 +59,7 @@ var bind = {};
         newChannel_chat.user_id = user_id;
         newChannel_chat.message = message;
         newChannel_chat.message_type = message_type;
+        newChannel_chat.created_timestamp = moment().unix();
         newChannel_chat.save(function(err){
         if (err){
         bind.status = 0;

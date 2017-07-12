@@ -8,7 +8,7 @@ var Channel_chat = new Schema({
     user_id               : ObjectId,
     message               : {type: String, default: ''},
     message_type          : {type: String, default: ''},
-    created_timestamp     : { type: Number, default: moment().unix()}
+    created_timestamp     : { type: Number}
 }, { timestamps: true});
 
 module.exports = mongoose.model('Channel_chat', Channel_chat);
