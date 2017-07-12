@@ -109,6 +109,9 @@ router.get('/get-all-channels', function (req, res, next) {
                 foreignField: 'channel_id',
                 as: 'latest_chat'
             }
+        },
+        {
+            $sort: { 'latest_chat.createdAt': -1 }
         }
     ], function (err, channels) {
         if (err) {
