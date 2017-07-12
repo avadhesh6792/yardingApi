@@ -103,7 +103,12 @@ router.get('/get-all-channels', function (req, res, next) {
     var bind = {};
     Channel.aggregate([
         {
-            
+            $lookup: { 
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
         }
     ], function (err, channels) {
         if (err) {
