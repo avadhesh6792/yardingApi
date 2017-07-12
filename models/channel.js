@@ -12,7 +12,7 @@ var Channel = new Schema({
     admin_id                : ObjectId,
     members_id              : { type: Array, default: []},
     link                    : { type: String, default: '' },
-    created_timestamp     : { type: Number, default: moment().unix()}
+    created_timestamp     : { type: Number}
 }, { timestamps: true});
 
 module.exports = mongoose.model('Channel', Channel);
