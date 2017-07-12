@@ -114,7 +114,7 @@ router.get('/get-all-channels', function (req, res, next) {
             $sort: { 'latest_chat.createdAt': -1 }
         },
         {
-            $project: { updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: { "$arrayElemAt": [ "$latest_chat", 0 ]}
+            $project: { updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: { "$arrayElemAt": [ "$latest_chat", 0 ]}}
         }
     ], function (err, channels) {
         if (err) {
