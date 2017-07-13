@@ -173,6 +173,46 @@ router.get('/get-all-groups', function (req, res, next) {
     });
 });
 
+// search in all groups
+router.get('/get-all-groups/:search_term', function (req, res, next) {
+    var bind = {};
+    var search_term = req.params.search_term;
+    var pattern = new RegExp(search_term, 'i');
+    Group.aggregate([
+        {
+          $match: { group_name: {$regex: pattern} }  
+        },
+        {
+            $lookup: { 
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
+        },
+        {
+            $sort: { 'latest_chat.createdAt': -1 }
+        },
+        {
+            $project: { updatedAt: 1, createdAt: 1, user_id: 1, created_timestamp: 1, members_id: 1, group_pic: 1, group_name: 1, latest_chat: { "$arrayElemAt": [ "$latest_chat", 0 ]}}
+        }
+    ], function (err, groups) {
+        if (err) {
+            bind.status = 0;
+            bind.message = 'Oops! error occur while fetching all groups';
+            bind.err = err;
+        } else if (groups.length > 0) {
+            bind.status = 1;
+            bind.groups = groups;
+        } else {
+            bind.status = 0;
+            bind.message = 'No groups found';
+        }
+        return res.json(bind);
+
+    });
+});
+
 // exit group
 router.post('/exit-group', function(req, res){
     var bind = {};
