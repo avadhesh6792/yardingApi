@@ -297,7 +297,7 @@ router.post('/exit-channel', function(req, res){
     var channel_id = req.body.channel_id;
     Channel.findOne({ _id: channel_id }, function(err, channel){
         if(channel){
-            var index = channel.members_id.indexOf(user_id);
+            var index = channel.members_id.indexOf(ObjectId(user_id));
             if(index > -1){
                 channel.members_id.splice(index, 1);
                 channel.save(function(err){

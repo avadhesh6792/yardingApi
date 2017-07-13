@@ -173,6 +173,40 @@ router.get('/get-all-groups', function (req, res, next) {
     });
 });
 
+// exit group
+router.post('/exit-group', function(req, res){
+    var bind = {};
+    var user_id = req.body.user_id;
+    var group_id = req.body.group_id;
+    Group.findOne({ _id: group_id }, function(err, group){
+        if(group){
+            var index = group.members_id.indexOf(ObjectId(user_id));
+            if(index > -1){
+                group.members_id.splice(index, 1);
+                group.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while exit from group';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'You were exited group successfully';
+                    }
+                    return res.json(bind);
+                });
+            } else {
+                bind.status = 0;
+                bind.message = 'User is not a member of group';
+            }
+            return res.json(bind);
+        } else{
+            bind.status = 0;
+            bind.message = 'No group found';
+            return res.json(bind);
+        }
+    });
+});
+
 
 
 // testing route
