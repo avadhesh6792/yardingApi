@@ -141,7 +141,22 @@ router.post('/add-member-to-group', function(req, res){
 // get all groups
 router.get('/get-all-groups', function (req, res, next) {
     var bind = {};
-    Group.find({}, function (err, groups) {
+    Group.aggregate([
+        {
+            $lookup: { 
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
+        },
+        {
+            $sort: { 'latest_chat.createdAt': -1 }
+        },
+        {
+            $project: { updatedAt: 1, createdAt: 1, user_id: 1, created_timestamp: 1, members_id: 1, group_pic: 1, group_name: 1, latest_chat: { "$arrayElemAt": [ "$latest_chat", 0 ]}}
+        }
+    ], function (err, groups) {
         if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all groups';
