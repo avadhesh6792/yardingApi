@@ -40,6 +40,7 @@ router.post('/create-group', function (req, res, next) {
         newGroup.group_name = group_name;
         newGroup.group_pic = group_pic;
         newGroup.user_id = user_id;
+        newGroup.admin_id = user_id;
         newGroup.created_timestamp = moment().unix();
 
         for(var i = 0; i< members_id.length ;i++){
@@ -245,6 +246,44 @@ router.post('/exit-group', function(req, res){
             return res.json(bind);
         }
     });
+});
+
+// make group admin
+router.post('/make-group-admin', function(req, res){
+    var bind = {};
+    var group_id = req.body.group_id;
+    var user_id = req.body.user_id;
+    
+    Group.findOne({  _id: group_id }, function(err, group){
+        if(group){
+            group.admin_id = user_id;
+            var index = group.members_id.indexOf(ObjectId(user_id));
+            
+            if(index > -1){
+                group.members_id.splice(index, 1);
+                group.members_id.unshift(ObjectId(user_id));
+                group.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while making group admin';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'Group admin was created successfully';
+                    }
+                    return res.json(bind);
+                });
+            } else {
+                bind.status = 0;
+                bind.message = 'User is not a group member';
+                return res.json(bind);
+            }
+        } else {
+            bind.status = 0;
+            bind.message = 'No group found';
+        }
+    });
+    
 });
 
 
