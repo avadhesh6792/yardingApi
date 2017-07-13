@@ -288,10 +288,29 @@ router.get('/get-user-status-list/:user_id', function(req, res){
     }).sort({ createdAt: -1}).limit(5);
 });
 
+// get all users list
 router.get('/get-users-list', function(req, res){
     var bind = {};
     
     User.find({}, { name: 1, status: 1, display_pic: 1}, function(err, users){
+        if(users.length){
+            bind.status = 1;
+            bind.users = users;
+        } else {
+            bind.status = 0;
+            bind.message = 'No users list found';
+        }
+        return res.json(bind);
+    }).sort({ name: 1 }).limit(30);
+});
+
+// search in all users list
+router.get('/get-users-list/:search_term', function(req, res){
+    var bind = {};
+    var search_term = req.param('search_term');
+    var pattern = new RegExp(search_term, 'i');
+    
+    User.find({name: {$regex: pattern}}, { name: 1, status: 1, display_pic: 1}, function(err, users){
         if(users.length){
             bind.status = 1;
             bind.users = users;
@@ -310,6 +329,35 @@ router.get('/get-more-participants-list/:group_id', function(req, res){
         if(group){
             var members_id = group.members_id;
             User.find({ _id: { $nin:  members_id} }, { name: 1, status: 1, display_pic: 1}, function(err, users){
+            if(users.length){
+                bind.status = 1;
+                bind.users = users;
+            } else {
+                bind.status = 0;
+                bind.message = 'No users list found';
+            }
+            return res.json(bind);
+        }).sort({ name: 1 }).limit(30);
+            
+        } else {
+            bind.status = 0;
+            bind.message = 'No group found';
+        }
+    });
+    
+});
+
+// search user in more participant list
+router.get('/get-more-participants-list/:group_id/:search_term', function(req, res){
+    var group_id = req.params.group_id;
+    var search_term = req.param('search_term');
+    var pattern = new RegExp(search_term, 'i');
+    
+    var bind = {};
+    Group.findOne({ _id: group_id }, function(err, group){
+        if(group){
+            var members_id = group.members_id;
+            User.find({ _id: { $nin:  members_id}, name: {$regex: pattern} }, { name: 1, status: 1, display_pic: 1}, function(err, users){
             if(users.length){
                 bind.status = 1;
                 bind.users = users;
