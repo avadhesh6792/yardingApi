@@ -5,6 +5,7 @@ var Channel = require('../../models/channel');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../../models/clear_chat');
+var Channel_chat = require('../models/channel_chat');
 var moment = require('moment');
 
 var Storage = multer.diskStorage({
@@ -398,7 +399,91 @@ router.post('/remove-user-from-channel', function(req, res){
 
 // testing route
 router.get('/testing', function(req, res, next){
-   res.json(Date.now());
+   
+var channel_id = '5962a1f468ed126d120f83a2';
+        var user_id = '5968d143fff4a707bbd1951a';
+        var bind = {};
+        Clear_chat.findOne({ 'channel_id' : ObjectId(channel_id), 'user_id' : ObjectId(user_id) }, function(err, clear_chat){
+        if (clear_chat){
+            
+        Channel_chat.aggregate([
+        {
+        $match: {
+        channel_id: ObjectId(channel_id),
+        updatedAt: { $gt: clear_chat.updatedAt }
+        }
+        },
+        {
+        $lookup: {
+        from: 'users',
+                localField: 'user_id',
+                foreignField: '_id',
+                as: 'user'
+        }
+        },
+        {
+        $unwind: "$user"
+        },
+        {
+        $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0 }
+        },
+        {
+            $sort: { createdAt: 1 }
+        }
+
+        ], function(err, channel_chat){
+        if (err){
+        bind.status = 0;
+                bind.message = 'Oops! error occured while fetching channel chats';
+                bind.error = err;
+        } else if (channel_chat.length > 0) {
+        bind.status = 1;
+                bind.channel_chat = channel_chat;
+        } else {
+        bind.status = 0;
+                bind.message = 'No channel chats found';
+        }
+        callback(bind);
+        });
+        
+        } else{
+        Channel_chat.aggregate([
+        {
+        $match: {
+        channel_id: ObjectId(channel_id)
+        }
+        },
+        {
+        $lookup: {
+        from: 'users',
+                localField: 'user_id',
+                foreignField: '_id',
+                as: 'user'
+        }
+        },
+        {
+        $unwind: "$user"
+        },
+        {
+        $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0 }
+        }
+
+        ], function(err, channel_chat){
+        if (err){
+        bind.status = 0;
+                bind.message = 'Oops! error occured while fetching channel chats';
+                bind.error = err;
+        } else if (channel_chat.length > 0) {
+        bind.status = 1;
+                bind.channel_chat = channel_chat;
+        } else {
+        bind.status = 0;
+                bind.message = 'No channel chats found';
+        }
+        callback(bind);
+        });
+    }
+    });
 });
 
 
