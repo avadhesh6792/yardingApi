@@ -173,6 +173,9 @@ var channel_id = jsonData.channel_id;
         },
         {
         $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0 }
+        },
+        {
+            $sort: { createdAt: 1 }
         }
 
         ], function(err, channel_chat){
