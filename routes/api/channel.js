@@ -443,7 +443,7 @@ var channel_id = '5962a1f468ed126d120f83a2';
         bind.status = 0;
                 bind.message = 'No channel chats found';
         }
-        callback(bind);
+        res.json(bind);
         });
         
         } else{
@@ -466,6 +466,9 @@ var channel_id = '5962a1f468ed126d120f83a2';
         },
         {
         $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0 }
+        },
+        {
+            $sort: { createdAt: 1 }
         }
 
         ], function(err, channel_chat){
@@ -480,7 +483,7 @@ var channel_id = '5962a1f468ed126d120f83a2';
         bind.status = 0;
                 bind.message = 'No channel chats found';
         }
-        callback(bind);
+        res.json(bind);
         });
     }
     });
