@@ -5,7 +5,7 @@ var Channel = require('../../models/channel');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../../models/clear_chat');
-var Channel_chat = require('../models/channel_chat');
+var Channel_chat = require('../../models/channel_chat');
 var moment = require('moment');
 
 var Storage = multer.diskStorage({
@@ -21,15 +21,15 @@ var Storage = multer.diskStorage({
 var upload = multer({storage: Storage}).single("channel_pic");
 
 var chatStorage = multer.diskStorage({
-    destination: function(req, file, callback){
-     callback(null, "./public/uploads/chat_media");   
+    destination: function (req, file, callback) {
+        callback(null, "./public/uploads/chat_media");
     },
-    filename: function(req, file, callback){
+    filename: function (req, file, callback) {
         callback(null, Date.now() + "_" + file.originalname);
     }
 });
 
-var chatUpload = multer({ storage: chatStorage}).single("chat_media");
+var chatUpload = multer({storage: chatStorage}).single("chat_media");
 
 // create new channel doc
 router.get('/create-channel/doc', function (req, res, next) {
@@ -57,7 +57,7 @@ router.post('/create-channel', function (req, res, next) {
         var user_id = req.body.user_id;
         var channel_pic = req.file ? 'uploads/channel_pic/' + req.file.filename : 'uploads/default/default-channel.jpg';
         var link = req.body.link;
-        
+
         Channel.findOne({link: link}, function (err, channels) {
 
             if (!channels) {
@@ -80,7 +80,7 @@ router.post('/create-channel', function (req, res, next) {
                     } else {
                         bind.status = 1;
                         bind.message = 'Channel was created successfully';
-                        bind.channel       = newChannel;
+                        bind.channel = newChannel;
                     }
                     return res.json(bind);
                 });
@@ -104,7 +104,7 @@ router.get('/get-all-channels', function (req, res, next) {
     var bind = {};
     Channel.aggregate([
         {
-            $lookup: { 
+            $lookup: {
                 from: 'channel_chats',
                 localField: '_id',
                 foreignField: 'channel_id',
@@ -112,10 +112,10 @@ router.get('/get-all-channels', function (req, res, next) {
             }
         },
         {
-            $sort: { 'latest_chat.createdAt': -1 }
+            $sort: {'latest_chat.createdAt': -1}
         },
         {
-            $project: { updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: { "$arrayElemAt": [ "$latest_chat", 0 ]}}
+            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
         }
     ], function (err, channels) {
         if (err) {
@@ -159,11 +159,11 @@ router.get('/search-channel/:term', function (req, res, next) {
 });
 
 // remove channels of a user
-router.get('/remove-channels/:user_id', function(req, res, next){
+router.get('/remove-channels/:user_id', function (req, res, next) {
     var bind = {};
     var user_id = req.param('user_id');
-    
-    Channel.remove({ user_id: user_id }, function(err){
+
+    Channel.remove({user_id: user_id}, function (err) {
         if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while deleting channels';
@@ -178,11 +178,11 @@ router.get('/remove-channels/:user_id', function(req, res, next){
 
 
 // delete a channel
-router.get('/delete-channel/:channel_id', function(req, res, next){
+router.get('/delete-channel/:channel_id', function (req, res, next) {
     var bind = {};
     var channel_id = req.param('channel_id');
-    Channel.remove({ _id: channel_id }, function(err){
-        if(err){
+    Channel.remove({_id: channel_id}, function (err) {
+        if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while deleting a channel';
             bind.err = err;
@@ -195,14 +195,14 @@ router.get('/delete-channel/:channel_id', function(req, res, next){
 });
 
 // upload chat media
-router.post('/upload-chat-media', function(req, res, next){
+router.post('/upload-chat-media', function (req, res, next) {
     var bind = {};
-    chatUpload(req, res, function(err){
-        if(err){
+    chatUpload(req, res, function (err) {
+        if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while uploading chat media.';
             bind.error = err;
-        } else{
+        } else {
             bind.status = 1;
             bind.media_url = 'uploads/chat_media/' + req.file.filename;
         }
@@ -211,12 +211,12 @@ router.post('/upload-chat-media', function(req, res, next){
 });
 
 
-router.get('/get-channel-info/:channel_id', function(req, res){
+router.get('/get-channel-info/:channel_id', function (req, res) {
     var bind = {};
     var channel_id = req.params.channel_id;
     Channel.aggregate([
         {
-            $match: { _id: ObjectId(channel_id)}
+            $match: {_id: ObjectId(channel_id)}
         },
         {
             $lookup: {
@@ -224,19 +224,19 @@ router.get('/get-channel-info/:channel_id', function(req, res){
                 localField: 'members_id',
                 foreignField: '_id',
                 as: 'members_info'
-                
-                }
-            },
-            {
-                $project: { members_id: 0, __v: 0, 'members_info.__v' : 0, 'members_info.token_id' : 0 }
+
             }
-    ], function(err, channelInfo){
-        
-        if(err){
+        },
+        {
+            $project: {members_id: 0, __v: 0, 'members_info.__v': 0, 'members_info.token_id': 0}
+        }
+    ], function (err, channelInfo) {
+
+        if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occured while fetching channel info';
             bind.error = err;
-        } else if(channelInfo.length > 0){
+        } else if (channelInfo.length > 0) {
             bind.status = 1;
             bind.channelInfo = channelInfo[0];
         } else {
@@ -244,42 +244,42 @@ router.get('/get-channel-info/:channel_id', function(req, res){
             bind.message = 'No channel info found';
         }
         return res.json(bind);
-        
+
     });
-    
+
 });
 
 // clear channel chat
-router.post('/clear-channel-chat', function(req, res){
+router.post('/clear-channel-chat', function (req, res) {
     var bind = {};
     var channel_id = req.body.channel_id;
     var user_id = req.body.user_id;
-    
-    Clear_chat.findOne({ 'channel_id' : ObjectId(channel_id), 'user_id' : ObjectId(user_id) }, function(err, clear_chat){
-        if(clear_chat){
+
+    Clear_chat.findOne({'channel_id': ObjectId(channel_id), 'user_id': ObjectId(user_id)}, function (err, clear_chat) {
+        if (clear_chat) {
             clear_chat.date = Date.now();
-            clear_chat.save(function(err){
-                if(err){
-                  bind.status = 0;
-                  bind.message = 'Oops! error occured while clearing chat';
-                  bind.error = err;
+            clear_chat.save(function (err) {
+                if (err) {
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while clearing chat';
+                    bind.error = err;
                 } else {
                     bind.status = 1;
                     bind.message = 'Chat was cleared successfully';
                 }
                 return res.json(bind);
             });
-            
+
         } else {
             newClear_chat = new Clear_chat;
             newClear_chat.channel_id = channel_id;
             newClear_chat.user_id = user_id;
             newClear_chat.date = Date.now();
-            newClear_chat.save(function(err){
-                if(err){
-                  bind.status = 0;
-                  bind.message = 'Oops! error occured while clearing chat';
-                  bind.error = err;
+            newClear_chat.save(function (err) {
+                if (err) {
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while clearing chat';
+                    bind.error = err;
                 } else {
                     bind.status = 1;
                     bind.message = 'Chat was cleared successfully';
@@ -288,21 +288,21 @@ router.post('/clear-channel-chat', function(req, res){
             });
         }
     });
-    
+
 });
 
 // exit channel
-router.post('/exit-channel', function(req, res){
+router.post('/exit-channel', function (req, res) {
     var bind = {};
     var user_id = req.body.user_id;
     var channel_id = req.body.channel_id;
-    Channel.findOne({ _id: channel_id }, function(err, channel){
-        if(channel){
+    Channel.findOne({_id: channel_id}, function (err, channel) {
+        if (channel) {
             var index = channel.members_id.indexOf(ObjectId(user_id));
-            if(index > -1){
+            if (index > -1) {
                 channel.members_id.splice(index, 1);
-                channel.save(function(err){
-                    if(err){
+                channel.save(function (err) {
+                    if (err) {
                         bind.status = 0;
                         bind.message = 'Oops! error occured while exit from channel';
                         bind.error = err;
@@ -317,7 +317,7 @@ router.post('/exit-channel', function(req, res){
                 bind.message = 'User is not a member of channel';
             }
             return res.json(bind);
-        } else{
+        } else {
             bind.status = 0;
             bind.message = 'No channel found';
             return res.json(bind);
@@ -326,21 +326,21 @@ router.post('/exit-channel', function(req, res){
 });
 
 // make channel admin
-router.post('/make-channel-admin', function(req, res){
+router.post('/make-channel-admin', function (req, res) {
     var bind = {};
     var channel_id = req.body.channel_id;
     var user_id = req.body.user_id;
-    
-    Channel.findOne({  _id: channel_id }, function(err, channel){
-        if(channel){
+
+    Channel.findOne({_id: channel_id}, function (err, channel) {
+        if (channel) {
             channel.admin_id = ObjectId(user_id);
             var index = channel.members_id.indexOf(ObjectId(user_id));
-            
-            if(index > -1){
+
+            if (index > -1) {
                 channel.members_id.splice(index, 1);
                 channel.members_id.unshift(ObjectId(user_id));
-                channel.save(function(err){
-                    if(err){
+                channel.save(function (err) {
+                    if (err) {
                         bind.status = 0;
                         bind.message = 'Oops! error occured while making channel admin';
                         bind.error = err;
@@ -360,21 +360,21 @@ router.post('/make-channel-admin', function(req, res){
             bind.message = 'No channel found';
         }
     });
-    
+
 });
 
 // remove user from a channel
-router.post('/remove-user-from-channel', function(req, res){
+router.post('/remove-user-from-channel', function (req, res) {
     var bind = {};
     var user_id = req.body.user_id;
     var channel_id = req.body.channel_id;
-    Channel.findOne({ _id: channel_id }, function(err, channel){
-        if(channel){
+    Channel.findOne({_id: channel_id}, function (err, channel) {
+        if (channel) {
             var index = channel.members_id.indexOf(user_id);
-            if(index > -1){
+            if (index > -1) {
                 channel.members_id.splice(index, 1);
-                channel.save(function(err){
-                    if(err){
+                channel.save(function (err) {
+                    if (err) {
                         bind.status = 0;
                         bind.message = 'Oops! error occured while removing user from channel';
                         bind.error = err;
@@ -389,7 +389,7 @@ router.post('/remove-user-from-channel', function(req, res){
                 bind.message = 'User is not a member of channel';
             }
             return res.json(bind);
-        } else{
+        } else {
             bind.status = 0;
             bind.message = 'No channel found';
             return res.json(bind);
@@ -398,94 +398,94 @@ router.post('/remove-user-from-channel', function(req, res){
 });
 
 // testing route
-router.get('/testing', function(req, res, next){
-   
-var channel_id = '5962a1f468ed126d120f83a2';
-        var user_id = '5968d143fff4a707bbd1951a';
-        var bind = {};
-        Clear_chat.findOne({ 'channel_id' : ObjectId(channel_id), 'user_id' : ObjectId(user_id) }, function(err, clear_chat){
-        if (clear_chat){
-            
-        Channel_chat.aggregate([
-        {
-        $match: {
-        channel_id: ObjectId(channel_id),
-        updatedAt: { $gt: clear_chat.updatedAt }
-        }
-        },
-        {
-        $lookup: {
-        from: 'users',
-                localField: 'user_id',
-                foreignField: '_id',
-                as: 'user'
-        }
-        },
-        {
-        $unwind: "$user"
-        },
-        {
-        $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0 }
-        },
-        {
-            $sort: { createdAt: 1 }
-        }
+router.get('/testing', function (req, res, next) {
 
-        ], function(err, channel_chat){
-        if (err){
-        bind.status = 0;
-                bind.message = 'Oops! error occured while fetching channel chats';
-                bind.error = err;
-        } else if (channel_chat.length > 0) {
-        bind.status = 1;
-                bind.channel_chat = channel_chat;
-        } else {
-        bind.status = 0;
-                bind.message = 'No channel chats found';
-        }
-        res.json(bind);
-        });
-        
-        } else{
-        Channel_chat.aggregate([
-        {
-        $match: {
-        channel_id: ObjectId(channel_id)
-        }
-        },
-        {
-        $lookup: {
-        from: 'users',
-                localField: 'user_id',
-                foreignField: '_id',
-                as: 'user'
-        }
-        },
-        {
-        $unwind: "$user"
-        },
-        {
-        $project: { 'user.phone_no' : 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0 }
-        },
-        {
-            $sort: { createdAt: 1 }
-        }
+    var channel_id = '5962a1f468ed126d120f83a2';
+    var user_id = '5968d143fff4a707bbd1951a';
+    var bind = {};
+    Clear_chat.findOne({'channel_id': ObjectId(channel_id), 'user_id': ObjectId(user_id)}, function (err, clear_chat) {
+        if (clear_chat) {
 
-        ], function(err, channel_chat){
-        if (err){
-        bind.status = 0;
-                bind.message = 'Oops! error occured while fetching channel chats';
-                bind.error = err;
-        } else if (channel_chat.length > 0) {
-        bind.status = 1;
-                bind.channel_chat = channel_chat;
+            Channel_chat.aggregate([
+                {
+                    $match: {
+                        channel_id: ObjectId(channel_id),
+                        updatedAt: {$gt: clear_chat.updatedAt}
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'user_id',
+                        foreignField: '_id',
+                        as: 'user'
+                    }
+                },
+                {
+                    $unwind: "$user"
+                },
+                {
+                    $project: {'user.phone_no': 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0}
+                },
+                {
+                    $sort: {createdAt: 1}
+                }
+
+            ], function (err, channel_chat) {
+                if (err) {
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while fetching channel chats';
+                    bind.error = err;
+                } else if (channel_chat.length > 0) {
+                    bind.status = 1;
+                    bind.channel_chat = channel_chat;
+                } else {
+                    bind.status = 0;
+                    bind.message = 'No channel chats found';
+                }
+                res.json(bind);
+            });
+
         } else {
-        bind.status = 0;
-                bind.message = 'No channel chats found';
+            Channel_chat.aggregate([
+                {
+                    $match: {
+                        channel_id: ObjectId(channel_id)
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'user_id',
+                        foreignField: '_id',
+                        as: 'user'
+                    }
+                },
+                {
+                    $unwind: "$user"
+                },
+                {
+                    $project: {'user.phone_no': 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0}
+                },
+                {
+                    $sort: {createdAt: 1}
+                }
+
+            ], function (err, channel_chat) {
+                if (err) {
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while fetching channel chats';
+                    bind.error = err;
+                } else if (channel_chat.length > 0) {
+                    bind.status = 1;
+                    bind.channel_chat = channel_chat;
+                } else {
+                    bind.status = 0;
+                    bind.message = 'No channel chats found';
+                }
+                res.json(bind);
+            });
         }
-        res.json(bind);
-        });
-    }
     });
 });
 
