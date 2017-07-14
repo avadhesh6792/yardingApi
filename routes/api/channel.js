@@ -7,6 +7,7 @@ var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../../models/clear_chat');
 var Channel_chat = require('../../models/channel_chat');
 var moment = require('moment');
+var arraySort = require('array-sort');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -115,7 +116,8 @@ router.get('/get-all-channels', function (req, res, next) {
             $sort: {'latest_chat.createdAt': -1}
         },
         {
-            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
+            //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
+            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1}
         }
     ], function (err, channels) {
         if (err) {
@@ -124,6 +126,17 @@ router.get('/get-all-channels', function (req, res, next) {
             bind.err = err;
         } else if (channels.length > 0) {
             bind.status = 1;
+            
+            
+            channels.forEach(function(item, index){
+                if(item.latest_chat){
+                    
+                    var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
+                    channels[index].latest_chat = sort_array[0];
+                }
+                
+            });
+            
             bind.channels = channels;
         } else {
             bind.status = 0;
