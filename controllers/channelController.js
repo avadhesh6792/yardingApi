@@ -15,7 +15,15 @@ exports.createSingleChannel = function(user_ids, callback){
     var user_id1 = ObjectId(user_ids.user_id1);
     var user_id2 = ObjectId(user_ids.user_id2);
     Channel.findOne({ members_id: { $in: [user_id1, user_id2] } }, function(err, single_channel){
+        if(err){
+            bind.status = 0;
+            bind.error = err;
+            bind.message = 'in single channel';
+            callback(bind);
+        }
         if(single_channel){
+            bind.status = 1;
+            bind.message = 'in single channel';
             bind.channel_id = single_channel._id;
             callback(bind);
         } else {
@@ -27,8 +35,13 @@ exports.createSingleChannel = function(user_ids, callback){
 
             newSingle_channel.save(function(err){
                 if(err){
+                    bind.status = 0;
+                    bind.error = err;
+                    bind.message = 'new single channel';
                     bind.channel_id = '';
                 } else {
+                    bind.status = 1;
+                    bind.message = 'new single channel';
                     bind.channel_id = newSingle_channel._id;
                 }
                 callback(bind);

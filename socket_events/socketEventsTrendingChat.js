@@ -19,7 +19,7 @@ module.exports = function (ioTrendingChat) {
             //console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
             
             if(room_type == 'single'){
-                console.log('***room type single****');
+                console.log('*** room type single ****');
                 var user_id1 = user_id;
                 var user_id2 = channel_id;
                 var user_ids = {
@@ -27,13 +27,13 @@ module.exports = function (ioTrendingChat) {
                     user_id2: user_id2
                 };
                 channelController.createSingleChannel(user_ids, function(response){
-                    //console.log('channelController.getChannelMessages response '+ JSON.stringify(response));
+                    console.log('channelController.createSingleChannel response '+ JSON.stringify(response));
                     var channel_id = response.channel_id;
                     jsonData.channel_id = channel_id;
                     socket.join(channel_id);
                     channelController.getChannelMessages(jsonData, socket, function(response){
-                        //console.log('channelController.getChannelMessages response '+ JSON.stringify(response));
                         response.channel_id = channel_id;
+                        console.log('channelController.getChannelMessages response '+ JSON.stringify(response));
                         socket.emit('get channel messages', response);
                     });
                 });
