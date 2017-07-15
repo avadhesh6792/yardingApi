@@ -42,6 +42,7 @@ router.post('/create-group', function (req, res, next) {
         newGroup.user_id = user_id;
         newGroup.admin_id = user_id;
         newGroup.created_timestamp = moment().unix();
+        newGroup.members_id.push( ObjectId(user_id) );
 
         for(var i = 0; i< members_id.length ;i++){
             var member_id = members_id[i].trim();
