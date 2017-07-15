@@ -343,6 +343,9 @@ router.get('/testing/:group_id', function(req, res, next){
             },
             {
                 $project: { members_id: 0, __v: 0, 'members_info.__v' : 0, 'members_info.token_id' : 0 }
+            },
+            {
+                $sort: { 'members_info.name': 1}
             }
     ], function(err, groupInfo){
         
