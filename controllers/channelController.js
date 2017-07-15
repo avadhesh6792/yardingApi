@@ -32,6 +32,8 @@ exports.createSingleChannel = function(user_ids, callback){
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             newSingle_channel.channel_name = user_id1 + '_' + user_id2;
+            newSingle_channel.user_id = user_id1;
+            newSingle_channel.admin_id = user_id2;
 
             newSingle_channel.save(function(err){
                 if(err){
