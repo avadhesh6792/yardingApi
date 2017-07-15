@@ -42,6 +42,7 @@ exports.createSingleChannel = function(user_ids, callback){
                 } else {
                     bind.status = 1;
                     bind.message = 'new single channel';
+                    bind.newSingle_channel = newSingle_channel;
                     bind.channel_id = newSingle_channel._id;
                 }
                 callback(bind);
