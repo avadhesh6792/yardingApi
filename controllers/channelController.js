@@ -4,10 +4,38 @@ var cookieParser = require('cookie-parser');
 var User = require('../models/user');
 var Channel = require('../models/channel');
 var Channel_chat = require('../models/channel_chat');
+var Single_channel = require('../models/single_channel');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../models/clear_chat');
 var moment = require('moment');
+
+exports.createSingleChannel = function(user_ids, callback){
+    var bind = {};
+    var user_id1 = ObjectId(user_ids.user_id1);
+    var user_id2 = ObjectId(user_ids.user_id2);
+    Channel.findOne({ members_id: { $in: [user_id1, user_id2] } }, function(err, single_channel){
+        if(single_channel){
+            bind.channel_id = single_channel._id;
+            callback(bind);
+        } else {
+            var newSingle_channel = new Channel;
+            newSingle_channel.members_id.push(user_id1, user_id2);
+            newSingle_channel.created_timestamp = moment().unix();
+            newSingle_channel.room_type = 'single';
+            newSingle_channel.channel_name = user_id1 + '_' + user_id2;
+
+            newSingle_channel.save(function(err){
+                if(err){
+                    bind.channel_id = '';
+                } else {
+                    bind.channel_id = newSingle_channel._id;
+                }
+                callback(bind);
+            });
+        }
+    });
+};
 
 exports.joinChannel = function (jsonData, socket, callback) {
     var user_id = jsonData.user_id;
