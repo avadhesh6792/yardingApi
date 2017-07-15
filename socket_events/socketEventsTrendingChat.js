@@ -19,6 +19,7 @@ module.exports = function (ioTrendingChat) {
             //console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
             
             if(room_type == 'single'){
+                console.log('***room type single****');
                 var user_id1 = user_id;
                 var user_id2 = channel_id;
                 var user_ids = {
@@ -37,6 +38,7 @@ module.exports = function (ioTrendingChat) {
                     });
                 });
             } else {
+                console.log('***room type other ****');
                 socket.join(channel_id);
                 channelController.getChannelMessages(jsonData, socket, function(response){
                     //console.log('channelController.getChannelMessages response '+ JSON.stringify(response));
