@@ -6,6 +6,7 @@ var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 //var Clear_chat = require('../../models/clear_chat');
 var moment = require('moment');
+var arraySort = require('array-sort');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -343,9 +344,6 @@ router.get('/testing/:group_id', function(req, res, next){
             },
             {
                 $project: { members_id: 0, __v: 0, 'members_info.__v' : 0, 'members_info.token_id' : 0 }
-            },
-            {
-                $sort: { 'members_info.name': 1}
             }
     ], function(err, groupInfo){
         
@@ -355,6 +353,7 @@ router.get('/testing/:group_id', function(req, res, next){
             bind.error = err;
         } else if(groupInfo.length > 0){
             bind.status = 1;
+            groupInfo[0].members_info = arraySort(groupInfo[0].members_info, 'name');
             bind.groupInfo = groupInfo[0];
         } else {
             bind.status = 0;
