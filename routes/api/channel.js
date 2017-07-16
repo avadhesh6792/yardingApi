@@ -72,6 +72,7 @@ router.post('/create-channel', function (req, res, next) {
                 newChannel.link = link;
                 newChannel.members_id.push(new ObjectId(user_id));
                 newChannel.created_timestamp = moment().unix();
+                newChannel.room_type = 'channel';
 
                 newChannel.save(function (err) {
                     if (err) {

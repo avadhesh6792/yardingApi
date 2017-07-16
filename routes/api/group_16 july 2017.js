@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var multer = require('multer');
 var Group = require('../../models/group');
-var Channel = require('../../models/channel');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 //var Clear_chat = require('../../models/clear_chat');
@@ -38,14 +37,13 @@ router.post('/create-group', function (req, res, next) {
         var members_id_string = req.body.members_id
         var members_id = members_id_string.split(',');
         
-        var newGroup = new Channel;
-        newGroup.channel_name = group_name;
-        newGroup.channel_pic = group_pic;
+        var newGroup = new Group;
+        newGroup.group_name = group_name;
+        newGroup.group_pic = group_pic;
         newGroup.user_id = user_id;
         newGroup.admin_id = user_id;
         newGroup.created_timestamp = moment().unix();
         newGroup.members_id.push( ObjectId(user_id) );
-        newGroup.room_type = 'group';
 
         for(var i = 0; i< members_id.length ;i++){
             var member_id = members_id[i].trim();
