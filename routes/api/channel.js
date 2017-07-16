@@ -127,7 +127,7 @@ router.get('/get-all-single-channels/:user_id', function (req, res, next) {
     ], function (err, channels) {
         if (err) {
             bind.status = 0;
-            bind.message = 'Oops! error occur while fetching all channels';
+            bind.message = 'Oops! error occur while fetching all single channels';
             bind.err = err;
         } else if (channels.length > 0) {
             bind.status = 1;
@@ -145,7 +145,58 @@ router.get('/get-all-single-channels/:user_id', function (req, res, next) {
             bind.channels = channels;
         } else {
             bind.status = 0;
-            bind.message = 'No channels found';
+            bind.message = 'No single channels found';
+        }
+        return res.json(bind);
+
+    });
+});
+
+// get all chat channels
+router.get('/get-chat-channels/:user_id', function (req, res, next) {
+    var bind = {};
+    var user_id = ObjectId(req.params.user_id);
+    Channel.aggregate([
+        {
+            $match : { members_id: { $elemMatch: { $eq: user_id } } }
+        },
+        {
+            $lookup: {
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
+        },
+        {
+            $sort: {'latest_chat.createdAt': -1}
+        },
+        {
+            //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
+            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1, room_type: 1}
+        }
+    ], function (err, channels) {
+        if (err) {
+            bind.status = 0;
+            bind.message = 'Oops! error occur while fetching all chat channels';
+            bind.err = err;
+        } else if (channels.length > 0) {
+            bind.status = 1;
+            
+            
+            channels.forEach(function(item, index){
+                if(item.latest_chat){
+                    
+                    var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
+                    channels[index].latest_chat = sort_array[0];
+                }
+                
+            });
+            
+            bind.channels = channels;
+        } else {
+            bind.status = 0;
+            bind.message = 'No chat channels found';
         }
         return res.json(bind);
 
