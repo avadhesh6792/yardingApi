@@ -148,6 +148,9 @@ router.get('/get-all-groups', function (req, res, next) {
     var bind = {};
     Group.aggregate([
         {
+            $match : { room_type: 'group' }
+        },
+        {
             $lookup: { 
                 from: 'channel_chats',
                 localField: '_id',
@@ -185,7 +188,7 @@ router.get('/get-all-groups/:search_term', function (req, res, next) {
     var pattern = new RegExp(search_term, 'i');
     Group.aggregate([
         {
-          $match: { group_name: {$regex: pattern} }  
+          $match: { group_name: {$regex: pattern}, room_type: 'group' }  
         },
         {
             $lookup: { 

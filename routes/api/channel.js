@@ -106,6 +106,9 @@ router.get('/get-all-channels', function (req, res, next) {
     var bind = {};
     Channel.aggregate([
         {
+            $match : { room_type: 'channel' }
+        },
+        {
             $lookup: {
                 from: 'channel_chats',
                 localField: '_id',
@@ -154,7 +157,7 @@ router.get('/search-channel/:term', function (req, res, next) {
     var term = req.param('term');
     var pattern = new RegExp(term, 'i');
 
-    Channel.find({channel_name: {$regex: pattern}}, function (err, channels) {
+    Channel.find({channel_name: {$regex: pattern}, room_type: 'channel'}, function (err, channels) {
         if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all channels';
