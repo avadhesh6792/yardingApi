@@ -153,7 +153,7 @@ router.get('/get-all-single-channels/:user_id', function (req, res, next) {
 });
 
 // get all chat channels
-router.get('/get-chat-channels/:user_id', function (req, res, next) {
+router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
     var bind = {};
     var user_id = ObjectId(req.params.user_id);
     Channel.aggregate([
