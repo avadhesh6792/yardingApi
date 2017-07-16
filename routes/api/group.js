@@ -146,12 +146,12 @@ router.post('/add-member-to-group', function(req, res){
 // get all groups
 router.get('/get-all-groups', function (req, res, next) {
     var bind = {};
-    Group.aggregate([
+    Channel.aggregate([
         {
-            $match : { room_type: 'group' }
+            $match : { room_type: 'channel' }
         },
         {
-            $lookup: { 
+            $lookup: {
                 from: 'channel_chats',
                 localField: '_id',
                 foreignField: 'channel_id',
@@ -159,10 +159,11 @@ router.get('/get-all-groups', function (req, res, next) {
             }
         },
         {
-            $sort: { 'latest_chat.createdAt': -1 }
+            $sort: {'latest_chat.createdAt': -1}
         },
         {
-            $project: { updatedAt: 1, createdAt: 1, user_id: 1, created_timestamp: 1, members_id: 1, group_pic: 1, group_name: 1, latest_chat: { "$arrayElemAt": [ "$latest_chat", 0 ]}}
+            //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
+            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1}
         }
     ], function (err, groups) {
         if (err) {
