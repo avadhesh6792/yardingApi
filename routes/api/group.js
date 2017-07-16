@@ -148,7 +148,7 @@ router.get('/get-all-groups', function (req, res, next) {
     var bind = {};
     Channel.aggregate([
         {
-            $match : { room_type: 'channel' }
+            $match : { room_type: 'group' }
         },
         {
             $lookup: {
