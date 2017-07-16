@@ -14,11 +14,16 @@ exports.createSingleChannel = function(user_ids, callback){
     var bind = {};
     var user_id1 = ObjectId(user_ids.user_id1);
     var user_id2 = ObjectId(user_ids.user_id2);
+    console.log('**** inside create single channel ****');
+    console.log('user_id1 '+ user_id1);
+    console.log('user_id2 '+ user_id2);
     Channel.findOne({ members_id: { $in: [user_id1, user_id2] }, room_type: 'single' }, function(err, single_channel){
         if(single_channel){
             bind.channel_id = single_channel._id;
+            console.log('inside single channel');
             callback(bind);
         } else {
+            
             var newSingle_channel = new Channel;
             newSingle_channel.members_id.push(user_id1, user_id2);
             newSingle_channel.created_timestamp = moment().unix();
