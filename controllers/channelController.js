@@ -17,7 +17,7 @@ exports.createSingleChannel = function(user_ids, callback){
     console.log('**** inside create single channel ****');
     console.log('user_id1 '+ user_id1);
     console.log('user_id2 '+ user_id2);
-    Channel.findOne({ members_id: { $all: [user_id1, user_id2] }, room_type: 'single' }, function(err, single_channel){
+    Channel.findOne({ members_id: { $elemMatch: { $eq: user_id1 } }, members_id: { $elemMatch: { $eq: user_id2 } }, room_type: 'single' }, function(err, single_channel){
         if(single_channel){
             bind.channel_id = single_channel._id;
             console.log('inside single channel');
