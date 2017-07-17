@@ -210,7 +210,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                     
                     //channels[index].members_info_index = members_info_index;
                     channels[index].channel_name = other_member_info.name;
-                    channels[index].display_pic = other_member_info.display_pic;
+                    channels[index].channel_pic = other_member_info.display_pic;
                      
                 }
                 channels[index].members_info = undefined;
