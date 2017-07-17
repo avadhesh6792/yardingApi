@@ -8,6 +8,7 @@ var find = require('array-find');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 var Group = require('../../models/group');
+var Channel = require('../../models/channel');
 
 
 var TWILIO_ACCOUNT_SID = 'AC07762a2e784bdfc2224c044620661ec2';
@@ -325,7 +326,7 @@ router.get('/get-users-list/:search_term', function(req, res){
 router.get('/get-more-participants-list/:group_id', function(req, res){
     var group_id = req.params.group_id;
     var bind = {};
-    Group.findOne({ _id: group_id }, function(err, group){
+    Channel.findOne({ _id: group_id }, function(err, group){
         if(group){
             var members_id = group.members_id;
             User.find({ _id: { $nin:  members_id} }, { name: 1, status: 1, display_pic: 1}, function(err, users){
@@ -342,6 +343,7 @@ router.get('/get-more-participants-list/:group_id', function(req, res){
         } else {
             bind.status = 0;
             bind.message = 'No group found';
+            return res.json(bind);
         }
     });
     
