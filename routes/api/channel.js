@@ -209,9 +209,11 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                             return (index == 1 ? 0 : 1);
                         }
                     });
-                    item.channel_name = item.members_info[members_info_index].name;
-                    item.display_pic = item.members_info[members_info_index].display_pic;
-                    item.members_info = undefined; 
+                    
+                    channels[index].members_info_index = members_info_index;
+//                    item.channel_name = item.members_info[members_info_index].name;
+//                    item.display_pic = item.members_info[members_info_index].display_pic;
+//                    item.members_info = undefined; 
                 }
                 
             });
