@@ -8,6 +8,7 @@ var Clear_chat = require('../../models/clear_chat');
 var Channel_chat = require('../../models/channel_chat');
 var moment = require('moment');
 var arraySort = require('array-sort');
+var arrayFind = require('array-find');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -201,6 +202,16 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                     
                     var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
                     channels[index].latest_chat = sort_array[0];
+                }
+                if(item.room_type == 'single'){
+                    var members_info_index = arrayFind(item.members_info, function(info, index){
+                        if(info._id == req.params.user_id){
+                            return (index == 1 ? 0 : 1);
+                        }
+                    });
+                    item.channel_name = item.members_info[members_info_index].name;
+                    item.display_pic = item.members_info[members_info_index].display_pic;
+                    item.members_info = undefined; 
                 }
                 
             });
