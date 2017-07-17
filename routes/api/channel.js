@@ -205,9 +205,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 }
                 if(item.room_type == 'single'){
                     var members_info_index = arrayFind(item.members_info, function(info, index){
-                        if(info._id == req.params.user_id){
-                            return (index == 1 ? 0 : 1);
-                        }
+                        return info._id != req.params.user_id;
                     });
                     
                     channels[index].members_info_index = members_info_index;
