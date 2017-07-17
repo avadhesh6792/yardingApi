@@ -204,16 +204,16 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                     channels[index].latest_chat = sort_array[0];
                 }
                 if(item.room_type == 'single'){
-                    var members_info_index = arrayFind(item.members_info, function(info, index){
+                    var other_member_info = arrayFind(item.members_info, function(info, index){
                         return info._id != req.params.user_id;
                     });
                     
-                    channels[index].members_info_index = members_info_index;
-//                    item.channel_name = item.members_info[members_info_index].name;
-//                    item.display_pic = item.members_info[members_info_index].display_pic;
-//                    item.members_info = undefined; 
+                    //channels[index].members_info_index = members_info_index;
+                    channels[index].channel_name = other_member_info.name;
+                    channels[index].display_pic = other_member_info.display_pic;
+                     
                 }
-                
+                channels[index].members_info = undefined;
             });
             
             bind.channels = channels;
