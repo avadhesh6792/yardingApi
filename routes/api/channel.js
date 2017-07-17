@@ -226,6 +226,90 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
     });
 });
 
+// search all chat channels
+router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res, next) {
+    var bind = {};
+    var user_id = ObjectId(req.params.user_id);
+    var search_term = req.params.search_term;
+    var pattern = new RegExp(search_term, 'i');
+    Channel.aggregate([
+        {
+            $match : { members_id: { $elemMatch: { $eq: user_id } } }
+        },
+        {
+            $lookup: {
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'members_id',
+                foreignField: '_id',
+                as: 'members_info'
+
+            }
+        },
+        {
+            $sort: {'latest_chat.createdAt': -1}
+        },
+        {
+            //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
+            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, 
+                'members_info._id': 1, 'members_info.name': 1, 'members_info.display_pic': 1,
+                channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1,
+                room_type: 1}
+        }
+    ], function (err, channels) {
+        if (err) {
+            bind.status = 0;
+            bind.message = 'Oops! error occur while fetching all chat channels';
+            bind.err = err;
+        } else if (channels.length > 0) {
+            var search_channels = [];
+            
+            
+            channels.forEach(function(item, index){
+                if(item.latest_chat){
+                    
+                    var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
+                    channels[index].latest_chat = sort_array[0];
+                }
+                if(item.room_type == 'single'){
+                    var other_member_info = arrayFind(item.members_info, function(info, index){
+                        return info._id != req.params.user_id;
+                    });
+                    
+                    //channels[index].members_info_index = members_info_index;
+                    channels[index].channel_name = other_member_info.name;
+                    channels[index].channel_pic = other_member_info.display_pic;
+                     
+                }
+                channels[index].members_info = undefined;
+                if(pattern.test(channels[index].channel_name)){
+                    search_channels.push(item);
+                }
+            });
+            
+            if(search_channels.length > 0){
+                bind.status = 1;
+                bind.channels = search_channels;
+            } else {
+                bind.status = 0;
+                bind.message = 'No chat channels found';
+            }
+        } else {
+            bind.status = 0;
+            bind.message = 'No chat channels found';
+        }
+        return res.json(bind);
+
+    });
+});
+
 // get all channels
 router.get('/get-all-channels', function (req, res, next) {
     var bind = {};
