@@ -169,11 +169,22 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
             }
         },
         {
+            $lookup: {
+                from: 'users',
+                localField: 'members_id',
+                foreignField: '_id',
+                as: 'members_info'
+
+            }
+        },
+        {
             $sort: {'latest_chat.createdAt': -1}
         },
         {
             //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
-            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1, room_type: 1}
+            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_info: 1,
+                channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1,
+                room_type: 1}
         }
     ], function (err, channels) {
         if (err) {
