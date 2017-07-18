@@ -677,7 +677,7 @@ router.get('/testing', function (req, res, next) {
         .takeScreenshots({
             count: 1,
             timemarks: [ '600' ] // number of seconds
-          }, '/public/uploads/chat_media', function(err) {
+          }, '/public/uploads/chat_media/aa.jpg', function(err) {
               if(err){
                   bind.status = 0;
                   bind.err = error;
