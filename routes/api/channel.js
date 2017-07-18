@@ -153,6 +153,49 @@ router.get('/get-all-single-channels/:user_id', function (req, res, next) {
     });
 });
 
+// delete from chat channels
+router.post('/delete-from-chat-channels', function(req, res, next){
+    var bind = {};
+    var user_id = ObjectId(req.body.user_id);
+    var channel_id = ObjectId(req.body.channel_id);
+    var room_type = req.body.room_type;
+    
+    Channel.findOne({ _id: channel_id }, function(err, channel){
+        if(channel){
+            var index = channel.members_id.indexOf(ObjectId(user_id));
+            if (index > -1) {
+                channel.members_id.splice(index, 1);
+                
+                if(channel.admin_id == user_id){
+                    var admin_id = channel.members_id[Math.floor(Math.random()*channel.members_id.length)];
+                    channel.admin_id = admin_id;
+                }
+                channel.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while deleting from chat channels';
+                        bind.error = err;
+                    } else{
+                        bind.status = 1;
+                        bind.message = 'Chats was deleted successfully';
+                    }
+                    return res.json(bind);
+                });
+                
+            } else{
+                bind.status = 0;
+                bind.message = 'You are not member of this channel';
+                res.json(bind);
+            }
+            
+        } else{
+            bind.status = 0;
+            bind.message = 'No chat channel found';
+            return res.json(bind);
+        }
+    });
+});
+
 // get all chat channels
 router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
     var bind = {};
