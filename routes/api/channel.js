@@ -673,6 +673,12 @@ router.get('/testing', function (req, res, next) {
     var bind = {};
     var ffmpeg = require('fluent-ffmpeg');
     var command = ffmpeg();
+    
+    var appRoot = require('app-root-path');
+    var myModule = require(appRoot + '/public/uploads/chat_media/1499398539751_file.mov');
+    return res.json(myModule);
+    
+    
     var proc = new ffmpeg('/public/uploads/chat_media/1499398539751_file.mov')
         .takeScreenshots({
             count: 1,
