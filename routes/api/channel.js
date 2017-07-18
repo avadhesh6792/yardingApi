@@ -676,24 +676,25 @@ router.get('/testing', function (req, res, next) {
     
     var appRoot = require('app-root-path');
     var myModule = require(appRoot + '/public/uploads/chat_media/1499398539751_file.mov');
-    return res.json(myModule);
+    //return res.json(myModule);
+    console.log('******* myModule *******'+myModule);
     
     
-    var proc = new ffmpeg('/public/uploads/chat_media/1499398539751_file.mov')
-        .takeScreenshots({
-            count: 1,
-            timemarks: [ '600' ] // number of seconds
-          }, '/public/uploads/chat_media/aa.jpg', function(err) {
-              if(err){
-                  bind.status = 0;
-                  bind.err = error;
-              } else{
-                  bind.status = 1;
-                  bind.message = 'screenshots were saved';
-              }
-              return res.json(bind);
-          console.log('screenshots were saved')
-        });
+//    var proc = new ffmpeg('/public/uploads/chat_media/1499398539751_file.mov')
+//        .takeScreenshots({
+//            count: 1,
+//            timemarks: [ '600' ] // number of seconds
+//          }, '/public/uploads/chat_media/aa.jpg', function(err) {
+//              if(err){
+//                  bind.status = 0;
+//                  bind.err = error;
+//              } else{
+//                  bind.status = 1;
+//                  bind.message = 'screenshots were saved';
+//              }
+//              return res.json(bind);
+//          console.log('screenshots were saved')
+//        });
 });
 
 
