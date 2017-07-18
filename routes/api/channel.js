@@ -259,7 +259,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
         {
             //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
             $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, 
-                'members_info._id': 1, 'members_info.name': 1, 'members_info.display_pic': 1,
+                'members_info._id': 1, 'members_info.name': 1, 'members_info.display_pic': 1, 'members_info.status': 1,
                 channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1,
                 room_type: 1}
         }
@@ -286,7 +286,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
                     //channels[index].members_info_index = members_info_index;
                     channels[index].channel_name = other_member_info.name;
                     channels[index].channel_pic = other_member_info.display_pic;
-                     
+                    channels[index].channel_description = other_member_info.status;
                 }
                 channels[index].members_info = undefined;
                 if(pattern.test(channels[index].channel_name)){
