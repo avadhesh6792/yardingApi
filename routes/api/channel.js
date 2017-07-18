@@ -678,24 +678,24 @@ router.get('/testing', function (req, res, next) {
     //var myModule = require(appRoot + '/public/uploads/chat_media/1499398539751_file.mov');
     //return res.json(myModule);
     console.log('******* appRoot *******'+appRoot);
-    res.json(appRoot + '/public/uploads/chat_media/1499398539751_file.mov');
+    //res.json(appRoot + '/public/uploads/chat_media/1499398539751_file.mov');
     
     
-//    var proc = new ffmpeg('/public/uploads/chat_media/1499398539751_file.mov')
-//        .takeScreenshots({
-//            count: 1,
-//            timemarks: [ '600' ] // number of seconds
-//          }, '/public/uploads/chat_media/aa.jpg', function(err) {
-//              if(err){
-//                  bind.status = 0;
-//                  bind.err = error;
-//              } else{
-//                  bind.status = 1;
-//                  bind.message = 'screenshots were saved';
-//              }
-//              return res.json(bind);
-//          console.log('screenshots were saved')
-//        });
+    var proc = new ffmpeg(appRoot + '/public/uploads/chat_media/1499398539751_file.mov')
+        .takeScreenshots({
+            count: 1,
+            timemarks: [ '600' ] // number of seconds
+          }, appRoot + '/public/uploads/chat_media/aa.jpg', function(err) {
+              if(err){
+                  bind.status = 0;
+                  bind.err = error;
+              } else{
+                  bind.status = 1;
+                  bind.message = 'screenshots were saved';
+              }
+              return res.json(bind);
+          console.log('screenshots were saved')
+        });
 });
 
 
