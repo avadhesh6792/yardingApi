@@ -684,8 +684,8 @@ router.get('/testing', function (req, res, next) {
     var proc = new ffmpeg(appRoot + '/public/uploads/chat_media/1499398539751_file.mov')
         .takeScreenshots({
             count: 1,
-            timemarks: [ '600' ] // number of seconds
-          }, appRoot + '/public/uploads/chat_media/aa.jpg', function(err) {
+            timemarks: [ '2' ] // number of seconds
+          }, appRoot + '/public/uploads/chat_media/', function(err) {
               if(err){
                   bind.status = 0;
                   bind.err = error;
