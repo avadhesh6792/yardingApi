@@ -8,6 +8,7 @@ var Channel_chat = new Schema({
     user_id               : ObjectId,
     message               : {type: String, default: ''},
     message_type          : {type: String, default: ''},
+    thumbnail             : {type: String, default: ''},
     created_timestamp     : { type: Number}
 }, { timestamps: true});
 

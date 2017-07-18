@@ -669,39 +669,20 @@ router.post('/remove-user-from-channel', function (req, res) {
 });
 
 // testing route
-router.get('/testing/:channel_id', function (req, res, next) {
+router.get('/testing', function (req, res, next) {
     var bind = {};
-    var channel_id = req.params.channel_id;
-    Channel.aggregate([
-        {
-            $match: {_id: ObjectId(channel_id)}
-        },
-        {
-            $lookup: {
-                from: 'users',
-                localField: 'members_id',
-                foreignField: '_id',
-                as: 'members_info'
+    var thumbler = require('video-thumb');
 
+    thumbler.extract('public/uploads/chat_media/1499398539751_file.mov', 'public/uploads/chat_media/snapshot.png', '00:00:22', '200x125', function(err){
+            if(err){
+                bind.status = 0;
+                bind.message = 'Oops! error ocurred while generating video thumbnail';
+                bind.error = err;
+            } else{
+                bind.status = 1;
+                bind.message = 'snapshot saved to snapshot.png (200x125) with a frame at 00:00:22';
             }
-        },
-        {
-            $project: {members_id: 0, __v: 0, 'members_info.__v': 0, 'members_info.token_id': 0}
-        }
-    ], function (err, channelInfo) {
-
-        if (err) {
-            bind.status = 0;
-            bind.message = 'Oops! error occured while fetching channel info';
-            bind.error = err;
-        } else if (channelInfo.length > 0) {
-            bind.status = 1;
-            bind.channelInfo = channelInfo[0];
-        } else {
-            bind.status = 0;
-            bind.message = 'No channel info found';
-        }
-        return res.json(bind);
+            res.json(bind);
 
     });
 });
