@@ -671,20 +671,23 @@ router.post('/remove-user-from-channel', function (req, res) {
 // testing route
 router.get('/testing', function (req, res, next) {
     var bind = {};
-    var thumbler = require('video-thumb');
-
-    thumbler.extract('public/uploads/chat_media/1499398539751_file.mov', 'public/uploads/chat_media/snapshot.png', '00:00:22', '200x125', function(err){
-            if(err){
-                bind.status = 0;
-                bind.message = 'Oops! error ocurred while generating video thumbnail';
-                bind.error = err;
-            } else{
-                bind.status = 1;
-                bind.message = 'snapshot saved to snapshot.png (200x125) with a frame at 00:00:22';
-            }
-            res.json(bind);
-
-    });
+    var ffmpeg = require('fluent-ffmpeg');
+    var command = ffmpeg();
+    var proc = new ffmpeg('/public/uploads/chat_media/1499398539751_file.mov')
+        .takeScreenshots({
+            count: 1,
+            timemarks: [ '600' ] // number of seconds
+          }, '/public/uploads/chat_media', function(err) {
+              if(err){
+                  bind.status = 0;
+                  bind.err = error;
+              } else{
+                  bind.status = 1;
+                  bind.message = 'screenshots were saved';
+              }
+              return res.json(bind);
+          console.log('screenshots were saved')
+        });
 });
 
 
