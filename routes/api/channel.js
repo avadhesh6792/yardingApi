@@ -478,25 +478,30 @@ router.post('/upload-chat-media', function (req, res, next) {
             return res.json(bind);
         } else {
             
-            //bind.file = req.file;
-            var video_file_path = appRoot + '/public/uploads/chat_media/' + req.file.filename;
+            var extArray = req.file.mimetype.split("/");
+            if(extArray[0] == 'video'){
+                var video_file_path = appRoot + '/public/uploads/chat_media/' + req.file.filename;
             
-            var thumbnail_file_name = Date.now()+'_150x110.png';
-            ffmpeg(video_file_path)
-                .screenshots({
-                  //timestamps: [30.5, '50%', '01:10.123'],
-                  count: 1,
-                  //filename: 'ava-thumbnail-160x120.png',
-                  filename: thumbnail_file_name,
-                  folder: appRoot + '/public/uploads/chat_media',
-                  size: '150x110'
-                }).on('end', function(stdout, stderr) {
-                  console.log('Transcoding succeeded !');
-                  bind.status = 1;
-                  bind.media_url = 'uploads/chat_media/' + req.file.filename + ',uploads/chat_media/' + thumbnail_file_name;
-                  return res.json(bind);
-              });
-
+                var thumbnail_file_name = Date.now()+'_150x110.png';
+                ffmpeg(video_file_path)
+                    .screenshots({
+                      //timestamps: [30.5, '50%', '01:10.123'],
+                      count: 1,
+                      //filename: 'ava-thumbnail-160x120.png',
+                      filename: thumbnail_file_name,
+                      folder: appRoot + '/public/uploads/chat_media',
+                      size: '150x110'
+                    }).on('end', function(stdout, stderr) {
+                      console.log('Transcoding succeeded !');
+                      bind.status = 1;
+                      bind.media_url = 'uploads/chat_media/' + req.file.filename + ',uploads/chat_media/' + thumbnail_file_name;
+                      return res.json(bind);
+                  });
+            } else {
+                bind.status = 1;
+                bind.media_url = 'uploads/chat_media/' + req.file.filename;
+                return res.json(bind);
+            }
         }
         
     });
