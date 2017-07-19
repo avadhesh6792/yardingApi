@@ -476,6 +476,7 @@ router.post('/upload-chat-media', function (req, res, next) {
         } else {
             bind.status = 1;
             bind.media_url = 'uploads/chat_media/' + req.file.filename;
+            bind.file = req.file;
         }
         return res.json(bind);
     });
