@@ -93,6 +93,13 @@ exports.saveMessage = function (jsonData, socket, callback) {
     newChannel_chat.message = message;
     newChannel_chat.message_type = message_type;
     newChannel_chat.created_timestamp = moment().unix();
+    
+    if(message_type == 'video'){
+      var msgArray = message.split("/");
+      newChannel_chat.message = msgArray[0];
+      newChannel_chat.thumbnail = msgArray[1];
+    }
+    
     newChannel_chat.save(function (err) {
         if (err) {
             bind.status = 0;
