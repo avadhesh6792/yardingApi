@@ -9,6 +9,8 @@ var Channel_chat = require('../../models/channel_chat');
 var moment = require('moment');
 var arraySort = require('array-sort');
 var arrayFind = require('array-find');
+var appRoot = require('app-root-path');
+var ffmpeg = require('fluent-ffmpeg');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -473,12 +475,30 @@ router.post('/upload-chat-media', function (req, res, next) {
             bind.status = 0;
             bind.message = 'Oops! error occur while uploading chat media.';
             bind.error = err;
+            return res.json(bind);
         } else {
-            bind.status = 1;
-            bind.media_url = 'uploads/chat_media/' + req.file.filename;
-            bind.file = req.file;
+            
+            //bind.file = req.file;
+            var video_file_path = appRoot + '/public/uploads/chat_media/' + req.file.filename;
+            
+            var thumbnail_file_name = Date.now()+'_150x110.png';
+            ffmpeg(video_file_path)
+                .screenshots({
+                  //timestamps: [30.5, '50%', '01:10.123'],
+                  count: 1,
+                  //filename: 'ava-thumbnail-160x120.png',
+                  filename: thumbnail_file_name,
+                  folder: appRoot + '/public/uploads/chat_media',
+                  size: '150x110'
+                }).on('end', function(stdout, stderr) {
+                  console.log('Transcoding succeeded !');
+                  bind.status = 1;
+                  bind.media_url = 'uploads/chat_media/' + req.file.filename + ',uploads/chat_media/' + thumbnail_file_name;
+                  return res.json(bind);
+              });
+
         }
-        return res.json(bind);
+        
     });
 });
 
