@@ -113,9 +113,9 @@ exports.saveMessage = function (jsonData, socket, callback) {
             if (!error) {
                 if (body_parse['result']['status'] == 'OK') {
                     if (body_parse['result']['image']) {
-                        newChannel_chat.thumbnail = body_parse['result']['image'];
+                        newChannel_chat.thumbnail = body_parse['meta']['image'];
                     } else {
-                        newChannel_chat.thumbnail = body_parse['result']['favicon'];
+                        newChannel_chat.thumbnail = body_parse['meta']['favicon'];
                     }
                 }
             }
