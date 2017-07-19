@@ -9,29 +9,31 @@ var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../models/clear_chat');
 var moment = require('moment');
+var request = require('request');
+var url = require('url');
 
-exports.createSingleChannel = function(user_ids, callback){
+exports.createSingleChannel = function (user_ids, callback) {
     var bind = {};
     var user_id1 = ObjectId(user_ids.user_id1);
     var user_id2 = ObjectId(user_ids.user_id2);
     console.log('**** inside create single channel ****');
-    console.log('user_id1 '+ user_id1);
-    console.log('user_id2 '+ user_id2);
-    Channel.findOne({ $or :[ { members_id: { $elemMatch: { $eq: user_id1 } }, members_id: { $elemMatch: { $eq: user_id2 } } , room_type: 'single' }, { _id: user_id2}]}, function(err, single_channel){
-        if(single_channel){
+    console.log('user_id1 ' + user_id1);
+    console.log('user_id2 ' + user_id2);
+    Channel.findOne({$or: [{members_id: {$elemMatch: {$eq: user_id1}}, members_id: {$elemMatch: {$eq: user_id2}}, room_type: 'single'}, {_id: user_id2}]}, function (err, single_channel) {
+        if (single_channel) {
             bind.channel_id = single_channel._id;
             console.log('inside single channel');
             callback(bind);
         } else {
-            
+
             var newSingle_channel = new Channel;
             newSingle_channel.members_id.push(user_id1, user_id2);
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             newSingle_channel.channel_name = user_id1 + '_' + user_id2;
 
-            newSingle_channel.save(function(err){
-                if(err){
+            newSingle_channel.save(function (err) {
+                if (err) {
                     bind.channel_id = '';
                 } else {
                     bind.channel_id = newSingle_channel._id;
@@ -93,13 +95,83 @@ exports.saveMessage = function (jsonData, socket, callback) {
     newChannel_chat.message = message;
     newChannel_chat.message_type = message_type;
     newChannel_chat.created_timestamp = moment().unix();
-    
-    if(message_type == 'video'){
-      var msgArray = message.split("/");
-      newChannel_chat.message = msgArray[0];
-      newChannel_chat.thumbnail = msgArray[1];
+
+    if (message_type == 'url') {
+        var bind = {};
+
+        var url = message;
+        var url_parse = url.parse(url);
+        if (!url_parse['protocol']) {
+            url = 'http://' + url;
+        }
+
+        request('https://api.urlmeta.org/?url=' + url, function (error, response, body) {
+            //bind.error = error;
+            //bind.response = response;
+            var body_parse = JSON.parse(body);
+
+            if (!error) {
+                if (body_parse['result']['status'] == 'OK') {
+                    if (body_parse['result']['image']) {
+                        newChannel_chat.thumbnail = body_parse['result']['image'];
+                    } else {
+                        newChannel_chat.thumbnail = body_parse['result']['favicon'];
+                    }
+                }
+            }
+
+            newChannel_chat.save(function (err) {
+                if (err) {
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while saving message';
+                    callback(bind);
+                } else {
+                    Channel_chat.aggregate([
+                        {
+                            $match: {
+                                _id: newChannel_chat._id
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'user_id',
+                                foreignField: '_id',
+                                as: 'user'
+                            }
+                        },
+                        {
+                            $unwind: "$user"
+                        },
+                        {
+                            $project: {'user.phone_no': 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0}
+                        }
+
+                    ], function (err, channel_chat) {
+                        if (err) {
+                            bind.status = 0;
+                            bind.message = 'Oops! error occured while fetching channel chats';
+                            bind.error = err;
+                        } else if (channel_chat.length > 0) {
+                            bind.status = 1;
+                            bind.channel_chat = channel_chat;
+                        } else {
+                            bind.status = 0;
+                            bind.message = 'No channel chats found';
+                        }
+                        callback(bind);
+                    });
+                }
+
+            });
+        });
+
+    } else if (message_type == 'video') {
+        var msgArray = message.split("/");
+        newChannel_chat.message = msgArray[0];
+        newChannel_chat.thumbnail = msgArray[1];
     }
-    
+
     newChannel_chat.save(function (err) {
         if (err) {
             bind.status = 0;

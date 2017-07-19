@@ -697,31 +697,14 @@ router.post('/remove-user-from-channel', function (req, res) {
 // testing route
 router.get('/testing', function (req, res, next) {
     var bind = {};
-    var ffmpeg = require('fluent-ffmpeg');
-    var command = ffmpeg();
-    
-    var appRoot = require('app-root-path');
-    //var myModule = require(appRoot + '/public/uploads/chat_media/1499398539751_file.mov');
-    //return res.json(myModule);
-    console.log('******* appRoot *******'+appRoot);
-    //res.json(appRoot + '/public/uploads/chat_media/1499398539751_file.mov');
-    
-    
-    var proc = new ffmpeg(appRoot + '/public/uploads/chat_media/1499398539751_file.mov')
-        .takeScreenshots({
-            count: 1,
-            timemarks: [ '2' ] // number of seconds
-          }, appRoot + '/public/uploads/chat_media/', function(err) {
-              if(err){
-                  bind.status = 0;
-                  bind.err = error;
-              } else{
-                  bind.status = 1;
-                  bind.message = 'screenshots were saved';
-              }
-              return res.json(bind);
-          console.log('screenshots were saved')
-        });
+    var request = require('request');
+    var url = 'https://www.google.co.in/?gfe_rd=cr&ei=uKxvWc-tO_Ts8AfF4afoDg&gws_rd=ssl';
+    request('https://api.urlmeta.org/?url='+url, function (error, response, body) {
+      bind.error = error;
+      bind.response = response;
+      bind.body = JSON.parse(body);
+      return res.json(bind.body);
+    });
 });
 
 
