@@ -167,7 +167,7 @@ exports.saveMessage = function (jsonData, socket, callback) {
         });
 
     } else if (message_type == 'video') {
-        var msgArray = message.split("/");
+        var msgArray = message.split(",");
         newChannel_chat.message = msgArray[0];
         newChannel_chat.thumbnail = msgArray[1];
     }
