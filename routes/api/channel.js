@@ -259,7 +259,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                     channels[index].channel_description = other_member_info.status;
                      
                 }
-                channels[index].members_info = undefined;
+                //channels[index].members_info = undefined;
             });
             
             bind.channels = channels;
