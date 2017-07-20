@@ -1,4 +1,5 @@
 var channelController = require('../controllers/channelController');
+var url = require('url');
 
 module.exports = function (ioTrendingChat) {
     console.log('ioTrendingChat :: inside this file');
@@ -70,15 +71,43 @@ module.exports = function (ioTrendingChat) {
             var channel_id = jsonData.channel_id;
             var message = jsonData.message;
             var user_id = jsonData.user_id;
+            var message_type = jsonData.message_type;
             console.log('send message to channel : ' + channel_id + ' ' + message);
-            //ioTrendingChat.to(channel_id).emit('get message', jsonData);
             
-            channelController.saveMessage(jsonData, socket, function(response){
-                console.log('*****************************************************************');
+            if(message_type == 'url'){
+                jsonData.thumbnail = '';
+                var url_msg = message;
+                var url_parse = url.parse(url_msg);
+                if (!url_parse['protocol']) {
+                    url_msg = 'http://' + url_msg;
+                }
+                
+                request('https://api.urlmeta.org/?url=' + url_msg, function (error, response, body) {
+                    var body_parse = JSON.parse(body);
+                    if (!error) {
+                        if (body_parse['result']['status'] == 'OK') {
+                            if (body_parse['meta']['image']) {
+                                jsonData.thumbnail = body_parse['meta']['image'];
+                            } else {
+                                jsonData.thumbnail = body_parse['meta']['favicon'];
+                            }
+                        }
+                    }
+                    channelController.saveMessage(jsonData, socket, function(response){
+                        console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                        ioTrendingChat.to(channel_id).emit('get message', response);
+                    });
+                });
+                
+                
+            } else{
+                channelController.saveMessage(jsonData, socket, function(response){
                     console.log('channelController.saveMessage response '+ JSON.stringify(response));
-                console.log('*****************************************************************');
-                ioTrendingChat.to(channel_id).emit('get message', response);
-            });
+                    ioTrendingChat.to(channel_id).emit('get message', response);
+                });
+            }
+            
+            
             
         });
         

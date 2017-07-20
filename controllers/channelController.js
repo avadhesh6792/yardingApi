@@ -96,77 +96,7 @@ exports.saveMessage = function (jsonData, socket, callback) {
     newChannel_chat.message_type = message_type;
     newChannel_chat.created_timestamp = moment().unix();
 
-    if (message_type == 'url') {
-        var bind = {};
-
-        var url_msg = message;
-        var url_parse = url.parse(url_msg);
-        if (!url_parse['protocol']) {
-            url_msg = 'http://' + url_msg;
-        }
-
-        request('https://api.urlmeta.org/?url=' + url_msg, function (error, response, body) {
-            //bind.error = error;
-            //bind.response = response;
-            var body_parse = JSON.parse(body);
-            //console.log(url_msg+'****************** url meta boday ************ '+body);
-            if (!error) {
-                if (body_parse['result']['status'] == 'OK') {
-                    if (body_parse['meta']['image']) {
-                        newChannel_chat.thumbnail = body_parse['meta']['image'];
-                    } else {
-                        newChannel_chat.thumbnail = body_parse['meta']['favicon'];
-                    }
-                }
-            }
-
-            newChannel_chat.save(function (err) {
-                if (err) {
-                    bind.status = 0;
-                    bind.message = 'Oops! error occured while saving message';
-                    callback(bind);
-                } else {
-                    Channel_chat.aggregate([
-                        {
-                            $match: {
-                                _id: newChannel_chat._id
-                            }
-                        },
-                        {
-                            $lookup: {
-                                from: 'users',
-                                localField: 'user_id',
-                                foreignField: '_id',
-                                as: 'user'
-                            }
-                        },
-                        {
-                            $unwind: "$user"
-                        },
-                        {
-                            $project: {'user.phone_no': 0, 'user.token_id': 0, '__v': 0, 'user.__v': 0}
-                        }
-
-                    ], function (err, channel_chat) {
-                        if (err) {
-                            bind.status = 0;
-                            bind.message = 'Oops! error occured while fetching channel chats';
-                            bind.error = err;
-                        } else if (channel_chat.length > 0) {
-                            bind.status = 1;
-                            bind.channel_chat = channel_chat;
-                        } else {
-                            bind.status = 0;
-                            bind.message = 'No channel chats found';
-                        }
-                        callback(bind);
-                    });
-                }
-
-            });
-        });
-
-    } else if (message_type == 'video') {
+    if (message_type == 'video') {
         var msgArray = message.split(",");
         newChannel_chat.message = msgArray[0];
         newChannel_chat.thumbnail = msgArray[1];
