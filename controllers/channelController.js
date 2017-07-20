@@ -109,6 +109,7 @@ exports.saveMessage = function (jsonData, socket, callback) {
             //bind.error = error;
             //bind.response = response;
             var body_parse = JSON.parse(body);
+            console.log('****************** url meta boday ************ '+body);
 
             if (!error) {
                 if (body_parse['result']['status'] == 'OK') {
@@ -124,7 +125,6 @@ exports.saveMessage = function (jsonData, socket, callback) {
                 if (err) {
                     bind.status = 0;
                     bind.message = 'Oops! error occured while saving message';
-                    console.log('**** inside url error: '+JSON.stringify(bind));
                     return callback(bind);
                 } else {
                     Channel_chat.aggregate([
@@ -160,7 +160,6 @@ exports.saveMessage = function (jsonData, socket, callback) {
                             bind.status = 0;
                             bind.message = 'No channel chats found';
                         }
-                        console.log('**** inside url save: '+JSON.stringify(bind));
                         return callback(bind);
                     });
                 }
