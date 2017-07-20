@@ -90,11 +90,14 @@ exports.saveMessage = function (jsonData, socket, callback) {
     var user_id = jsonData.user_id;
     var message = jsonData.message;
     var message_type = jsonData.message_type;
+    var thumbnail = jsonData.thumbnail;
+    
     newChannel_chat.channel_id = channel_id;
     newChannel_chat.user_id = user_id;
     newChannel_chat.message = message;
     newChannel_chat.message_type = message_type;
     newChannel_chat.created_timestamp = moment().unix();
+    newChannel_chat.thumbnail = thumbnail ? thumbnail : '';
 
     if (message_type == 'video') {
         var msgArray = message.split(",");
