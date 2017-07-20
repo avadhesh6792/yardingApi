@@ -108,8 +108,8 @@ exports.saveMessage = function (jsonData, socket, callback) {
         request('https://api.urlmeta.org/?url=' + url_msg, function (error, response, body) {
             //bind.error = error;
             //bind.response = response;
-            //var body_parse = JSON.parse(body);
-            console.log(url_msg+'****************** url meta boday ************ '+body);
+            var body_parse = JSON.parse(body);
+            //console.log(url_msg+'****************** url meta boday ************ '+body);
 
             if (!error) {
                 if (body_parse['result']['status'] == 'OK') {
