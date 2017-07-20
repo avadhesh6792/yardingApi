@@ -99,13 +99,13 @@ exports.saveMessage = function (jsonData, socket, callback) {
     if (message_type == 'url') {
         var bind = {};
 
-        var url = message;
-        var url_parse = url.parse(url);
+        var url_msg = message;
+        var url_parse = url.parse(url_msg);
         if (!url_parse['protocol']) {
-            url = 'http://' + url;
+            url_msg = 'http://' + url;
         }
 
-        request('https://api.urlmeta.org/?url=' + url, function (error, response, body) {
+        request('https://api.urlmeta.org/?url=' + url_msg, function (error, response, body) {
             //bind.error = error;
             //bind.response = response;
             var body_parse = JSON.parse(body);
