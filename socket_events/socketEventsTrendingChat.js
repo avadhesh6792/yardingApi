@@ -1,5 +1,6 @@
 var channelController = require('../controllers/channelController');
 var url = require('url');
+var request = require('request');
 
 module.exports = function (ioTrendingChat) {
     console.log('ioTrendingChat :: inside this file');
