@@ -102,7 +102,7 @@ exports.saveMessage = function (jsonData, socket, callback) {
         var url_msg = message;
         var url_parse = url.parse(url_msg);
         if (!url_parse['protocol']) {
-            url_msg = 'http://' + url;
+            url_msg = 'http://' + url_msg;
         }
 
         request('https://api.urlmeta.org/?url=' + url_msg, function (error, response, body) {
