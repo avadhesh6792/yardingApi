@@ -109,7 +109,7 @@ exports.saveMessage = function (jsonData, socket, callback) {
             //bind.error = error;
             //bind.response = response;
             var body_parse = JSON.parse(body);
-            console.log('****************** url meta boday ************ '+body);
+            console.log(url_msg+'****************** url meta boday ************ '+body);
 
             if (!error) {
                 if (body_parse['result']['status'] == 'OK') {
