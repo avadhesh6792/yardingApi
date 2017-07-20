@@ -694,6 +694,31 @@ router.post('/remove-user-from-channel', function (req, res) {
     });
 });
 
+router.get('/change-channel-type/:channel_id', function(req, res, next){
+    var channel_id = req.params.channel_id;
+    var bind = {};
+    Channel.findOne({ _id: channel_id }, function(err, channel){
+        if(channel){
+            channel.channel_type = channel.channel_type == 'private' ? 'public' : 'private';
+            channel.save(function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while changing channel type';
+                    bind.error = err;
+                } else {
+                    bind.status = 1;
+                    bind.message = 'Channel type was changed successfully';
+                }
+                return res.json(bind);
+            });
+        } else {
+            bind.status = 0;
+            bind.message = 'No channel found';
+            return res.json(bind);
+        }
+    });
+});
+
 // testing route
 router.get('/testing', function (req, res, next) {
     var bind = {};
