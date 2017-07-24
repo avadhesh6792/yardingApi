@@ -332,41 +332,9 @@ router.post('/make-group-admin', function(req, res){
 
 // testing route
 router.get('/testing/:group_id', function(req, res, next){
-   
-    var bind = {};
-    var group_id = req.params.group_id;
-    Group.aggregate([
-        {
-            $match: { _id: ObjectId(group_id)}
-        },
-        {
-            $lookup: {
-                from: 'users',
-                localField: 'members_id',
-                foreignField: '_id',
-                as: 'members_info'
-                
-                }
-            },
-            {
-                $project: { members_id: 0, __v: 0, 'members_info.__v' : 0, 'members_info.token_id' : 0 }
-            }
-    ], function(err, groupInfo){
-        
-        if(err){
-            bind.status = 0;
-            bind.message = 'Oops! error occured while fetching group info';
-            bind.error = err;
-        } else if(groupInfo.length > 0){
-            bind.status = 1;
-            groupInfo[0].members_info = arraySort(groupInfo[0].members_info, 'name');
-            bind.groupInfo = groupInfo[0];
-        } else {
-            bind.status = 0;
-            bind.message = 'No group info found';
-        }
-        return res.json(bind);
-        
+    var group_id = req.param.group_id;
+    Channel.findOne({ _id: group_id }, function(err, channel){
+        return res.json(channel);
     });
 });
 
