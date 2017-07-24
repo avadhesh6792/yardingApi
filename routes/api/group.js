@@ -113,10 +113,8 @@ router.post('/add-member-to-group', function(req, res){
     var group_id = req.body.group_id;
     var members_id_string = req.body.members_id;
     var members_id = members_id_string.split(',');
-    console.log('group id ********** '+ group_id);
         
        Channel.findOne({ _id: group_id }, function(err, group){
-           console.log('***** group *****'+ JSON.stringify(group));
            if(group){
                 for(var i = 0; i< members_id.length ;i++){
                     var member_id = members_id[i].trim();
