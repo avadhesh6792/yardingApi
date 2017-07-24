@@ -332,9 +332,9 @@ router.post('/make-group-admin', function(req, res){
 
 // testing route
 router.get('/testing/:group_id', function(req, res, next){
-    var group_id = req.param.group_id;
+    var group_id = req.params.group_id;
     Channel.findOne({ _id: group_id }, function(err, channel){
-        return res.json(group_id);
+        return res.json(channel);
     });
 });
 
