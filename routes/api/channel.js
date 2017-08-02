@@ -6,6 +6,7 @@ var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../../models/clear_chat');
 var Channel_chat = require('../../models/channel_chat');
+var Channel_request = require('../../models/channel_request');
 var moment = require('moment');
 var arraySort = require('array-sort');
 var arrayFind = require('array-find');
@@ -724,6 +725,36 @@ router.get('/change-channel-type/:channel_id', function(req, res, next){
             bind.status = 0;
             bind.message = 'No channel found';
             return res.json(bind);
+        }
+    });
+});
+
+// add to channel request
+router.post('/add-to-channel-request', function(req, res, next){
+    var bind = {};
+    var channel_id = req.body.channel_id;
+    var user_id = req.body.user_id;
+    Channel_request.findOne({ channel_id: channel_id, user_id: user_id }, function(err, channel_request){
+        if(channel_request){
+            bind.status = 0;
+            bind.message = 'You have already sent request to this channel';
+            return res.json(bind);
+        } else {
+            var newChannel_request = new Channel_request;
+            newChannel_request.channel_id = channel_id;
+            newChannel_request.user_id = user_id
+            newChannel_request.save(function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occur while add to channel request';
+                    bind.error = err;
+                } else{
+                    bind.status = 1;
+                    bind.message = 'Your request was sennt successfully';
+                }
+                return res.json(bind);
+            });
+            
         }
     });
 });
