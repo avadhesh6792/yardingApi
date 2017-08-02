@@ -759,6 +759,36 @@ router.post('/add-to-channel-request', function(req, res, next){
     });
 });
 
+// get channel requests
+router.get('/get-channel-requests/:channel_id', function(req, res, next){
+    var bind = {};
+    var channel_id = req.params.channel_id;
+    Channel_request.aggregate([
+        {
+            $match : { channel_id: ObjectId(channel_id), status: false }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'user_id',
+                foreignField: '_id',
+                as: 'users'
+
+            }
+        }
+        
+    ], function(err, channel_requests){
+        if(channel_requests.length > 0){
+            bind.status = 1;
+            bind.channel_requests = channel_requests;
+        } else {
+            bind.status = 0;
+            bind.message = 'No channel requests found';
+        }
+        return res.json(bind);
+    });
+});
+
 // testing route
 router.get('/testing', function (req, res, next) {
     var bind = {};
