@@ -734,29 +734,59 @@ router.post('/add-to-channel-request', function(req, res, next){
     var bind = {};
     var channel_id = req.body.channel_id;
     var user_id = req.body.user_id;
-    Channel_request.findOne({ channel_id: channel_id, user_id: user_id }, function(err, channel_request){
-        if(channel_request){
-            bind.status = 0;
-            bind.message = 'You have already sent request to this channel';
-            return res.json(bind);
-        } else {
-            var newChannel_request = new Channel_request;
-            newChannel_request.channel_id = channel_id;
-            newChannel_request.user_id = user_id
-            newChannel_request.save(function(err){
-                if(err){
-                    bind.status = 0;
-                    bind.message = 'Oops! error occur while add to channel request';
-                    bind.error = err;
-                } else{
-                    bind.status = 1;
-                    bind.message = 'Your request was sennt successfully';
-                }
+//    Channel_request.findOne({ channel_id: channel_id, user_id: user_id }, function(err, channel_request){
+//        if(channel_request){
+//            bind.status = 0;
+//            bind.message = 'You have already sent request to this channel';
+//            return res.json(bind);
+//        } else {
+//            var newChannel_request = new Channel_request;
+//            newChannel_request.channel_id = channel_id;
+//            newChannel_request.user_id = user_id
+//            newChannel_request.save(function(err){
+//                if(err){
+//                    bind.status = 0;
+//                    bind.message = 'Oops! error occur while add to channel request';
+//                    bind.error = err;
+//                } else{
+//                    bind.status = 1;
+//                    bind.message = 'Your request was sennt successfully';
+//                }
+//                return res.json(bind);
+//            });
+//            
+//        }
+//    });
+    
+    Channel.findOne({_id: channel_id}, function (err, channel) {
+        if (channel) {
+            var index = channel.request_users_id.indexOf(ObjectId(user_id));
+            if (index > -1) {
+                bind.status = 0;
+                bind.message = 'You have already sent request to this channel';
                 return res.json(bind);
-            });
-            
+            } else {
+                channel.request_users_id.push(ObjectId(user_id));
+                channel.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occur while add to channel request';
+                        bind.error = err;
+                    } else{
+                        bind.status = 1;
+                        bind.message = 'Your request was sennt successfully';
+                    }
+                    return res.json(bind);
+                });
+                
+            }
+        } else {
+            bind.status = 0;
+            bind.message = 'No channel found';
+            return res.json(bind);
         }
     });
+    
 });
 
 // get channel requests

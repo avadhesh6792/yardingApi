@@ -11,6 +11,7 @@ var Channel = new Schema({
     user_id                 : ObjectId,
     admin_id                : ObjectId,
     members_id              : { type: Array, default: []},
+    request_users_id         : { type: Array, default: []},
     link                    : { type: String, default: '' },
     created_timestamp       : { type: Number},
     room_type               : {type: String, default: ''} // channel, group, single
