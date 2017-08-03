@@ -798,6 +798,41 @@ router.post('/add-to-channel-request', function(req, res, next){
     
 });
 
+// accept/reject channel request
+router.post('/accept-reject-channel-request', function(req, res, next){
+    var bind = {};
+    var channel_id = ObjectId(req.body.channel_id);
+    var user_id = ObjectId(req.body.user_id);
+    var flag = req.body.flag; // 1: accept, 0: reject
+    
+    Channel.findOne({ _id: channel_id }, function(err, channel){
+        if(channel){
+            
+            if(flag == 1){ // accept
+                channel.members_id.push(user_id);
+            }
+            var index = channel.request_users_id.indexOf(user_id);
+            channel.request_users_id.splice(index, 1);
+            channel.save(function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occur while responding to request';
+                    bind.error = err;
+                } else {
+                    bind.status = 1;
+                    bind.message = flag == 1 ? 'Request was accepted successfully' : 'Request was rejected successfully';
+                }
+                return res.json(bind);
+            });
+            
+        } else {
+            bind.status = 0;
+            bind.message = 'No channel found';
+            return res.json(bind);
+        }
+    });
+});
+
 // get channel requests
 router.get('/get-channel-requests/:channel_id', function(req, res, next){
     var bind = {};
