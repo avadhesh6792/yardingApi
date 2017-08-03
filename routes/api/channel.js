@@ -535,7 +535,16 @@ router.get('/get-channel-info/:channel_id', function (req, res) {
             }
         },
         {
-            $project: {members_id: 0, __v: 0, 'members_info.__v': 0, 'members_info.token_id': 0}
+            $lookup: {
+                from: 'users',
+                localField: 'request_users_id',
+                foreignField: '_id',
+                as: 'requests_info'
+
+            }
+        },
+        {
+            $project: {members_id: 0, __v: 0, 'members_info.__v': 0, 'members_info.token_id': 0, 'requests_info.__v': 0, 'requests_info.token_id': 0}
         }
     ], function (err, channelInfo) {
 
