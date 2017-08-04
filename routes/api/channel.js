@@ -703,9 +703,8 @@ router.post('/remove-user-from-channel', function (req, res) {
             } else {
                 bind.status = 0;
                 bind.message = 'User is not a member of channel';
-                //return res.json(bind);
+                return res.json(bind);
             }
-            return res.json(bind);
             
         } else {
             bind.status = 0;
