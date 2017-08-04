@@ -682,8 +682,8 @@ router.post('/make-channel-admin', function (req, res) {
 // remove user from a channel
 router.post('/remove-user-from-channel', function (req, res) {
     var bind = {};
-    var user_id = req.body.user_id;
-    var channel_id = req.body.channel_id;
+    var user_id = ObjectId(req.body.user_id);
+    var channel_id = ObjectId(req.body.channel_id);
     Channel.findOne({_id: channel_id}, function (err, channel) {
         if (channel) {
             var index = channel.members_id.indexOf(user_id);
