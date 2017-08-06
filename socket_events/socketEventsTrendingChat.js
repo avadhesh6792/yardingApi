@@ -92,7 +92,7 @@ module.exports = function (ioTrendingChat) {
                             } else {
                                 jsonData.thumbnail = body_parse['meta']['favicon'];
                             }
-                            jsonData.message = message + ',' + body_parse['meta']['description'];
+                            jsonData.message = message + '~' + body_parse['meta']['description'];
                         }
                         //console.log('************************ url meta ******************' + body_parse['meta']['image'] + ' ' +body_parse['meta']['favicon']);
                         channelController.saveMessage(jsonData, socket, function(response){
