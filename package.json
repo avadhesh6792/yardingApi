@@ -6,6 +6,7 @@
     "start": "nodemon ./bin/www"
   },
   "dependencies": {
+    "apn": "^2.1.5",
     "app-root-path": "^2.0.1",
     "array-find": "^1.0.0",
     "array-sort": "^0.1.2",

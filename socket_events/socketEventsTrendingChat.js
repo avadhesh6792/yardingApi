@@ -110,7 +110,6 @@ module.exports = function (ioTrendingChat) {
                 var url_arr = url_msg.split('~');
                 jsonData.message = url_arr[0] + ( url_arr[1] ? '~'+url_arr[1] : '');
                 jsonData.thumbnail = url_arr[2] ? url_arr[2] : '';
-                
             }
             channelController.saveMessage(jsonData, socket, function(response){
                 console.log('channelController.saveMessage response '+ JSON.stringify(response));

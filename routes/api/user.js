@@ -399,16 +399,31 @@ router.post('/sms', function(req, res, next){
 });
 
 router.get('/testing', function(req, res, next){ 
-    User.find({ _id: new ObjectId('58fe35c46a1443119c23d567') }, function(err, user){
-        res.json(user);
+    var apn = require('apn');
+    var appRoot = require('app-root-path');
+    var options = {
+        cert: appRoot + "/config/cert.pem",
+        key: appRoot + "/config/key.pem",
+        production: false
+      };
+
+    var apnProvider = new apn.Provider(options);
+    var deviceToken = "9714BC5CA55696CF6AC89BE9A62277B8F3D1BCF85CB7E65D1937A1B3288284A4";
+    var note = new apn.Notification();
+
+    //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+    //note.badge = 3;
+    //note.sound = "ping.aiff";
+    note.alert = "hello, sir how are you?";
+    note.payload = {'messageFrom': 'Ava Appleseed'};
+    note.topic = "com.yardingllc.yarding";
+    
+    apnProvider.send(note, deviceToken).then( function(result) {
+        // see documentation for an explanation of result
+        console.log('notification result '+ JSON.stringify(result));
+        return res.json(result);
     });
-//   User.aggregate([
-//       {
-//         $match: { _id: new ObjectId('58fe35c46a1443119c23d567') }  
-//       }
-//   ], function(err, users){
-//       res.json(users);
-//   });
+    
 });
 
 module.exports = router;
