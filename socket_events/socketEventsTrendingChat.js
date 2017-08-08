@@ -106,24 +106,16 @@ module.exports = function (ioTrendingChat) {
 //                
 //            } 
             if(message_type == 'url'){
-                //jsonData.thumbnail = 'testing';
                 var url_msg = message;
                 var url_arr = url_msg.split('~');
                 jsonData.message = url_arr[0] + ( url_arr[1] ? '~'+url_arr[1] : '');
                 jsonData.thumbnail = url_arr[2] ? url_arr[2] : '';
-                channelController.saveMessage(jsonData, socket, function(response){
-                    console.log('channelController.saveMessage response '+ JSON.stringify(response));
-                    ioTrendingChat.to(channel_id).emit('get message', response);
-                });
-            } else{
-                channelController.saveMessage(jsonData, socket, function(response){
-                    console.log('channelController.saveMessage response '+ JSON.stringify(response));
-                    ioTrendingChat.to(channel_id).emit('get message', response);
-                });
+                
             }
-            
-            
-            
+            channelController.saveMessage(jsonData, socket, function(response){
+                console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                ioTrendingChat.to(channel_id).emit('get message', response);
+            });
         });
         
         socket.on('leave channel', function (channel_id) {
