@@ -63,9 +63,9 @@ router.post('/create-channel', function (req, res, next) {
         var channel_pic = req.file ? 'uploads/channel_pic/' + req.file.filename : 'uploads/default/default-channel.jpg';
         var link = req.body.link;
 
-        Channel.findOne({ $or : [{link: link}, {channel_name: channel_name}]}, function (err, channels) {
+        Channel.findOne({ $or : [{link: link}, {channel_name: channel_name}]}, function (err, channel) {
 
-            if (!channels) {
+            if (!channel) {
                 var newChannel = new Channel;
                 newChannel.channel_name = channel_name;
                 newChannel.channel_description = channel_description;
@@ -92,7 +92,7 @@ router.post('/create-channel', function (req, res, next) {
                 });
             } else {
                 bind.status = 0;
-                if(channels.link == link){
+                if(channel.link == link){
                     bind.message = 'link is already exists!';
                 } else {
                     bind.message = 'channel name is already exists!';
