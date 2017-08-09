@@ -18,7 +18,7 @@ module.exports = function (ioTrendingChat) {
             var user_id = jsonData.user_id;
             var room_type = jsonData.room_type; // channel, group, single
             
-            //console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
+            console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
             
             if(room_type == 'single'){
                 console.log('*** room type single ****');
