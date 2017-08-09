@@ -27,7 +27,8 @@ exports.createSingleChannel = function (user_ids, callback) {
         } else {
 
             var newSingle_channel = new Channel;
-            newSingle_channel.members_id.push(user_id1, user_id2);
+            newSingle_channel.members_id.push(user_id1);
+            newSingle_channel.members_id.push(user_id2);
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             newSingle_channel.channel_name = user_id1 + '_' + user_id2;
