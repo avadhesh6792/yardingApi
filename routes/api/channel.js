@@ -63,7 +63,7 @@ router.post('/create-channel', function (req, res, next) {
         var channel_pic = req.file ? 'uploads/channel_pic/' + req.file.filename : 'uploads/default/default-channel.jpg';
         var link = req.body.link;
 
-        Channel.findOne({link: link}, function (err, channels) {
+        Channel.findOne({ $or : [{link: link}, {channel_name: channel_name}]}, function (err, channels) {
 
             if (!channels) {
                 var newChannel = new Channel;
@@ -92,16 +92,14 @@ router.post('/create-channel', function (req, res, next) {
                 });
             } else {
                 bind.status = 0;
-                bind.message = 'link is already exists!';
-
+                if(channels.link == link){
+                    bind.message = 'link is already exists!';
+                } else {
+                    bind.message = 'channel name is already exists!';
+                }
                 return res.json(bind);
             }
-
-
         });
-
-
-
     });
 });
 
