@@ -14,12 +14,12 @@ var url = require('url');
 
 exports.createSingleChannel = function (user_ids, callback) {
     var bind = {};
-    var user_id1 = ObjectId(user_ids.user_id1);
-    var user_id2 = ObjectId(user_ids.user_id2);
+    var user_id1 = user_ids.user_id1;
+    var user_id2 = user_ids.user_id2;
     console.log('**** inside create single channel ****');
     console.log('user_id1 ' + user_id1);
     console.log('user_id2 ' + user_id2);
-    Channel.findOne({$or: [{members_id: {$elemMatch: {$eq: user_id1}}, members_id: {$elemMatch: {$eq: user_id2}}, room_type: 'single'}, {_id: user_id2}]}, function (err, single_channel) {
+    Channel.findOne({$or: [{members_id: {$elemMatch: {$eq: ObjectId(user_id1)}}, members_id: {$elemMatch: {$eq: ObjectId(user_id2)}}, room_type: 'single'}, {_id: ObjectId(user_id2)}]}, function (err, single_channel) {
         if (single_channel) {
             bind.channel_id = single_channel._id;
             console.log('inside single channel');
@@ -27,8 +27,8 @@ exports.createSingleChannel = function (user_ids, callback) {
         } else {
 
             var newSingle_channel = new Channel;
-            newSingle_channel.members_id.push(user_id1);
-            newSingle_channel.members_id.push(user_id2);
+            newSingle_channel.members_id.push(ObjectId(user_id1));
+            newSingle_channel.members_id.push(ObjectId(user_id2));
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             newSingle_channel.channel_name = user_id1 + '_' + user_id2;
