@@ -252,10 +252,13 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                         return info._id != req.params.user_id;
                     });
                     
-                    //channels[index].members_info_index = members_info_index;
-                    channels[index].channel_name = other_member_info.name;
-                    channels[index].channel_pic = other_member_info.display_pic;
-                    channels[index].channel_description = other_member_info.status;
+                    if(other_member_info){
+                        //channels[index].members_info_index = members_info_index;
+                        channels[index].channel_name = other_member_info.name;
+                        channels[index].channel_pic = other_member_info.display_pic;
+                        channels[index].channel_description = other_member_info.status;
+                    }
+                    
                      
                 }
                 //channels[index].members_info = undefined;

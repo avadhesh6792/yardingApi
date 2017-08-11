@@ -28,8 +28,7 @@ exports.createSingleChannel = function (user_ids, callback) {
         } else {
 
             var newSingle_channel = new Channel;
-            newSingle_channel.members_id.push(ObjectId(user_id1));
-            newSingle_channel.members_id.push(ObjectId(user_id2));
+            newSingle_channel.members_id.push(ObjectId(user_id1), ObjectId(user_id2));
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             newSingle_channel.channel_name = user_id1 + '_' + user_id2;
@@ -39,6 +38,7 @@ exports.createSingleChannel = function (user_ids, callback) {
                     bind.channel_id = '';
                 } else {
                     bind.channel_id = newSingle_channel._id;
+                    bind.single_channel = newSingle_channel;
                 }
                 callback(bind);
             });
