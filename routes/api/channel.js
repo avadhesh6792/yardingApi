@@ -652,7 +652,7 @@ router.post('/make-channel-admin', function (req, res) {
         if (channel) {
             channel.admin_id = ObjectId(user_id);
             var index = channel.members_id.indexOf(ObjectId(user_id));
-
+            console.log('*** make channel admin : BEFORE '+ JSON.stringify(channel));
             if (index > -1) {
                 channel.members_id.splice(index, 1);
                 channel.members_id.unshift(ObjectId(user_id));
@@ -665,6 +665,7 @@ router.post('/make-channel-admin', function (req, res) {
                         bind.status = 1;
                         bind.message = 'Channel admin was created successfully';
                     }
+                    console.log('*** make channel admin : AFTER '+ JSON.stringify(channel));
                     return res.json(bind);
                 });
             } else {
