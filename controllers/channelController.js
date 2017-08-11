@@ -19,7 +19,7 @@ exports.createSingleChannel = function (user_ids, callback) {
     console.log('**** inside create single channel ****');
     console.log('user_id1 ' + user_id1);
     console.log('user_id2 ' + user_id2);
-    Channel.findOne({$or: [{members_id: {$elemMatch: {$eq: ObjectId(user_id1)}}, members_id: {$elemMatch: {$eq: ObjectId(user_id2)}}, room_type: 'single'}, {_id: ObjectId(user_id2)}]}, function (err, single_channel) {
+    Channel.findOne({$or: [{members_id: {$elemMatch: {$eq: ObjectId(user_id1)}}, members_id: {$elemMatch: {$eq: ObjectId(user_id2)}}, room_type: 'single'}, {_id: user_id2}]}, function (err, single_channel) {
     //Channel.findOne({ members_id: {$elemMatch: {$eq: ObjectId(user_id1)}}, members_id: { $elemMatch: {$eq: ObjectId(user_id2)}}, room_type: 'single'}, function (err, single_channel) {
         if (single_channel) {
             bind.channel_id = single_channel._id;
