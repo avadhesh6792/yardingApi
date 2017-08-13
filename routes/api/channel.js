@@ -705,23 +705,21 @@ router.post('/remove-user-from-channel', function (req, res) {
                         bind.message = 'User was removed from channel successfully';
 
                         // send notification to user
-                    var deviceToken = '';
-                    var alert = '';
-                    var payload = {
-                        extra_data: {}
-                    };
-                    User.findOne({ _id: user_id }, function(err, user){
-                        if(user && user.token_id){
-                            deviceToken = user.token_id;
-                            var room_type = channel.room_type;
-                            alert = 'You are removed from ' + channel.channel_name + ' ' + room_type ;
-                            payload.notification_type = 'remove-user-from-channel';
-                            payload.extra_data.channel_id = channel_id;
-                            sendAPNotification(deviceToken, alert, payload);
-                        }
-                    });
-                        
-                        
+                        var deviceToken = '';
+                        var alert = '';
+                        var payload = {
+                            extra_data: {}
+                        };
+                        User.findOne({ _id: user_id }, function(err, user){
+                            if(user && user.token_id){
+                                deviceToken = user.token_id;
+                                var room_type = channel.room_type;
+                                alert = 'You are removed from ' + channel.channel_name + ' ' + room_type ;
+                                payload.notification_type = 'remove-user-from-channel';
+                                payload.extra_data.channel_id = channel_id;
+                                sendAPNotification(deviceToken, alert, payload);
+                            }
+                        });
                     }
                     return res.json(bind);
                 });

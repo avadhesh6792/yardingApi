@@ -3,11 +3,14 @@ var router = express.Router();
 var multer = require('multer');
 var Group = require('../../models/group');
 var Channel = require('../../models/channel');
+var User = require('../../models/user');
 var Mongoose = require('mongoose');
 var ObjectId = Mongoose.Types.ObjectId;
 //var Clear_chat = require('../../models/clear_chat');
 var moment = require('moment');
 var arraySort = require('array-sort');
+var apn = require('apn');
+var appRoot = require('app-root-path');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -128,6 +131,28 @@ router.post('/add-member-to-group', function(req, res){
                 } else {
                     bind.status = 1;
                     bind.message = 'Participants was added successfully';
+                    
+                    // send notification to user
+                    var deviceToken = '';
+                    var alert = '';
+                    var payload = {
+                        extra_data: {}
+                    };
+                    User.find({ _id: { $in : members_id } }, function(err, users){
+                        if(users.length){
+                            for(user in users){
+                                if(user.token_id){
+                                   deviceToken = user.token_id;
+                                    var room_type = group.room_type;
+                                    alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
+                                    payload.notification_type = 'add-member-to-group';
+                                    payload.extra_data.channel_id = group_id;
+                                    sendAPNotification(deviceToken, alert, payload); 
+                                }
+                            }
+                        }
+                    });
+                    
                 }
                 return res.json(bind);
             });
