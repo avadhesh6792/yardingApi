@@ -19,7 +19,7 @@ exports.createSingleChannel = function (user_ids, callback) {
     console.log('**** inside create single channel ****');
     console.log('user_id1 ' + user_id1);
     console.log('user_id2 ' + user_id2);
-    Channel.findOne({$or: [{'members_id.user_id': {$elemMatch: {$eq: ObjectId(user_id1)}}, 'members_id.user_id': {$elemMatch: {$eq: ObjectId(user_id2)}}, room_type: 'single'}, {_id: ObjectId(user_id2)}]}, function (err, single_channel) {
+    Channel.findOne({$or: [{members_id: {$elemMatch: {$eq: ObjectId(user_id1)}}, members_id: {$elemMatch: {$eq: ObjectId(user_id2)}}, room_type: 'single'}, {_id: ObjectId(user_id2)}]}, function (err, single_channel) {
     //Channel.findOne({ members_id: {$elemMatch: {$eq: ObjectId(user_id1)}}, members_id: { $elemMatch: {$eq: ObjectId(user_id2)}}, room_type: 'single'}, function (err, single_channel) {
         if (single_channel) {
             bind.channel_id = single_channel._id;
@@ -28,7 +28,7 @@ exports.createSingleChannel = function (user_ids, callback) {
         } else {
 
             var newSingle_channel = new Channel;
-            newSingle_channel.members_id.push({ user_id: ObjectId(user_id1), online_status: true}, { user_id: ObjectId(user_id2), online_status: false});
+            newSingle_channel.members_id.push(ObjectId(user_id1), ObjectId(user_id2));
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             newSingle_channel.channel_name = user_id1 + '_' + user_id2;
@@ -57,10 +57,10 @@ exports.joinChannel = function (jsonData, socket, callback) {
             callback(bind);
         }
         if (channel) {
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
-            //var index = channel.members_id.indexOf(new ObjectId(user_id));
+
+            var index = channel.members_id.indexOf(new ObjectId(user_id));
             if (index == -1) {
-                channel.members_id.push({user_id: new ObjectId(user_id), online_status: true});
+                channel.members_id.push(new ObjectId(user_id));
                 channel.save(function (err) {
                     if (err) {
                         bind.status = 0;

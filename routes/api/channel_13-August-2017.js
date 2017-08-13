@@ -77,7 +77,7 @@ router.post('/create-channel', function (req, res, next) {
                 newChannel.user_id = user_id;
                 newChannel.admin_id = user_id;
                 newChannel.link = link;
-                newChannel.members_id.push({user_id: ObjectId(user_id), online_status: false});
+                newChannel.members_id.push(new ObjectId(user_id));
                 newChannel.created_timestamp = moment().unix();
                 newChannel.room_type = 'channel';
 
@@ -113,7 +113,7 @@ router.get('/get-all-single-channels/:user_id', function (req, res, next) {
     var user_id = ObjectId(req.params.user_id);
     Channel.aggregate([
         {
-            $match : { 'members_id.user_id': { $elemMatch: { $eq: user_id } }, room_type: 'single' }
+            $match : { members_id: { $elemMatch: { $eq: user_id } }, room_type: 'single' }
         },
         {
             $lookup: {
@@ -167,13 +167,12 @@ router.post('/delete-from-chat-channels', function(req, res, next){
     
     Channel.findOne({ _id: channel_id }, function(err, channel){
         if(channel){
-            //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+            var index = channel.members_id.indexOf(ObjectId(user_id));
             if (index > -1) {
                 channel.members_id.splice(index, 1);
                 
                 if(channel.admin_id == user_id){
-                    var admin_id = channel.members_id[Math.floor(Math.random()*channel.members_id.length)].user_id;
+                    var admin_id = channel.members_id[Math.floor(Math.random()*channel.members_id.length)];
                     channel.admin_id = admin_id;
                 }
                 channel.save(function(err){
@@ -208,7 +207,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
     var user_id = ObjectId(req.params.user_id);
     Channel.aggregate([
         {
-            $match : { 'members_id.user_id': { $elemMatch: { $eq: user_id } } }
+            $match : { members_id: { $elemMatch: { $eq: user_id } } }
         },
         {
             $lookup: {
@@ -221,7 +220,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.user_id',
+                localField: 'members_id',
                 foreignField: '_id',
                 as: 'members_info'
 
@@ -287,7 +286,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
     var pattern = new RegExp(search_term, 'i');
     Channel.aggregate([
         {
-            $match : { 'members_id.user_id': { $elemMatch: { $eq: user_id } } }
+            $match : { members_id: { $elemMatch: { $eq: user_id } } }
         },
         {
             $lookup: {
@@ -300,7 +299,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.user_id',
+                localField: 'members_id',
                 foreignField: '_id',
                 as: 'members_info'
 
@@ -381,7 +380,7 @@ router.get('/get-all-channels', function (req, res, next) {
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.user_id',
+                localField: 'members_id',
                 foreignField: '_id',
                 as: 'members_info'
 
@@ -534,7 +533,7 @@ router.get('/get-channel-info/:channel_id', function (req, res) {
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.user_id',
+                localField: 'members_id',
                 foreignField: '_id',
                 as: 'members_info'
 
@@ -620,8 +619,7 @@ router.post('/exit-channel', function (req, res) {
     var channel_id = req.body.channel_id;
     Channel.findOne({_id: channel_id}, function (err, channel) {
         if (channel) {
-            //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = channel.members_id.indexOf(ObjectId(user_id));
             if (index > -1) {
                 channel.members_id.splice(index, 1);
                 channel.save(function (err) {
@@ -657,12 +655,11 @@ router.post('/make-channel-admin', function (req, res) {
     Channel.findOne({_id: channel_id}, function (err, channel) {
         if (channel) {
             channel.admin_id = ObjectId(user_id);
-            //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = channel.members_id.indexOf(ObjectId(user_id));
             console.log('*** make channel admin : BEFORE '+ JSON.stringify(channel));
             if (index > -1) {
                 channel.members_id.splice(index, 1);
-                channel.members_id.unshift({ user_id: ObjectId(user_id), online_status: false});
+                channel.members_id.unshift(ObjectId(user_id));
                 channel.save(function (err) {
                     if (err) {
                         bind.status = 0;
@@ -695,8 +692,7 @@ router.post('/remove-user-from-channel', function (req, res) {
     var channel_id = ObjectId(req.body.channel_id);
     Channel.findOne({_id: channel_id}, function (err, channel) {
         if (channel) {
-            //var index = channel.members_id.indexOf(user_id);
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+            var index = channel.members_id.indexOf(user_id);
             if (index > -1) {
                 channel.members_id.splice(index, 1);
                 channel.save(function (err) {
@@ -836,7 +832,7 @@ router.post('/accept-reject-channel-request', function(req, res, next){
         if(channel){
             
             if(flag == 1){ // accept
-                channel.members_id.push({user_id: user_id, online_status: false});
+                channel.members_id.push(user_id);
             }
             var index = channel.request_users_id.indexOf(user_id);
             channel.request_users_id.splice(index, 1);

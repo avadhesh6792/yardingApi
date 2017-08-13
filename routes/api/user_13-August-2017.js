@@ -92,7 +92,7 @@ router.post('/sign-up', function (req, res, next) {
                 Channel.findOne({channel_name: 'Yarding'}, function (err, channel) {
                     if(channel){
                         var user_id = newUser._id;
-                        channel.members_id.push({ user_id: ObjectId(user_id), online_status: false });
+                        channel.members_id.push(new ObjectId(user_id));
                         channel.save();
                     }
                 });
@@ -336,11 +336,7 @@ router.get('/get-more-participants-list/:group_id', function(req, res){
     var bind = {};
     Channel.findOne({ _id: group_id }, function(err, group){
         if(group){
-            //var members_id = group.members_id;
-            var members_id = [];
-            for(member in group.members_id){
-                members_id.push(member.user_id);
-            }
+            var members_id = group.members_id;
             User.find({ _id: { $nin:  members_id} }, { name: 1, status: 1, display_pic: 1}, function(err, users){
             if(users.length){
                 bind.status = 1;
@@ -370,11 +366,7 @@ router.get('/get-more-participants-list/:group_id/:search_term', function(req, r
     var bind = {};
     Group.findOne({ _id: group_id }, function(err, group){
         if(group){
-            //var members_id = group.members_id;
-            var members_id = [];
-            for(member in group.members_id){
-                members_id.push(member.user_id);
-            }
+            var members_id = group.members_id;
             User.find({ _id: { $nin:  members_id}, name: {$regex: pattern} }, { name: 1, status: 1, display_pic: 1}, function(err, users){
             if(users.length){
                 bind.status = 1;
