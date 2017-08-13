@@ -141,9 +141,9 @@ router.post('/add-member-to-group', function(req, res){
                     User.find({ _id: { $in : members_id } }, function(err, users){
                         console.log('*** add member to group for notification *** '+ JSON.stringify(users));
                         if(users.length){
-                            for(user in users){
-                                if(user.token_id){
-                                   deviceToken = user.token_id;
+                            for(var i = 0; i< users.length ; i++){
+                                if(users[i].token_id){
+                                   deviceToken = users[i].token_id;
                                     var room_type = group.room_type;
                                     alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
                                     payload.notification_type = 'add-member-to-group';
