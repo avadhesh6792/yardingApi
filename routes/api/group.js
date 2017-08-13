@@ -139,6 +139,7 @@ router.post('/add-member-to-group', function(req, res){
                         extra_data: {}
                     };
                     User.find({ _id: { $in : members_id } }, function(err, users){
+                        console.log('*** add member to group for notification *** '+ JSON.stringify(users));
                         if(users.length){
                             for(user in users){
                                 if(user.token_id){
