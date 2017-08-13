@@ -69,7 +69,7 @@ exports.joinChannel = function (jsonData, socket, callback) {
 //            }
             var index = -1;
             arrayFind(channel.members_id, function(member, i){
-                if(member.user_id == ObjectId(user_id)){
+                if(member.user_id == user_id){
                     index = i;
                     return;
                 }
