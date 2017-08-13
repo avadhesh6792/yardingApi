@@ -60,6 +60,7 @@ exports.joinChannel = function (jsonData, socket, callback) {
             var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
             //var index = channel.members_id.indexOf(new ObjectId(user_id));
             if (index == -1) {
+                console.log('*** join channel and user id  not exists in the member ids array');
                 channel.members_id.push({user_id: new ObjectId(user_id), online_status: true});
                 channel.save(function (err) {
                     if (err) {
@@ -72,6 +73,7 @@ exports.joinChannel = function (jsonData, socket, callback) {
                     callback(bind);
                 });
             } else {
+                console.log('*** join channel and user id   exists in the member ids array');
                 bind.status = 0;
                 bind.message = 'User is already channel member';
                 callback(bind);
