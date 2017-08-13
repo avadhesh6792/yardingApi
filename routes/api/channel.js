@@ -778,24 +778,18 @@ router.post('/add-to-channel-request', function(req, res, next){
                         
                         User.findOne({ _id: channel_admin_id }, function(err, admin_user){
                             if(admin_user && admin_user.token_id){
-                                
                                 User.findOne({ _id: user_id }, function(err, user){
                                     if(user){
                                         deviceToken = admin_user.token_id;
                                         var room_type = channel.room_type;
-                                        alert = user.name +' has sent request to ' + channel.name + ' ' + room_type;
+                                        alert = user.name +' has sent request to ' + channel.channel_name + ' ' + room_type;
                                         payload.notification_type = 'add-to-channel-request';
                                         payload.extra_data.channel_id = channel_id;
                                         sendAPNotification(deviceToken, alert, payload);
                                     }
                                 });
-                                
-                                
                             }
                         });
-                        
-                        
-                        
                     }
                     return res.json(bind);
                 });
@@ -833,6 +827,25 @@ router.post('/accept-reject-channel-request', function(req, res, next){
                 } else {
                     bind.status = 1;
                     bind.message = flag == 1 ? 'Request was accepted successfully' : 'Request was rejected successfully';
+                    
+                    // send notification to user
+                    var deviceToken = '';
+                    var alert = '';
+                    var payload = {
+                        extra_data: {}
+                    };
+                    User.findOne({ _id: user_id }, function(err, user){
+                        if(user && user.token_id){
+                            deviceToken = user.token_id;
+                            var room_type = channel.room_type;
+                            alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request' ;
+                            payload.notification_type = 'accept-reject-channel-request';
+                            payload.extra_data.channel_id = channel_id;
+                            sendAPNotification(deviceToken, alert, payload);
+                        }
+                    });
+                        
+                    
                 }
                 return res.json(bind);
             });
