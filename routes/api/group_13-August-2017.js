@@ -47,12 +47,12 @@ router.post('/create-group', function (req, res, next) {
         newGroup.user_id = user_id;
         newGroup.admin_id = user_id;
         newGroup.created_timestamp = moment().unix();
-        newGroup.members_id.push({ user_id: ObjectId(user_id), online_status: false } );
+        newGroup.members_id.push( ObjectId(user_id) );
         newGroup.room_type = 'group';
 
         for(var i = 0; i< members_id.length ;i++){
             var member_id = members_id[i].trim();
-            newGroup.members_id.push({ user_id: ObjectId(member_id), online_status: false }  );
+            newGroup.members_id.push( ObjectId(member_id) );
         }
         
         newGroup.save(function (err) {
@@ -83,7 +83,7 @@ router.get('/get-group-info/:group_id', function(req, res){
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.user_id',
+                localField: 'members_id',
                 foreignField: '_id',
                 as: 'members_info'
                 
@@ -121,7 +121,7 @@ router.post('/add-member-to-group', function(req, res){
            if(group){
                 for(var i = 0; i< members_id.length ;i++){
                     var member_id = members_id[i].trim();
-                    group.members_id.push({user_id: ObjectId(member_id), online_status: false}  );
+                    group.members_id.push( ObjectId(member_id) );
                 }
                 group.save(function (err) {
                 if (err) {
@@ -138,7 +138,6 @@ router.post('/add-member-to-group', function(req, res){
                     var payload = {
                         extra_data: {}
                     };
-                    
                     User.find({ _id: { $in : members_id } }, function(err, users){
                         console.log('*** add member to group for notification *** '+ JSON.stringify(users));
                         if(users.length){
@@ -255,8 +254,7 @@ router.post('/exit-group', function(req, res){
     var group_id = req.body.group_id;
     Group.findOne({ _id: group_id }, function(err, group){
         if(group){
-            //var index = group.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = group.members_id.indexOf(ObjectId(user_id));
             if(index > -1){
                 group.members_id.splice(index, 1);
                 group.save(function(err){
@@ -290,8 +288,7 @@ router.post('/remove-user', function(req, res){
     var group_id = req.body.group_id;
     Group.findOne({ _id: group_id }, function(err, group){
         if(group){
-            //var index = group.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = group.members_id.indexOf(ObjectId(user_id));
             if(index > -1){
                 group.members_id.splice(index, 1);
                 group.save(function(err){
@@ -345,13 +342,11 @@ router.post('/make-group-admin', function(req, res){
     Group.findOne({  _id: group_id }, function(err, group){
         if(group){
             group.admin_id = user_id;
-            //var index = group.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
-            
+            var index = group.members_id.indexOf(ObjectId(user_id));
             
             if(index > -1){
                 group.members_id.splice(index, 1);
-                group.members_id.unshift({ user_id : ObjectId(user_id), online_status: false});
+                group.members_id.unshift(ObjectId(user_id));
                 group.save(function(err){
                     if(err){
                         bind.status = 0;
