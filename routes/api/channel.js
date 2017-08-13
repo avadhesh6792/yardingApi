@@ -7,11 +7,13 @@ var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../../models/clear_chat');
 var Channel_chat = require('../../models/channel_chat');
 var Channel_request = require('../../models/channel_request');
+var User = require('../../models/user');
 var moment = require('moment');
 var arraySort = require('array-sort');
 var arrayFind = require('array-find');
 var appRoot = require('app-root-path');
 var ffmpeg = require('fluent-ffmpeg');
+var apn = require('apn');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -748,30 +750,6 @@ router.post('/add-to-channel-request', function(req, res, next){
     var bind = {};
     var channel_id = req.body.channel_id;
     var user_id = req.body.user_id;
-//    Channel_request.findOne({ channel_id: channel_id, user_id: user_id }, function(err, channel_request){
-//        if(channel_request){
-//            bind.status = 0;
-//            bind.message = 'You have already sent request to this channel';
-//            return res.json(bind);
-//        } else {
-//            var newChannel_request = new Channel_request;
-//            newChannel_request.channel_id = channel_id;
-//            newChannel_request.user_id = user_id
-//            newChannel_request.save(function(err){
-//                if(err){
-//                    bind.status = 0;
-//                    bind.message = 'Oops! error occur while add to channel request';
-//                    bind.error = err;
-//                } else{
-//                    bind.status = 1;
-//                    bind.message = 'Your request was sennt successfully';
-//                }
-//                return res.json(bind);
-//            });
-//            
-//        }
-//    });
-    
     Channel.findOne({_id: channel_id}, function (err, channel) {
         if (channel) {
             var index = channel.request_users_id.indexOf(ObjectId(user_id));
@@ -789,6 +767,25 @@ router.post('/add-to-channel-request', function(req, res, next){
                     } else{
                         bind.status = 1;
                         bind.message = 'Your request was sennt successfully';
+                        
+                        // send notification to channel admin
+                        var deviceToken = '';
+                        var alert = '';
+                        var payload = {};
+                        var channel_admin_id = channel.admin_id;
+                        
+                        User.findOne({ _id: channel_admin_id }, function(err, user){
+                            if(user && user.token_id){
+                                deviceToken = user.token_id;
+                                alert = 'You have new channel request';
+                                payload.notification_type = 'add-to-channel-request';
+                                payload.channel_id = channel_id;
+                                sendAPNotification(deviceToken, alert, payload);
+                            }
+                        });
+                        
+                        
+                        
                     }
                     return res.json(bind);
                 });
@@ -867,6 +864,31 @@ router.get('/get-channel-requests/:channel_id', function(req, res, next){
         return res.json(bind);
     });
 });
+
+function sendAPNotification(deviceToken, alert, payload){
+    var options = {
+        cert: appRoot + "/config/cert.pem",
+        key: appRoot + "/config/key.pem",
+        production: false
+      };
+
+    var apnProvider = new apn.Provider(options);
+    //var deviceToken = "9714BC5CA55696CF6AC89BE9A62277B8F3D1BCF85CB7E65D1937A1B3288284A4";
+    var note = new apn.Notification();
+
+    //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+    //note.badge = 3;
+    //note.sound = "ping.aiff";
+    note.alert = alert;
+    note.payload = payload;
+    note.topic = "com.yardingllc.yarding";
+    
+    apnProvider.send(note, deviceToken).then( function(result) {
+        // see documentation for an explanation of result
+        console.log('notification result '+ JSON.stringify(result));
+        //return res.json(result);
+    });
+}
 
 // testing route
 router.get('/testing', function (req, res, next) {
