@@ -113,7 +113,7 @@ router.get('/get-all-single-channels/:user_id', function (req, res, next) {
     var user_id = ObjectId(req.params.user_id);
     Channel.aggregate([
         {
-            $match : { 'members_id.user_id': { $elemMatch: { $eq: user_id } }, room_type: 'single' }
+            $match : { 'members_id.user_id': user_id, room_type: 'single' }
         },
         {
             $lookup: {
@@ -208,7 +208,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
     var user_id = ObjectId(req.params.user_id);
     Channel.aggregate([
         {
-            $match : { 'members_id.user_id': { $elemMatch: { $eq: user_id } } }
+            $match : { 'members_id.user_id': user_id  }
         },
         {
             $lookup: {
@@ -287,7 +287,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
     var pattern = new RegExp(search_term, 'i');
     Channel.aggregate([
         {
-            $match : { 'members_id.user_id': { $elemMatch: { $eq: user_id } } }
+            $match : { 'members_id.user_id': user_id }
         },
         {
             $lookup: {
