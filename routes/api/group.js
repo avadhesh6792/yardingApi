@@ -153,7 +153,6 @@ router.post('/add-member-to-group', function(req, res){
                             }
                         }
                     });
-                    
                 }
                 return res.json(bind);
             });
@@ -300,6 +299,24 @@ router.post('/remove-user', function(req, res){
                     } else {
                         bind.status = 1;
                         bind.message = 'User was removed from group successfully';
+
+                        // send notification to user
+                        var deviceToken = '';
+                        var alert = '';
+                        var payload = {
+                            extra_data: {}
+                        };
+                        User.findOne({ _id: user_id }, function(err, user){
+                            if(user.token_id){
+                               deviceToken = user.token_id;
+                                var room_type = group.room_type;
+                                alert = 'You are removed from ' + group.channel_name + ' ' + room_type ;
+                                payload.notification_type = 'remove-user';
+                                payload.extra_data.channel_id = group_id;
+                                sendAPNotification(deviceToken, alert, payload); 
+                            }
+                        });
+                        
                     }
                     return res.json(bind);
                 });
