@@ -766,21 +766,31 @@ router.post('/add-to-channel-request', function(req, res, next){
                         bind.error = err;
                     } else{
                         bind.status = 1;
-                        bind.message = 'Your request was sennt successfully';
+                        bind.message = 'Your request was sent successfully';
                         
                         // send notification to channel admin
                         var deviceToken = '';
                         var alert = '';
-                        var payload = {};
+                        var payload = {
+                            extra_data: {}
+                        };
                         var channel_admin_id = channel.admin_id;
                         
-                        User.findOne({ _id: channel_admin_id }, function(err, user){
-                            if(user && user.token_id){
-                                deviceToken = user.token_id;
-                                alert = 'You have new channel request';
-                                payload.notification_type = 'add-to-channel-request';
-                                payload.channel_id = channel_id;
-                                sendAPNotification(deviceToken, alert, payload);
+                        User.findOne({ _id: channel_admin_id }, function(err, admin_user){
+                            if(admin_user && admin_user.token_id){
+                                
+                                User.findOne({ _id: user_id }, function(err, user){
+                                    if(user){
+                                        deviceToken = admin_user.token_id;
+                                        var room_type = channel.room_type;
+                                        alert = user.name +' has sent request to ' + channel.name + ' ' + room_type;
+                                        payload.notification_type = 'add-to-channel-request';
+                                        payload.extra_data.channel_id = channel_id;
+                                        sendAPNotification(deviceToken, alert, payload);
+                                    }
+                                });
+                                
+                                
                             }
                         });
                         
