@@ -11,6 +11,7 @@ var Clear_chat = require('../models/clear_chat');
 var moment = require('moment');
 var request = require('request');
 var url = require('url');
+var arrayFind = require('array-find');
 
 exports.createSingleChannel = function (user_ids, callback) {
     var bind = {};
@@ -57,15 +58,23 @@ exports.joinChannel = function (jsonData, socket, callback) {
             callback(bind);
         }
         if (channel) {
-            //var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
-            var index = -1;
-            for(var i = 0; i< channel.members_id.length ; i++){
-                if(channel.members_id[i].user_id == ObjectId(user_id)){
-                    index = i;
-                    break;
-                }
-            }
             //var index = channel.members_id.indexOf(new ObjectId(user_id));
+            //var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+//            var index = -1;
+//            for(var i = 0; i< channel.members_id.length ; i++){
+//                if(channel.members_id[i].user_id == ObjectId(user_id)){
+//                    index = i;
+//                    break;
+//                }
+//            }
+            var index = -1;
+            arrayFind(channel.members_id, function(member, i){
+                if(member.user_id == ObjectId(user_id)){
+                    index = i;
+                    return;
+                }
+            });
+            
             if (index == -1) {
                 console.log('*** join channel and user id  not exists in the member ids array');
                 channel.members_id.push({user_id: new ObjectId(user_id), online_status: true});
