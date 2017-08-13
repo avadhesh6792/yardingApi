@@ -59,7 +59,7 @@ exports.joinChannel = function (jsonData, socket, callback) {
         }
         if (channel) {
             //var index = channel.members_id.indexOf(new ObjectId(user_id));
-            //var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
 //            var index = -1;
 //            for(var i = 0; i< channel.members_id.length ; i++){
 //                if(channel.members_id[i].user_id == ObjectId(user_id)){
@@ -67,13 +67,13 @@ exports.joinChannel = function (jsonData, socket, callback) {
 //                    break;
 //                }
 //            }
-            var index = -1;
-            arrayFind(channel.members_id, function(member, i){
-                if(member.user_id == user_id){
-                    index = i;
-                    return;
-                }
-            });
+//            var index = -1;
+//            arrayFind(channel.members_id, function(member, i){
+//                if(member.user_id == user_id){
+//                    index = i;
+//                    return;
+//                }
+//            });
             
             if (index == -1) {
                 console.log('*** join channel and user id  not exists in the member ids array');

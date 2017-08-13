@@ -256,7 +256,7 @@ router.post('/exit-group', function(req, res){
     Group.findOne({ _id: group_id }, function(err, group){
         if(group){
             //var index = group.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
             if(index > -1){
                 group.members_id.splice(index, 1);
                 group.save(function(err){
@@ -291,7 +291,7 @@ router.post('/remove-user', function(req, res){
     Group.findOne({ _id: group_id }, function(err, group){
         if(group){
             //var index = group.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
             if(index > -1){
                 group.members_id.splice(index, 1);
                 group.save(function(err){
@@ -346,7 +346,7 @@ router.post('/make-group-admin', function(req, res){
         if(group){
             group.admin_id = user_id;
             //var index = group.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
             
             
             if(index > -1){

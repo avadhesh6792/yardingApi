@@ -162,13 +162,14 @@ router.get('/get-all-single-channels/:user_id', function (req, res, next) {
 router.post('/delete-from-chat-channels', function(req, res, next){
     var bind = {};
     var user_id = ObjectId(req.body.user_id);
+    var user_id_normal = req.body.user_id;
     var channel_id = ObjectId(req.body.channel_id);
     var room_type = req.body.room_type;
     
     Channel.findOne({ _id: channel_id }, function(err, channel){
         if(channel){
             //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id_normal);
             if (index > -1) {
                 channel.members_id.splice(index, 1);
                 
@@ -658,7 +659,7 @@ router.post('/make-channel-admin', function (req, res) {
         if (channel) {
             channel.admin_id = ObjectId(user_id);
             //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
             console.log('*** make channel admin : BEFORE '+ JSON.stringify(channel));
             if (index > -1) {
                 channel.members_id.splice(index, 1);
@@ -692,11 +693,12 @@ router.post('/make-channel-admin', function (req, res) {
 router.post('/remove-user-from-channel', function (req, res) {
     var bind = {};
     var user_id = ObjectId(req.body.user_id);
+    var user_id_normal = req.body.user_id;
     var channel_id = ObjectId(req.body.channel_id);
     Channel.findOne({_id: channel_id}, function (err, channel) {
         if (channel) {
             //var index = channel.members_id.indexOf(user_id);
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id_normal);
             if (index > -1) {
                 channel.members_id.splice(index, 1);
                 channel.save(function (err) {
