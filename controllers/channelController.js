@@ -12,6 +12,8 @@ var moment = require('moment');
 var request = require('request');
 var url = require('url');
 var arrayFind = require('array-find');
+var apn = require('apn');
+var appRoot = require('app-root-path');
 
 exports.createSingleChannel = function (user_ids, callback) {
     var bind = {};
@@ -175,6 +177,56 @@ exports.joinChannel = function (jsonData, socket, callback) {
     });
 }
 
+exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
+    var channel_id = jsonData.channel_id;
+    var user_id = jsonData.user_id;
+    var message = jsonData.message;
+    var message_type = jsonData.message_type;
+    
+    // send notification to user
+    var deviceToken = '';
+    var alert = '';
+    var payload = {
+        extra_data: {}
+    };
+    
+    Channel.findOne({ '_id': channel_id }, function(err, channel){
+        if(channel){
+            if(channel.members_id.length > 0){
+                var offline_user_ids = channel.members_id.map(function(member){
+                    if(member.online_status == false){
+                        return member.user_id;
+                    }
+                });
+                
+                User.findOne( { _id: user_id }, function(err, sender){
+                    var sender_name = sender.name;
+                    User.find({ _id: { $in: offline_user_ids} }, function(err, users){
+                        if(users.length > 0 ){
+                            users.forEach(function(user){
+                                if(user.token_id){
+                                    deviceToken = user.token_id;
+                                    var room_type = channel.room_type;
+                                    var channel_name = channel.channel_name;
+                                    alert = '@ '+sender_name+' send you message '+ channel_name + ' ' + room_type ;
+                                    payload.notification_type = 'channel_chat';
+                                    payload.extra_data.channel_id = channel_id;
+                                    sendAPNotification(deviceToken, alert, payload);
+                                }
+                            });
+                        }
+                    });
+                    
+                });
+                
+                
+            }
+        }
+    });
+    
+    
+}
+
 exports.saveMessage = function (jsonData, socket, callback) {
     var bind = {};
     var newChannel_chat = new Channel_chat;
@@ -330,6 +382,31 @@ exports.getChannelMessages = function (jsonData, socket, callback) {
                 callback(bind);
             });
         }
+    });
+}
+
+function sendAPNotification(deviceToken, alert, payload){
+    var options = {
+        cert: appRoot + "/config/cert.pem",
+        key: appRoot + "/config/key.pem",
+        production: false
+      };
+
+    var apnProvider = new apn.Provider(options);
+    //var deviceToken = "9714BC5CA55696CF6AC89BE9A62277B8F3D1BCF85CB7E65D1937A1B3288284A4";
+    var note = new apn.Notification();
+
+    //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+    //note.badge = 3;
+    //note.sound = "ping.aiff";
+    note.alert = alert;
+    note.payload = payload;
+    note.topic = "com.yardingllc.yarding";
+    
+    apnProvider.send(note, deviceToken).then( function(result) {
+        // see documentation for an explanation of result
+        console.log('notification result '+ JSON.stringify(result));
+        //return res.json(result);
     });
 }
 

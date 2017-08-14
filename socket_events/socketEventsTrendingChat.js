@@ -109,7 +109,13 @@ module.exports = function (ioTrendingChat) {
                         //console.log('************************ url meta ******************' + body_parse['meta']['image'] + ' ' +body_parse['meta']['favicon']);
                         channelController.saveMessage(jsonData, socket, function(response){
                             console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                            
+                            // send message to online user
                             ioTrendingChat.to(channel_id).emit('get message', response);
+                            
+                            // send message to offline user
+                            
+                            
                         });
                     }
                     
@@ -119,7 +125,14 @@ module.exports = function (ioTrendingChat) {
             } else {
                 channelController.saveMessage(jsonData, socket, function(response){
                     console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                    
+                    // send message to online user
                     ioTrendingChat.to(channel_id).emit('get message', response);
+                    
+                    // send message to offline user
+                    channelController.sendMessageToOfflineUser(jsonData, socket, function(response){
+                        console.log('channelController.sendMessageToOfflineUser response '+ JSON.stringify(response));
+                    });
                 });
             }
 //            if(message_type == 'url'){
