@@ -118,7 +118,7 @@ exports.setUserOnline = function(jsonData, socket, callback){
                 Channel.update({ 'members_id.user_id': ObjectId(user_id) },{ $set: { 'members_id.online_status': true } }, { multi: false }, function(err){
                     if (err) {
                         bind.status = 0;
-                        bind.message = 'Oops! error occured while saving user online status';
+                        bind.message = 'Oops! error occured while saving user online status' + JSON.stringify(err);
                         console.log('*** setUserOnline 4***');
                     } else {
                         bind.status = 1;
