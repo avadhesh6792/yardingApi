@@ -117,6 +117,7 @@ exports.setUserOnline = function(jsonData, socket, callback){
                     }
                     callback(bind);
                 });
+            }
                 
                 
 //                Channel.update({ 'members_id.user_id': ObjectId(user_id) },{ $set: { 'members_id.online_status': true } }, { multi: false }, function(err){
