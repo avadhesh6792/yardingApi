@@ -97,13 +97,25 @@ exports.setUserOnline = function(jsonData, socket, callback){
             callback(bind);
         }
         if (channel) {
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
-            console.log('*** setUserOnline 2***');
-            if (index > -1) {
-                
-                channel.members_id[index].online_status = true;
-                console.log('*** setUserOnline 3***' + JSON.stringify(channel.members_id[index]));
-                channel.save(function (err) {
+//            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+//            console.log('*** setUserOnline 2***');
+//            if (index > -1) {
+//                
+//                channel.members_id[index].online_status = true;
+//                console.log('*** setUserOnline 3***' + JSON.stringify(channel.members_id[index]));
+//                channel.save(function (err) {
+//                    if (err) {
+//                        bind.status = 0;
+//                        bind.message = 'Oops! error occured while saving user online status';
+//                        console.log('*** setUserOnline 4***');
+//                    } else {
+//                        bind.status = 1;
+//                        bind.message = 'User online status was updated successfully';
+//                        console.log('*** setUserOnline 5***' + JSON.stringify(channel.members_id[index]));
+//                    }
+//                    callback(bind);
+//                });
+                Channel.update({ 'members_id.user_id': ObjectId(user_id) },{ $set: { 'members_id.online_status': true } },{}, function(err){
                     if (err) {
                         bind.status = 0;
                         bind.message = 'Oops! error occured while saving user online status';
@@ -115,7 +127,7 @@ exports.setUserOnline = function(jsonData, socket, callback){
                     }
                     callback(bind);
                 });
-            }
+            
         } else {
             bind.status = 0;
             bind.message = 'Oops! channel not found';
