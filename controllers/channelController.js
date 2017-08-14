@@ -100,8 +100,9 @@ exports.setUserOnline = function(jsonData, socket, callback){
             var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
             console.log('*** setUserOnline 2***');
             if (index > -1) {
-                console.log('*** setUserOnline 3***');
+                
                 channel.members_id[index].online_status = true;
+                console.log('*** setUserOnline 3***' + JSON.stringify(channel.members_id[index]));
                 channel.save(function (err) {
                     if (err) {
                         bind.status = 0;
