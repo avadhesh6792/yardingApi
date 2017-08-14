@@ -17,6 +17,7 @@ module.exports = function (ioTrendingChat) {
             var channel_id = jsonData.channel_id;
             var user_id = jsonData.user_id;
             var room_type = jsonData.room_type; // channel, group, single
+            jsonData.online_status = 'online';
             
             console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
             
@@ -40,7 +41,7 @@ module.exports = function (ioTrendingChat) {
                     });
                     
                     // set user online
-                    channelController.setUserOnline(jsonData, socket, function(response){
+                    channelController.setUserOnlineStatus(jsonData, socket, function(response){
                         console.log('channelController.setUserOnline response '+ JSON.stringify(response));
                     });
                     
@@ -49,7 +50,7 @@ module.exports = function (ioTrendingChat) {
                 console.log('***room type other ****');
                 socket.join(channel_id);
                 // set user online
-                channelController.setUserOnline(jsonData, socket, function(response){
+                channelController.setUserOnlineStatus(jsonData, socket, function(response){
                     console.log('channelController.setUserOnline response '+ JSON.stringify(response));
                 });
                 
@@ -152,10 +153,11 @@ module.exports = function (ioTrendingChat) {
         socket.on('leave channel', function (jsonData) {
             var user_id = jsonData.user_id;
             var channel_id = jsonData.channel_id;
+            jsonData.online_status = 'offline';
             console.log('** ** ** ioTrendingChat user disconnected to channel : ' + channel_id);
             socket.leave(channel_id);
             // set user offline
-            channelController.setUserOffline(jsonData, socket, function(response){
+            channelController.setUserOnlineStatus(jsonData, socket, function(response){
                 console.log('channelController.setUserOffline response '+ JSON.stringify(response));
             });
         });

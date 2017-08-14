@@ -49,45 +49,10 @@ exports.createSingleChannel = function (user_ids, callback) {
     });
 };
 
-exports.setUserOffline = function(jsonData, socket, callback){
+exports.setUserOnlineStatus = function(jsonData, socket, callback){
     var user_id = jsonData.user_id;
     var channel_id = jsonData.channel_id;
-    var bind = {};
-    
-    Channel.findOne({_id: channel_id}, function(err, channel){
-        if(err){
-            bind.status = 0;
-            bind.message = 'Oops! error occured while fetching channel by channel id';
-            callback(bind);
-        }
-        if (channel) {
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
-            if (index > -1) {
-                console.log('*** join channel and user id  not exists in the member ids array');
-                channel.members_id[index].online_status = false;
-                channel.save(function (err) {
-                    if (err) {
-                        bind.status = 0;
-                        bind.message = 'Oops! error occured while saving user online status';
-                    } else {
-                        bind.status = 1;
-                        bind.message = 'User online status was updated successfully';
-                    }
-                    callback(bind);
-                });
-            }
-        } else {
-            bind.status = 0;
-            bind.message = 'Oops! channel not found';
-            callback(bind);
-        }
-        
-    });
-} 
-
-exports.setUserOnline = function(jsonData, socket, callback){
-    var user_id = jsonData.user_id;
-    var channel_id = jsonData.channel_id;
+    var online_status = jsonData.online_status;
     var bind = {};
     console.log('*** setUserOnline 1***');
     Channel.findOne({_id: channel_id}, function(err, channel){
@@ -102,7 +67,7 @@ exports.setUserOnline = function(jsonData, socket, callback){
             if (index > -1) {
                 
                 var members_id = channel.members_id; 
-                members_id[index].online_status = true;
+                members_id[index].online_status = online_status;
                 channel.members_id = members_id;
                 console.log('*** setUserOnline 3***' + JSON.stringify(channel.members_id[index]));
                 channel.save(function (err) {
