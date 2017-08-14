@@ -111,7 +111,7 @@ exports.setUserOnline = function(jsonData, socket, callback){
                     } else {
                         bind.status = 1;
                         bind.message = 'User online status was updated successfully';
-                        console.log('*** setUserOnline 5***');
+                        console.log('*** setUserOnline 5***' + JSON.stringify(channel.members_id[index]));
                     }
                     callback(bind);
                 });
