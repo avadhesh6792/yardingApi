@@ -89,7 +89,7 @@ exports.setUserOnline = function(jsonData, socket, callback){
     var user_id = jsonData.user_id;
     var channel_id = jsonData.channel_id;
     var bind = {};
-    
+    console.log('*** setUserOnline 1***');
     Channel.findOne({_id: channel_id}, function(err, channel){
         if(err){
             bind.status = 0;
@@ -98,16 +98,19 @@ exports.setUserOnline = function(jsonData, socket, callback){
         }
         if (channel) {
             var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+            console.log('*** setUserOnline 2***');
             if (index > -1) {
-                console.log('*** join channel and user id  not exists in the member ids array');
+                console.log('*** setUserOnline 3***');
                 channel.members_id[index].online_status = true;
                 channel.save(function (err) {
                     if (err) {
                         bind.status = 0;
                         bind.message = 'Oops! error occured while saving user online status';
+                        console.log('*** setUserOnline 4***');
                     } else {
                         bind.status = 1;
                         bind.message = 'User online status was updated successfully';
+                        console.log('*** setUserOnline 5***');
                     }
                     callback(bind);
                 });
