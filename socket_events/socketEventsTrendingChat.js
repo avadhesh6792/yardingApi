@@ -41,18 +41,24 @@ module.exports = function (ioTrendingChat) {
                     
                     // set user online
                     channelController.setUserOnline(jsonData, socket, function(response){
-                        console.log('channelController.getUserOnline response '+ JSON.stringify(response));
+                        console.log('channelController.setUserOnline response '+ JSON.stringify(response));
                     });
                     
                 });
             } else {
                 console.log('***room type other ****');
                 socket.join(channel_id);
+                // set user online
+                channelController.setUserOnline(jsonData, socket, function(response){
+                    console.log('channelController.setUserOnline response '+ JSON.stringify(response));
+                });
+                
                 channelController.getChannelMessages(jsonData, socket, function(response){
                     //console.log('channelController.getChannelMessages response '+ JSON.stringify(response));
                     response.channel_id = channel_id;
                     socket.emit('get channel messages', response);
                 });
+                
             }
             
             
@@ -134,12 +140,11 @@ module.exports = function (ioTrendingChat) {
             var user_id = jsonData.user_id;
             var channel_id = jsonData.channel_id;
             console.log('** ** ** ioTrendingChat user disconnected to channel : ' + channel_id);
+            socket.leave(channel_id);
             // set user offline
             channelController.setUserOffline(jsonData, socket, function(response){
-                console.log('channelController.getUserOnline response '+ JSON.stringify(response));
-                socket.leave(channel_id);
+                console.log('channelController.setUserOffline response '+ JSON.stringify(response));
             });
-            
         });
         
     });
