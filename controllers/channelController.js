@@ -194,7 +194,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     deviceToken = user.token_id;
                                     var room_type = channel.room_type;
                                     var channel_name = channel.channel_name;
-                                    alert = '@ '+sender_name+' send you message '+ channel_name + ' ' + room_type ;
+                                    alert = '@ '+sender_name+' posted message in '+ channel_name + ' ' + room_type ;
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
                                     sendAPNotification(deviceToken, alert, payload);
