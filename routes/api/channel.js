@@ -954,7 +954,11 @@ router.get('/testing', function (req, res, next) {
 //            res.json(bind);
 
     var index = channel.members_id.findIndex(obj => obj.user_id == '59908a76f236b37d22dd0daa');
-    res.json(index);
+    channel.members_id[index].online_status = false;
+    channel.save(function(err){
+        return err ? res.json(err) : res.json(channel);
+    });
+    
     });
 });
 
