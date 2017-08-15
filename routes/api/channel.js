@@ -77,7 +77,7 @@ router.post('/create-channel', function (req, res, next) {
                 newChannel.user_id = user_id;
                 newChannel.admin_id = user_id;
                 newChannel.link = link;
-                newChannel.members_id.push({user_id: ObjectId(user_id), online_status: false});
+                //newChannel.members_id.push({user_id: ObjectId(user_id), online_status: false});
                 newChannel.created_timestamp = moment().unix();
                 newChannel.room_type = 'channel';
 
@@ -90,6 +90,7 @@ router.post('/create-channel', function (req, res, next) {
                         bind.status = 1;
                         bind.message = 'Channel was created successfully';
                         bind.channel = newChannel;
+                        Channel.update({ _id: newChannel._id }, { $push: { members_id: { user_id: ObjectId(user_id), online_status: false } } });
                     }
                     return res.json(bind);
                 });
@@ -166,41 +167,54 @@ router.post('/delete-from-chat-channels', function(req, res, next){
     var channel_id = ObjectId(req.body.channel_id);
     var room_type = req.body.room_type;
     
-    Channel.findOne({ _id: channel_id }, function(err, channel){
-        if(channel){
-            //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id_normal);
-            if (index > -1) {
-                channel.members_id.splice(index, 1);
-                
-                if(channel.admin_id == user_id){
-                    var admin_id = channel.members_id[Math.floor(Math.random()*channel.members_id.length)].user_id;
-                    channel.admin_id = admin_id;
-                }
-                channel.save(function(err){
-                    if(err){
-                        bind.status = 0;
-                        bind.message = 'Oops! error occured while deleting from chat channels';
-                        bind.error = err;
-                    } else{
-                        bind.status = 1;
-                        bind.message = 'Chats was deleted successfully';
-                    }
-                    return res.json(bind);
-                });
-                
-            } else{
-                bind.status = 0;
-                bind.message = 'You are not member of this channel';
-                res.json(bind);
-            }
-            
-        } else{
+    Channel.update({ _id: channel_id }, { $pull: { members_id:  { user_id: user_id } } }, function(err){
+        if(err){
             bind.status = 0;
-            bind.message = 'No chat channel found';
+            bind.message = 'Oops! error occured while deleting from chat channels';
+            bind.error = err;
+            return res.json(bind);
+        } else {
+            bind.status = 1;
+            bind.message = 'Chats was deleted successfully';
             return res.json(bind);
         }
     });
+    
+//    Channel.findOne({ _id: channel_id }, function(err, channel){
+//        if(channel){
+//            
+//            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id_normal);
+//            if (index > -1) {
+//                channel.members_id.splice(index, 1);
+//                
+//                if(channel.admin_id == user_id){
+//                    var admin_id = channel.members_id[Math.floor(Math.random()*channel.members_id.length)].user_id;
+//                    channel.admin_id = admin_id;
+//                }
+//                channel.save(function(err){
+//                    if(err){
+//                        bind.status = 0;
+//                        bind.message = 'Oops! error occured while deleting from chat channels';
+//                        bind.error = err;
+//                    } else{
+//                        bind.status = 1;
+//                        bind.message = 'Chats was deleted successfully';
+//                    }
+//                    return res.json(bind);
+//                });
+//                
+//            } else{
+//                bind.status = 0;
+//                bind.message = 'You are not member of this channel';
+//                res.json(bind);
+//            }
+//            
+//        } else{
+//            bind.status = 0;
+//            bind.message = 'No chat channel found';
+//            return res.json(bind);
+//        }
+//    });
 });
 
 // get all chat channels
@@ -535,7 +549,7 @@ router.get('/get-channel-info/:channel_id', function (req, res) {
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.user_id',
+                localField: 'members_id.$.user_id',
                 foreignField: '_id',
                 as: 'members_info'
 
@@ -619,34 +633,47 @@ router.post('/exit-channel', function (req, res) {
     var bind = {};
     var user_id = req.body.user_id;
     var channel_id = req.body.channel_id;
-    Channel.findOne({_id: channel_id}, function (err, channel) {
-        if (channel) {
-            //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
-            if (index > -1) {
-                channel.members_id.splice(index, 1);
-                channel.save(function (err) {
-                    if (err) {
-                        bind.status = 0;
-                        bind.message = 'Oops! error occured while exit from channel';
-                        bind.error = err;
-                    } else {
-                        bind.status = 1;
-                        bind.message = 'You were exited channel successfully';
-                    }
-                    return res.json(bind);
-                });
-            } else {
-                bind.status = 0;
-                bind.message = 'User is not a member of channel';
-            }
-            return res.json(bind);
-        } else {
+    
+    Channel.update({ _id: channel_id }, { $pull: { members_id:  { user_id: ObjectId(user_id) } } }, function(err){
+        if(err){
             bind.status = 0;
-            bind.message = 'No channel found';
-            return res.json(bind);
+            bind.message = 'Oops! error occured while exit from channel';
+            bind.error = err;
+        } else {
+            bind.status = 1;
+            bind.message = 'You were exited channel successfully';
         }
+        return res.json(bind);
     });
+    
+//    Channel.findOne({_id: channel_id}, function (err, channel) {
+//        if (channel) {
+//            //var index = channel.members_id.indexOf(ObjectId(user_id));
+//            var index = channel.members_id.findIndex(member_id => member_id.user_id == ObjectId(user_id));
+//            if (index > -1) {
+//                channel.members_id.splice(index, 1);
+//                channel.save(function (err) {
+//                    if (err) {
+//                        bind.status = 0;
+//                        bind.message = 'Oops! error occured while exit from channel';
+//                        bind.error = err;
+//                    } else {
+//                        bind.status = 1;
+//                        bind.message = 'You were exited channel successfully';
+//                    }
+//                    return res.json(bind);
+//                });
+//            } else {
+//                bind.status = 0;
+//                bind.message = 'User is not a member of channel';
+//            }
+//            return res.json(bind);
+//        } else {
+//            bind.status = 0;
+//            bind.message = 'No channel found';
+//            return res.json(bind);
+//        }
+//    });
 });
 
 // make channel admin
@@ -695,52 +722,90 @@ router.post('/remove-user-from-channel', function (req, res) {
     var user_id = ObjectId(req.body.user_id);
     var user_id_normal = req.body.user_id;
     var channel_id = ObjectId(req.body.channel_id);
+    
     Channel.findOne({_id: channel_id}, function (err, channel) {
         if (channel) {
-            //var index = channel.members_id.indexOf(user_id);
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id_normal);
-            if (index > -1) {
-                channel.members_id.splice(index, 1);
-                channel.save(function (err) {
-                    if (err) {
-                        bind.status = 0;
-                        bind.message = 'Oops! error occured while removing user from channel';
-                        bind.error = err;
-                    } else {
-                        bind.status = 1;
-                        bind.message = 'User was removed from channel successfully';
-
-                        // send notification to user
-                        var deviceToken = '';
-                        var alert = '';
-                        var payload = {
-                            extra_data: {}
-                        };
-                        User.findOne({ _id: user_id }, function(err, user){
-                            if(user && user.token_id){
-                                deviceToken = user.token_id;
-                                var room_type = channel.room_type;
-                                alert = 'You are removed from ' + channel.channel_name + ' ' + room_type ;
-                                payload.notification_type = 'remove-user-from-channel';
-                                payload.extra_data.channel_id = channel_id;
-                                sendAPNotification(deviceToken, alert, payload);
-                            }
-                        });
-                    }
-                    return res.json(bind);
-                });
-            } else {
-                bind.status = 0;
-                bind.message = 'User is not a member of channel';
+            Channel.update({ _id: channel_id }, { $pull: { members_id:  { user_id: user_id } } }, function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occured while removing user from channel';
+                    bind.error = err;
+                } else {
+                    bind.status = 1;
+                    bind.message = 'User was removed from channel successfully';
+                    // send notification to user
+                    var deviceToken = '';
+                    var alert = '';
+                    var payload = {
+                        extra_data: {}
+                    };
+                    User.findOne({ _id: user_id }, function(err, user){
+                        if(user && user.token_id){
+                            deviceToken = user.token_id;
+                            var room_type = channel.room_type;
+                            alert = 'You are removed from ' + channel.channel_name + ' ' + room_type ;
+                            payload.notification_type = 'remove-user-from-channel';
+                            payload.extra_data.channel_id = channel_id;
+                            sendAPNotification(deviceToken, alert, payload);
+                        }
+                    });
+                }
                 return res.json(bind);
-            }
-            
+            });
+
         } else {
             bind.status = 0;
             bind.message = 'No channel found';
             return res.json(bind);
         }
     });
+    
+//    Channel.findOne({_id: channel_id}, function (err, channel) {
+//        if (channel) {
+//            //var index = channel.members_id.indexOf(user_id);
+//            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id_normal);
+//            if (index > -1) {
+//                channel.members_id.splice(index, 1);
+//                channel.save(function (err) {
+//                    if (err) {
+//                        bind.status = 0;
+//                        bind.message = 'Oops! error occured while removing user from channel';
+//                        bind.error = err;
+//                    } else {
+//                        bind.status = 1;
+//                        bind.message = 'User was removed from channel successfully';
+//
+//                        // send notification to user
+//                        var deviceToken = '';
+//                        var alert = '';
+//                        var payload = {
+//                            extra_data: {}
+//                        };
+//                        User.findOne({ _id: user_id }, function(err, user){
+//                            if(user && user.token_id){
+//                                deviceToken = user.token_id;
+//                                var room_type = channel.room_type;
+//                                alert = 'You are removed from ' + channel.channel_name + ' ' + room_type ;
+//                                payload.notification_type = 'remove-user-from-channel';
+//                                payload.extra_data.channel_id = channel_id;
+//                                sendAPNotification(deviceToken, alert, payload);
+//                            }
+//                        });
+//                    }
+//                    return res.json(bind);
+//                });
+//            } else {
+//                bind.status = 0;
+//                bind.message = 'User is not a member of channel';
+//                return res.json(bind);
+//            }
+//            
+//        } else {
+//            bind.status = 0;
+//            bind.message = 'No channel found';
+//            return res.json(bind);
+//        }
+//    });
 });
 
 router.get('/change-channel-type/:channel_id', function(req, res, next){
@@ -773,57 +838,101 @@ router.post('/add-to-channel-request', function(req, res, next){
     var bind = {};
     var channel_id = req.body.channel_id;
     var user_id = req.body.user_id;
-    Channel.findOne({_id: channel_id}, function (err, channel) {
-        if (channel) {
-            var index = channel.request_users_id.indexOf(ObjectId(user_id));
-            if (index > -1) {
-                bind.status = 0;
-                bind.message = 'You have already sent request to this channel';
-                return res.json(bind);
-            } else {
-                channel.request_users_id.push(ObjectId(user_id));
-                channel.save(function(err){
-                    if(err){
-                        bind.status = 0;
-                        bind.message = 'Oops! error occur while add to channel request';
-                        bind.error = err;
-                    } else{
-                        bind.status = 1;
-                        bind.message = 'Your request was sent successfully';
-                        
-                        // send notification to channel admin
-                        var deviceToken = '';
-                        var alert = '';
-                        var payload = {
-                            extra_data: {}
-                        };
-                        var channel_admin_id = channel.admin_id;
-                        
-                        User.findOne({ _id: channel_admin_id }, function(err, admin_user){
-                            if(admin_user && admin_user.token_id){
-                                User.findOne({ _id: user_id }, function(err, user){
-                                    if(user){
-                                        deviceToken = admin_user.token_id;
-                                        var room_type = channel.room_type;
-                                        alert = user.name +' has sent request to ' + channel.channel_name + ' ' + room_type;
-                                        payload.notification_type = 'add-to-channel-request';
-                                        payload.extra_data.channel_id = channel_id;
-                                        sendAPNotification(deviceToken, alert, payload);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    return res.json(bind);
-                });
-                
-            }
-        } else {
+    
+    Channel.count( { _id: channel_id, 'request_users_id': ObjectId(user_id) }, function(err, count){
+        if(count){
             bind.status = 0;
-            bind.message = 'No channel found';
+            bind.message = 'You have already sent request to this channel';
             return res.json(bind);
+        } else {
+            Channel.update({ _id: channel_id }, { $push: { request_users_id: ObjectId(user_id) } }, function(err){
+                if(err){
+                    bind.status = 0;
+                    bind.message = 'Oops! error occur while add to channel request';
+                    bind.error = err;
+                } else{
+                    bind.status = 1;
+                    bind.message = 'Your request was sent successfully';
+
+                    // send notification to channel admin
+                    var deviceToken = '';
+                    var alert = '';
+                    var payload = {
+                        extra_data: {}
+                    };
+                    var channel_admin_id = channel.admin_id;
+
+                    User.findOne({ _id: channel_admin_id }, function(err, admin_user){
+                        if(admin_user && admin_user.token_id){
+                            User.findOne({ _id: user_id }, function(err, user){
+                                if(user){
+                                    deviceToken = admin_user.token_id;
+                                    var room_type = channel.room_type;
+                                    alert = user.name +' has sent request to ' + channel.channel_name + ' ' + room_type;
+                                    payload.notification_type = 'add-to-channel-request';
+                                    payload.extra_data.channel_id = channel_id;
+                                    sendAPNotification(deviceToken, alert, payload);
+                                }
+                            });
+                        }
+                    });
+                }
+                return res.json(bind); 
+            });
         }
     });
+    
+//    Channel.findOne({_id: channel_id}, function (err, channel) {
+//        if (channel) {
+//            var index = channel.request_users_id.indexOf(ObjectId(user_id));
+//            if (index > -1) {
+//                bind.status = 0;
+//                bind.message = 'You have already sent request to this channel';
+//                return res.json(bind);
+//            } else {
+//                channel.request_users_id.push(ObjectId(user_id));
+//                channel.save(function(err){
+//                    if(err){
+//                        bind.status = 0;
+//                        bind.message = 'Oops! error occur while add to channel request';
+//                        bind.error = err;
+//                    } else{
+//                        bind.status = 1;
+//                        bind.message = 'Your request was sent successfully';
+//                        
+//                        // send notification to channel admin
+//                        var deviceToken = '';
+//                        var alert = '';
+//                        var payload = {
+//                            extra_data: {}
+//                        };
+//                        var channel_admin_id = channel.admin_id;
+//                        
+//                        User.findOne({ _id: channel_admin_id }, function(err, admin_user){
+//                            if(admin_user && admin_user.token_id){
+//                                User.findOne({ _id: user_id }, function(err, user){
+//                                    if(user){
+//                                        deviceToken = admin_user.token_id;
+//                                        var room_type = channel.room_type;
+//                                        alert = user.name +' has sent request to ' + channel.channel_name + ' ' + room_type;
+//                                        payload.notification_type = 'add-to-channel-request';
+//                                        payload.extra_data.channel_id = channel_id;
+//                                        sendAPNotification(deviceToken, alert, payload);
+//                                    }
+//                                });
+//                            }
+//                        });
+//                    }
+//                    return res.json(bind);
+//                });
+//                
+//            }
+//        } else {
+//            bind.status = 0;
+//            bind.message = 'No channel found';
+//            return res.json(bind);
+//        }
+//    });
     
 });
 
@@ -834,51 +943,85 @@ router.post('/accept-reject-channel-request', function(req, res, next){
     var user_id = ObjectId(req.body.user_id);
     var flag = req.body.flag; // 1: accept, 0: reject
     
-    Channel.findOne({ _id: channel_id }, function(err, channel){
-        if(channel){
-            
-            if(flag == 1){ // accept
-                channel.members_id.push({user_id: user_id, online_status: false});
-            }
-            var index = channel.request_users_id.indexOf(user_id);
-            channel.request_users_id.splice(index, 1);
-            channel.save(function(err){
-                if(err){
-                    bind.status = 0;
-                    bind.message = 'Oops! error occur while responding to request';
-                    bind.error = err;
-                } else {
-                    bind.status = 1;
-                    bind.message = flag == 1 ? 'Request was accepted successfully' : 'Request was rejected successfully';
-                    
-                    // send notification to user
-                    var deviceToken = '';
-                    var alert = '';
-                    var payload = {
-                        extra_data: {}
-                    };
-                    User.findOne({ _id: user_id }, function(err, user){
-                        if(user && user.token_id){
-                            deviceToken = user.token_id;
-                            var room_type = channel.room_type;
-                            alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request' ;
-                            payload.notification_type = 'accept-reject-channel-request';
-                            payload.extra_data.channel_id = channel_id;
-                            sendAPNotification(deviceToken, alert, payload);
-                        }
-                    });
-                        
-                    
-                }
-                return res.json(bind);
-            });
-            
-        } else {
+    var update_data = { $pull: { request_users_id: user_id } };
+    if(flag == 1){ // accept
+        update_data = { $push: { members_id: { user_id: user_id, online_status: false } }, $pull: { request_users_id: user_id } };
+    }
+     
+    Channel.update({ _id: channel_id }, update_data, { multi: true}, function(err){
+        if(err){
             bind.status = 0;
-            bind.message = 'No channel found';
-            return res.json(bind);
+            bind.message = 'Oops! error occur while responding to request';
+            bind.error = err;
+        } else {
+            bind.status = 1;
+            bind.message = flag == 1 ? 'Request was accepted successfully' : 'Request was rejected successfully';
+
+            // send notification to user
+            var deviceToken = '';
+            var alert = '';
+            var payload = {
+                extra_data: {}
+            };
+            User.findOne({ _id: user_id }, function(err, user){
+                if(user && user.token_id){
+                    deviceToken = user.token_id;
+                    var room_type = channel.room_type;
+                    alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request' ;
+                    payload.notification_type = 'accept-reject-channel-request';
+                    payload.extra_data.channel_id = channel_id;
+                    sendAPNotification(deviceToken, alert, payload);
+                }
+            });
         }
+        return res.json(bind);
     });
+    
+//    Channel.findOne({ _id: channel_id }, function(err, channel){
+//        if(channel){
+//            
+//            if(flag == 1){ // accept
+//                channel.members_id.push({user_id: user_id, online_status: false});
+//            }
+//            var index = channel.request_users_id.indexOf(user_id);
+//            channel.request_users_id.splice(index, 1);
+//            channel.save(function(err){
+//                if(err){
+//                    bind.status = 0;
+//                    bind.message = 'Oops! error occur while responding to request';
+//                    bind.error = err;
+//                } else {
+//                    bind.status = 1;
+//                    bind.message = flag == 1 ? 'Request was accepted successfully' : 'Request was rejected successfully';
+//                    
+//                    // send notification to user
+//                    var deviceToken = '';
+//                    var alert = '';
+//                    var payload = {
+//                        extra_data: {}
+//                    };
+//                    User.findOne({ _id: user_id }, function(err, user){
+//                        if(user && user.token_id){
+//                            deviceToken = user.token_id;
+//                            var room_type = channel.room_type;
+//                            alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request' ;
+//                            payload.notification_type = 'accept-reject-channel-request';
+//                            payload.extra_data.channel_id = channel_id;
+//                            sendAPNotification(deviceToken, alert, payload);
+//                        }
+//                    });
+//                        
+//                    
+//                }
+//                return res.json(bind);
+//            });
+//            
+//        } else {
+//            bind.status = 0;
+//            bind.message = 'No channel found';
+//            return res.json(bind);
+//        }
+//    });
 });
 
 // get channel requests
@@ -939,34 +1082,12 @@ function sendAPNotification(deviceToken, alert, payload){
 // testing route
 router.get('/testing', function (req, res, next) {
     var bind = {};
-//    Channel.findOne({ _id: '5990dd8f56d4290b9060e577' }, function(err, channel){
-//        
-////        channel.members_id.push({online_status : true, user_id : ObjectId("59908a76f236b37d22dd0daa")},{online_status : false, user_id : ObjectId("59908a76f236b37d22dd0daa")});
-////        channel.save(function(err){
-////            if(err){
-////                bind.status = 0;
-////                bind.message = 'Oops! error occured while saving channel info';
-////                bind.error = err;
-////            } else {
-////                bind.status = 1;
-////                bind.message = 'Channel info was saved successfully';
-////                bind.channel = channel;
-////            }
-////            res.json(bind);
-////        });
-//
-//        var index = channel.members_id.findIndex(obj => obj.user_id == '59908a76f236b37d22dd0daa');
-//        channel.members_id[index].online_status = false;
-//        channel.save(function(err){
-//            return err ? res.json(err) : res.json(channel);
-//        });
-//    
-//    });
+
     
-    Channel.update({"_id": '5990dd8f56d4290b9060e577', "members_id.user_id": ObjectId('59908a76f236b37d22dd0daa')}, 
-        {$set: {"members_id.$.online_status": false}}, function(err){
-            return err ? res.json(err) : res.json('updated');
-        });
+//    Channel.update({"_id": '5990dd8f56d4290b9060e577', "members_id.user_id": ObjectId('59908a76f236b37d22dd0daa')}, 
+//        {$set: {"members_id.$.online_status": false}}, function(err){
+//            return err ? res.json(err) : res.json('updated');
+//        });
 
 });
 

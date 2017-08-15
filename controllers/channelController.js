@@ -31,7 +31,7 @@ exports.createSingleChannel = function (user_ids, callback) {
         } else {
 
             var newSingle_channel = new Channel;
-            newSingle_channel.members_id.push({ user_id: ObjectId(user_id1), online_status: true}, { user_id: ObjectId(user_id2), online_status: false});
+            //newSingle_channel.members_id.push({ user_id: ObjectId(user_id1), online_status: true}, { user_id: ObjectId(user_id2), online_status: false});
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             newSingle_channel.channel_name = user_id1 + '_' + user_id2;
@@ -42,6 +42,9 @@ exports.createSingleChannel = function (user_ids, callback) {
                 } else {
                     bind.channel_id = newSingle_channel._id;
                     bind.single_channel = newSingle_channel;
+                    var members_id_arr = [];
+                    members_id_arr.push({ user_id: ObjectId(user_id1), online_status: false}, { user_id: ObjectId(user_id2), online_status: false});
+                    Channel.update({ _id: newSingle_channel._id }, { $push: { members_id: { $each: members_id_arr }} });
                 }
                 callback(bind);
             });

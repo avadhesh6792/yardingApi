@@ -47,14 +47,12 @@ router.post('/create-group', function (req, res, next) {
         newGroup.user_id = user_id;
         newGroup.admin_id = user_id;
         newGroup.created_timestamp = moment().unix();
-        //newGroup.members_id.push({ user_id: ObjectId(user_id), online_status: false } );
+        newGroup.members_id.push({ user_id: ObjectId(user_id), online_status: false } );
         newGroup.room_type = 'group';
 
-        var members_id_arr = [];
         for(var i = 0; i< members_id.length ;i++){
             var member_id = members_id[i].trim();
-            //newGroup.members_id.push({ user_id: ObjectId(member_id), online_status: false }  );
-            members_id_arr.push({ user_id: ObjectId(member_id), online_status: false });
+            newGroup.members_id.push({ user_id: ObjectId(member_id), online_status: false }  );
         }
         
         newGroup.save(function (err) {
@@ -66,9 +64,6 @@ router.post('/create-group', function (req, res, next) {
                 bind.status = 1;
                 bind.message = 'Group was created successfully';
                 bind.channel       = newGroup;
-                
-                Channel.update({ _id: newGroup._id }, { $push: { members_id: { user_id: ObjectId(user_id), online_status: false } } });
-                Channel.update({ _id: newGroup._id }, { $push: { members_id: { $each: members_id_arr }} });
             }
             return res.json(bind);
         });
@@ -124,82 +119,44 @@ router.post('/add-member-to-group', function(req, res){
         
        Channel.findOne({ _id: group_id }, function(err, group){
            if(group){
-               var members_id_arr = [];
                 for(var i = 0; i< members_id.length ;i++){
                     var member_id = members_id[i].trim();
-                    //group.members_id.push({user_id: ObjectId(member_id), online_status: false}  );
-                    members_id_arr.push({user_id: ObjectId(member_id), online_status: false}  );
+                    group.members_id.push({user_id: ObjectId(member_id), online_status: false}  );
                 }
-                
-                Channel.update({ _id: newGroup._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
-                    if (err) {
-                        bind.status = 0;
-                        bind.message = 'Oops! error occur while adding participants';
-                        bind.error = err;
-                    } else {
-                        bind.status = 1;
-                        bind.message = 'Participants was added successfully';
-
-                        // send notification to user
-                        var deviceToken = '';
-                        var alert = '';
-                        var payload = {
-                            extra_data: {}
-                        };
-
-                        User.find({ _id: { $in : members_id } }, function(err, users){
-                            console.log('*** add member to group for notification *** '+ JSON.stringify(users));
-                            if(users.length){
-                                for(var i = 0; i< users.length ; i++){
-                                    if(users[i].token_id){
-                                       deviceToken = users[i].token_id;
-                                        var room_type = group.room_type;
-                                        alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
-                                        payload.notification_type = 'add-member-to-group';
-                                        payload.extra_data.channel_id = group_id;
-                                        sendAPNotification(deviceToken, alert, payload); 
-                                    }
+                group.save(function (err) {
+                if (err) {
+                    bind.status = 0;
+                    bind.message = 'Oops! error occur while adding participants';
+                    bind.error = err;
+                } else {
+                    bind.status = 1;
+                    bind.message = 'Participants was added successfully';
+                    
+                    // send notification to user
+                    var deviceToken = '';
+                    var alert = '';
+                    var payload = {
+                        extra_data: {}
+                    };
+                    
+                    User.find({ _id: { $in : members_id } }, function(err, users){
+                        console.log('*** add member to group for notification *** '+ JSON.stringify(users));
+                        if(users.length){
+                            for(var i = 0; i< users.length ; i++){
+                                if(users[i].token_id){
+                                   deviceToken = users[i].token_id;
+                                    var room_type = group.room_type;
+                                    alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
+                                    payload.notification_type = 'add-member-to-group';
+                                    payload.extra_data.channel_id = group_id;
+                                    sendAPNotification(deviceToken, alert, payload); 
                                 }
                             }
-                        });
-                    }
-                    return res.json(bind);
-                });
-                
-//                group.save(function (err) {
-//                if (err) {
-//                    bind.status = 0;
-//                    bind.message = 'Oops! error occur while adding participants';
-//                    bind.error = err;
-//                } else {
-//                    bind.status = 1;
-//                    bind.message = 'Participants was added successfully';
-//                    
-//                    // send notification to user
-//                    var deviceToken = '';
-//                    var alert = '';
-//                    var payload = {
-//                        extra_data: {}
-//                    };
-//                    
-//                    User.find({ _id: { $in : members_id } }, function(err, users){
-//                        console.log('*** add member to group for notification *** '+ JSON.stringify(users));
-//                        if(users.length){
-//                            for(var i = 0; i< users.length ; i++){
-//                                if(users[i].token_id){
-//                                   deviceToken = users[i].token_id;
-//                                    var room_type = group.room_type;
-//                                    alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
-//                                    payload.notification_type = 'add-member-to-group';
-//                                    payload.extra_data.channel_id = group_id;
-//                                    sendAPNotification(deviceToken, alert, payload); 
-//                                }
-//                            }
-//                        }
-//                    });
-//                }
-//                return res.json(bind);
-//            });
+                        }
+                    });
+                }
+                return res.json(bind);
+            });
            } else {
                bind.status = 0;
                bind.message = 'No group found';
@@ -296,47 +253,34 @@ router.post('/exit-group', function(req, res){
     var bind = {};
     var user_id = req.body.user_id;
     var group_id = req.body.group_id;
-    
-    Channel.update({ _id: group_id }, { $pull: { members_id:  { user_id: ObjectId(user_id) } } }, function(err){
-        if(err){
+    Group.findOne({ _id: group_id }, function(err, group){
+        if(group){
+            //var index = group.members_id.indexOf(ObjectId(user_id));
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+            if(index > -1){
+                group.members_id.splice(index, 1);
+                group.save(function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while exit from group';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'You were exited group successfully';
+                    }
+                    return res.json(bind);
+                });
+            } else {
+                bind.status = 0;
+                bind.message = 'User is not a member of group';
+            }
+            return res.json(bind);
+        } else{
             bind.status = 0;
-            bind.message = 'Oops! error occured while exit from group';
-            bind.error = err;
-        } else {
-            bind.status = 1;
-            bind.message = 'You were exited group successfully';
+            bind.message = 'No group found';
+            return res.json(bind);
         }
-        return res.json(bind);
     });
-    
-//    Group.findOne({ _id: group_id }, function(err, group){
-//        if(group){
-//            //var index = group.members_id.indexOf(ObjectId(user_id));
-//            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
-//            if(index > -1){
-//                group.members_id.splice(index, 1);
-//                group.save(function(err){
-//                    if(err){
-//                        bind.status = 0;
-//                        bind.message = 'Oops! error occured while exit from group';
-//                        bind.error = err;
-//                    } else {
-//                        bind.status = 1;
-//                        bind.message = 'You were exited group successfully';
-//                    }
-//                    return res.json(bind);
-//                });
-//            } else {
-//                bind.status = 0;
-//                bind.message = 'User is not a member of group';
-//            }
-//            return res.json(bind);
-//        } else{
-//            bind.status = 0;
-//            bind.message = 'No group found';
-//            return res.json(bind);
-//        }
-//    });
 });
 
 // remove user from group chat
