@@ -1101,7 +1101,7 @@ router.get('/testing', function (req, res, next) {
             }
         },
         {
-            $project: { _id:1,  members_info1: { $arrayElemAt: [ "$members_info1", 0 ] }}
+            $project: { _id:1,  members_info1: 1 }
         },
         {
             $group: {
