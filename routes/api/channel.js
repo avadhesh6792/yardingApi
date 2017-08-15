@@ -1101,12 +1101,19 @@ router.get('/testing', function (req, res, next) {
             }
         },
         {
+            $lookup: {
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
+        },
+        {
             $group: {
                 _id: '$_id',
-                members_info : { $push: { $arrayElemAt: ["$members_info", 0] } },
-                created_timestamp: { $first: '$created_timestamp' },
                 updatedAt: { $first: '$updatedAt' },
                 createdAt: { $first: '$createdAt' },
+                created_timestamp: { $first: '$created_timestamp' },
                 admin_id: { $first: '$admin_id' },
                 user_id: { $first: '$user_id' },
                 room_type: { $first: '$room_type' },
@@ -1115,7 +1122,9 @@ router.get('/testing', function (req, res, next) {
                 channel_pic: { $first: '$channel_pic' },
                 channel_description: { $first: '$channel_description' },
                 channel_name: { $first: '$channel_name' },
-                created_timestamp: { $first: '$created_timestamp' }
+                created_timestamp: { $first: '$created_timestamp' },
+                members_info : { $push: { $arrayElemAt: ["$members_info", 0] } },
+                latest_chat: {$first: '$latest_chat'}
             }
         }
     ], function (err, channels) {
