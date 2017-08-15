@@ -940,19 +940,21 @@ function sendAPNotification(deviceToken, alert, payload){
 router.get('/testing', function (req, res, next) {
     var bind = {};
     Channel.findOne({ _id: '5990dd8f56d4290b9060e577' }, function(err, channel){
-        channel.members_id.push({online_status : true, user_id : ObjectId("59908a76f236b37d22dd0daa")},{online_status : false, user_id : ObjectId("59908a76f236b37d22dd0daa")});
-        channel.save(function(err){
-            if(err){
-                bind.status = 0;
-                bind.message = 'Oops! error occured while saving channel info';
-                bind.error = err;
-            } else {
-                bind.status = 1;
-                bind.message = 'Channel info was saved successfully';
-                bind.channel = channel;
-            }
-            res.json(bind);
-        });
+//        channel.members_id.push({online_status : true, user_id : ObjectId("59908a76f236b37d22dd0daa")},{online_status : false, user_id : ObjectId("59908a76f236b37d22dd0daa")});
+//        channel.save(function(err){
+//            if(err){
+//                bind.status = 0;
+//                bind.message = 'Oops! error occured while saving channel info';
+//                bind.error = err;
+//            } else {
+//                bind.status = 1;
+//                bind.message = 'Channel info was saved successfully';
+//                bind.channel = channel;
+//            }
+//            res.json(bind);
+
+    var index = channel.members_id.findIndex(obj => return obj.user_id == '59908a76f236b37d22dd0daa');
+    res.json(index);
     });
 });
 
