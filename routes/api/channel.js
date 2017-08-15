@@ -236,7 +236,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.$.user_id',
+                localField: 'members_id.user_id',
                 foreignField: '_id',
                 as: 'members_info'
 
