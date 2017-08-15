@@ -1096,17 +1096,25 @@ router.get('/testing', function (req, res, next) {
                 from: 'users',
                 localField: 'members_id.user_id',
                 foreignField: '_id',
-                as: 'members_info1'
+                as: 'members_info'
 
             }
         },
         {
-            $project: { _id:1,  members_info1: { $arrayElemAt: [ "$members_info1", 0 ] }, created_timestamp: 1 }
-        },
-        {
             $group: {
                 _id: '$_id',
-                members_info : { $push: "$members_info1" },
+                members_info : { $push: { $arrayElemAt: ["$members_info", 0] } },
+                created_timestamp: { $first: '$created_timestamp' },
+                updatedAt: { $first: '$updatedAt' },
+                createdAt: { $first: '$createdAt' },
+                admin_id: { $first: '$admin_id' },
+                user_id: { $first: '$user_id' },
+                room_type: { $first: '$room_type' },
+                link: { $first: '$link' },
+                channel_type: { $first: '$channel_type' },
+                channel_pic: { $first: '$channel_pic' },
+                channel_description: { $first: '$channel_description' },
+                channel_name: { $first: '$channel_name' },
                 created_timestamp: { $first: '$created_timestamp' }
             }
         }
