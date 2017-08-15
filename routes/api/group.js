@@ -51,6 +51,7 @@ router.post('/create-group', function (req, res, next) {
         newGroup.room_type = 'group';
 
         var members_id_arr = [];
+        members_id_arr.push({ user_id: ObjectId(user_id), online_status: false });
         for(var i = 0; i< members_id.length ;i++){
             var member_id = members_id[i].trim();
             //newGroup.members_id.push({ user_id: ObjectId(member_id), online_status: false }  );
@@ -67,8 +68,14 @@ router.post('/create-group', function (req, res, next) {
                 bind.message = 'Group was created successfully';
                 bind.channel       = newGroup;
                 
-                Channel.update({ _id: newGroup._id }, { $push: { members_id: { user_id: ObjectId(user_id), online_status: false } } });
-                Channel.update({ _id: newGroup._id }, { $push: { members_id: { $each: members_id_arr }} });
+                //Channel.update({ _id: newGroup._id }, { $push: { members_id: { user_id: ObjectId(user_id), online_status: false } } });
+                Channel.update({ _id: newGroup._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
+                    if(err){
+                        console.log('**** create group update error **** '+JSON.stringify(err));
+                    } else {
+                        console.log('**** create group update success **** ');
+                    }
+                });
             }
             return res.json(bind);
         });
