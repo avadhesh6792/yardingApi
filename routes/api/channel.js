@@ -953,7 +953,7 @@ router.get('/testing', function (req, res, next) {
 //            }
 //            res.json(bind);
 
-    var index = channel.members_id.findIndex(obj => return obj.user_id == '59908a76f236b37d22dd0daa');
+    var index = channel.members_id.findIndex(obj => obj.user_id == '59908a76f236b37d22dd0daa');
     res.json(index);
     });
 });
