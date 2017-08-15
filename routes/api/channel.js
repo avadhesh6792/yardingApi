@@ -222,16 +222,42 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
     var bind = {};
     var user_id = ObjectId(req.params.user_id);
     Channel.aggregate([
+//        {
+//            $match : { 'members_id.user_id': user_id  }
+//        },
+//        {
+//            $lookup: {
+//                from: 'channel_chats',
+//                localField: '_id',
+//                foreignField: 'channel_id',
+//                as: 'latest_chat'
+//            }
+//        },
+//        {
+//            $lookup: {
+//                from: 'users',
+//                localField: 'members_id.user_id',
+//                foreignField: '_id',
+//                as: 'members_info'
+//
+//            }
+//        },
+//        {
+//            $sort: {'latest_chat.createdAt': -1}
+//        },
+//        {
+//            //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
+//            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, 
+//                'members_info._id': 1, 'members_info.name': 1, 'members_info.display_pic': 1, 'members_info.status': 1,
+//                channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1,
+//                room_type: 1}
+//        }
+        
         {
             $match : { 'members_id.user_id': user_id  }
         },
         {
-            $lookup: {
-                from: 'channel_chats',
-                localField: '_id',
-                foreignField: 'channel_id',
-                as: 'latest_chat'
-            }
+            $unwind: "$members_id"
         },
         {
             $lookup: {
@@ -243,15 +269,33 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
             }
         },
         {
-            $sort: {'latest_chat.createdAt': -1}
+            $lookup: {
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
         },
         {
-            //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
-            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, 
-                'members_info._id': 1, 'members_info.name': 1, 'members_info.display_pic': 1, 'members_info.status': 1,
-                channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1,
-                room_type: 1}
+            $group: {
+                _id: '$_id',
+                updatedAt: { $first: '$updatedAt' },
+                createdAt: { $first: '$createdAt' },
+                created_timestamp: { $first: '$created_timestamp' },
+                admin_id: { $first: '$admin_id' },
+                user_id: { $first: '$user_id' },
+                room_type: { $first: '$room_type' },
+                link: { $first: '$link' },
+                channel_type: { $first: '$channel_type' },
+                channel_pic: { $first: '$channel_pic' },
+                channel_description: { $first: '$channel_description' },
+                channel_name: { $first: '$channel_name' },
+                created_timestamp: { $first: '$created_timestamp' },
+                members_info : { $push: { $arrayElemAt: ["$members_info", 0] } },
+                latest_chat: {$first: '$latest_chat'}
+            }
         }
+        
     ], function (err, channels) {
         if (err) {
             bind.status = 0;
