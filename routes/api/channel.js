@@ -90,7 +90,7 @@ router.post('/create-channel', function (req, res, next) {
                         bind.status = 1;
                         bind.message = 'Channel was created successfully';
                         bind.channel = newChannel;
-                        Channel.update({ _id: newChannel._id }, { $push: { members_id: { user_id: ObjectId(user_id), online_status: false } } });
+                        Channel.update({ _id: newChannel._id }, { $push: { members_id: { user_id: ObjectId(user_id), online_status: false } } }, function(err){});
                     }
                     return res.json(bind);
                 });
@@ -236,7 +236,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
         {
             $lookup: {
                 from: 'users',
-                localField: 'members_id.user_id',
+                localField: 'members_id.$.user_id',
                 foreignField: '_id',
                 as: 'members_info'
 
