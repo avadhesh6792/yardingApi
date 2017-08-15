@@ -44,7 +44,13 @@ exports.createSingleChannel = function (user_ids, callback) {
                     bind.single_channel = newSingle_channel;
                     var members_id_arr = [];
                     members_id_arr.push({ user_id: ObjectId(user_id1), online_status: false}, { user_id: ObjectId(user_id2), online_status: false});
-                    Channel.update({ _id: newSingle_channel._id }, { $push: { members_id: { $each: members_id_arr }} });
+                    Channel.update({ _id: newSingle_channel._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
+                        if(err){
+                            console.log('*** create single channel error : '+ JSON.stringify(err));
+                        } else {
+                            console.log('*** create single channel success : ');
+                        }
+                    });
                 }
                 callback(bind);
             });
