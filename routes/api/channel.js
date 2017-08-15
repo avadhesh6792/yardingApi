@@ -1128,12 +1128,38 @@ router.get('/testing', function (req, res, next) {
             }
         }
     ], function (err, channels) {
+        
         if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all chat channels';
             bind.err = err;
         } else if (channels.length > 0) {
             bind.status = 1;
+            
+            
+            channels.forEach(function(item, index){
+                if(item.latest_chat){
+                    
+                    var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
+                    channels[index].latest_chat = sort_array[0];
+                }
+                if(item.room_type == 'single'){
+                    var other_member_info = arrayFind(item.members_info, function(info, index){
+                        return info._id != req.params.user_id;
+                    });
+                    
+                    if(other_member_info){
+                        //channels[index].members_info_index = members_info_index;
+                        channels[index].channel_name = other_member_info.name;
+                        channels[index].channel_pic = other_member_info.display_pic;
+                        channels[index].channel_description = other_member_info.status;
+                    }
+                    
+                     
+                }
+                //channels[index].members_info = undefined;
+            });
+            
             bind.channels = channels;
         } else {
             bind.status = 0;
