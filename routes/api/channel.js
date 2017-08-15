@@ -1101,12 +1101,13 @@ router.get('/testing', function (req, res, next) {
             }
         },
         {
-            $project: { _id:1,  members_info1: { $arrayElemAt: [ "$members_info1", 0 ] } }
+            $project: { _id:1,  members_info1: { $arrayElemAt: [ "$members_info1", 0 ] }, created_timestamp: 1 }
         },
         {
             $group: {
                 _id: '$_id',
-                members_info : { $push: "$members_info1" }
+                members_info : { $push: "$members_info1" },
+                created_timestamp: { $first: '$created_timestamp' }
             }
         }
     ], function (err, channels) {
