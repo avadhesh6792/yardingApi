@@ -17,7 +17,7 @@ module.exports = function (ioTrendingChat) {
             var channel_id = jsonData.channel_id;
             var user_id = jsonData.user_id;
             var room_type = jsonData.room_type; // channel, group, single
-            jsonData.online_status = 'online';
+            jsonData.online_status = true;
             
             console.log('** ** ** ioTrendingChat user connected to channel : ' + channel_id + ' ' + user_id);
             
@@ -153,7 +153,7 @@ module.exports = function (ioTrendingChat) {
         socket.on('leave channel', function (jsonData) {
             var user_id = jsonData.user_id;
             var channel_id = jsonData.channel_id;
-            jsonData.online_status = 'offline';
+            jsonData.online_status = false;
             console.log('** ** ** ioTrendingChat user disconnected to channel : ' + channel_id);
             socket.leave(channel_id);
             // set user offline

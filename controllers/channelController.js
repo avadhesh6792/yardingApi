@@ -54,56 +54,18 @@ exports.setUserOnlineStatus = function(jsonData, socket, callback){
     var channel_id = jsonData.channel_id;
     var online_status = jsonData.online_status;
     var bind = {};
-    console.log('*** setUserOnline 1***');
-    Channel.findOne({_id: channel_id}, function(err, channel){
-        if(err){
-            bind.status = 0;
-            bind.message = 'Oops! error occured while fetching channel by channel id';
-            callback(bind);
-        }
-        if (channel) {
-            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
-            console.log('*** setUserOnline 2***');
-            if (index > -1) {
-                
-                var members_id = channel.members_id; 
-                members_id[index].online_status = online_status;
-                channel.members_id = members_id;
-                console.log('*** setUserOnline 3***' + JSON.stringify(channel.members_id[index]));
-                channel.save(function (err) {
-                    if (err) {
-                        bind.status = 0;
-                        bind.message = 'Oops! error occured while saving user online status';
-                        console.log('*** setUserOnline 4***');
-                    } else {
-                        bind.status = 1;
-                        bind.message = 'User online status was updated successfully';
-                        console.log('*** setUserOnline 5***' + JSON.stringify(channel.members_id[index]));
-                    }
-                    callback(bind);
-                });
+    
+    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(user_id)}, 
+        {$set: {"members_id.$.online_status": online_status}}, function(err){
+            if(err){
+                bind.status = 0;
+                bind.message = 'Oops! error occured while updating user online status';
+                bind.error = err;
+            } else {
+                bind.status = 1;
+                bind.message = 'User online status was updated successfully'
             }
-                
-                
-//                Channel.update({ 'members_id.user_id': ObjectId(user_id) },{ $set: { 'members_id.online_status': true } }, { multi: false }, function(err){
-//                    if (err) {
-//                        bind.status = 0;
-//                        bind.message = 'Oops! error occured while saving user online status' + JSON.stringify(err);
-//                        console.log('*** setUserOnline 4***');
-//                    } else {
-//                        bind.status = 1;
-//                        bind.message = 'User online status was updated successfully';
-//                        console.log('*** setUserOnline 5***' + JSON.stringify(channel.members_id[index]));
-//                    }
-//                    callback(bind);
-//                });
-            
-        } else {
-            bind.status = 0;
-            bind.message = 'Oops! channel not found';
             callback(bind);
-        }
-        
     });
 } 
 
