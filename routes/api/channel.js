@@ -1089,6 +1089,9 @@ router.get('/testing', function (req, res, next) {
             $match : { 'members_id.user_id': user_id  }
         },
         {
+            $unwind: "$members_id"
+        },
+        {
             $lookup: {
                 from: 'users',
                 localField: 'members_id.user_id',
