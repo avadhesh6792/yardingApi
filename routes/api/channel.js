@@ -939,13 +939,20 @@ function sendAPNotification(deviceToken, alert, payload){
 // testing route
 router.get('/testing', function (req, res, next) {
     var bind = {};
-    var request = require('request');
-    var url = 'https://www.google.co.in/?gfe_rd=cr&ei=uKxvWc-tO_Ts8AfF4afoDg&gws_rd=ssl';
-    request('https://api.urlmeta.org/?url='+url, function (error, response, body) {
-      bind.error = error;
-      bind.response = response;
-      bind.body = JSON.parse(body);
-      return res.json(bind.body);
+    Channel.findOne({ _id: '5990dd8f56d4290b9060e577' }, function(err, channel){
+        channel.members_id.push({online_status : true, user_id : ObjectId("59908a76f236b37d22dd0daa")},{online_status : false, user_id : ObjectId("59908a76f236b37d22dd0daa")});
+        channel.save(function(err){
+            if(err){
+                bind.status = 0;
+                bind.message = 'Oops! error occured while saving channel info';
+                bind.error = err;
+            } else {
+                bind.status = 1;
+                bind.message = 'Channel info was saved successfully';
+                bind.channel = channel;
+            }
+            res.json(bind);
+        });
     });
 });
 
