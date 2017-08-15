@@ -1101,14 +1101,14 @@ router.get('/testing', function (req, res, next) {
             }
         },
         {
-            $project: { _id:1,  members_info1: 1 }
+            $project: { _id:1,  members_info1: { $arrayElemAt: [ "$members_info1", 0 ] } }
+        },
+        {
+            $group: {
+                _id: '$_id',
+                members_info : { $push: "$members_info1" }
+            }
         }
-//        {
-//            $group: {
-//                _id: '$_id',
-//                members_info : { $push: "$members_info" }
-//            }
-//        }
     ], function (err, channels) {
         if (err) {
             bind.status = 0;
