@@ -1081,13 +1081,37 @@ function sendAPNotification(deviceToken, alert, payload){
 
 // testing route
 router.get('/testing', function (req, res, next) {
-    var bind = {};
-
     
-//    Channel.update({"_id": '5990dd8f56d4290b9060e577', "members_id.user_id": ObjectId('59908a76f236b37d22dd0daa')}, 
-//        {$set: {"members_id.$.online_status": false}}, function(err){
-//            return err ? res.json(err) : res.json('updated');
-//        });
+    var bind = {};
+    var user_id = ObjectId('59908a76f236b37d22dd0dac');
+    Channel.aggregate([
+        {
+            $match : { 'members_id.user_id': user_id  }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'members_id.user_id',
+                foreignField: '_id',
+                as: 'members_info'
+
+            }
+        }
+    ], function (err, channels) {
+        if (err) {
+            bind.status = 0;
+            bind.message = 'Oops! error occur while fetching all chat channels';
+            bind.err = err;
+        } else if (channels.length > 0) {
+            bind.status = 1;
+            bind.channels = channels;
+        } else {
+            bind.status = 0;
+            bind.message = 'No chat channels found';
+        }
+        return res.json(bind);
+
+    });
 
 });
 
