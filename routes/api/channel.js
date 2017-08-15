@@ -1103,7 +1103,7 @@ router.get('/testing', function (req, res, next) {
         {
             $group: {
                 _id: '$_id',
-                members_info : { $push: "$members_info1.0" }
+                members_info : { $push: "$members_info1" }
             }
         }
     ], function (err, channels) {
