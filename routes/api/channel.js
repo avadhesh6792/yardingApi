@@ -1096,8 +1096,14 @@ router.get('/testing', function (req, res, next) {
                 from: 'users',
                 localField: 'members_id.user_id',
                 foreignField: '_id',
-                as: 'members_info'
+                as: 'members_info1'
 
+            }
+        },
+        {
+            $group: {
+                _id: '_id',
+                members_info : { $push: "$members_info1.0" }
             }
         }
     ], function (err, channels) {
