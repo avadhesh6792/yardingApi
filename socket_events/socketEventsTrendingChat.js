@@ -97,7 +97,7 @@ module.exports = function (ioTrendingChat) {
                 }
                 
                 request('http://juicer.herokuapp.com/api/article?url=' + url_msg, function (error, response, body) {
-                    console.log('******** juicer.herokuapp.com/api *********** '+body);
+                    //console.log('******** juicer.herokuapp.com/api *********** '+body);
                     var body_parse = JSON.parse(body);
 //                    if (!error) {
 //                        if (body_parse['result']['status'] == 'OK') {
@@ -121,7 +121,9 @@ module.exports = function (ioTrendingChat) {
 //                        });
 //                    }
                       if(!error){
-                          jsonData.thumbnail = body_parse['article']['image']['src'];
+                          if(body_parse['article']['image']){
+                              jsonData.thumbnail = body_parse['article']['image']['src'];
+                          }
                           jsonData.message = message + '~' + body_parse['article']['description'];
                           channelController.saveMessage(jsonData, socket, function(response){
                             console.log('channelController.saveMessage response '+ JSON.stringify(response));
