@@ -97,6 +97,7 @@ module.exports = function (ioTrendingChat) {
                 }
                 
                 request('http://juicer.herokuapp.com/api/article?url=' + url_msg, function (error, response, body) {
+                    console.log('******** juicer.herokuapp.com/api *********** '+body);
                     var body_parse = JSON.parse(body);
 //                    if (!error) {
 //                        if (body_parse['result']['status'] == 'OK') {
