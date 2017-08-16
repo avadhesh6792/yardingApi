@@ -560,6 +560,9 @@ router.get('/get-channel-info/:channel_id', function (req, res) {
             $match: {_id: ObjectId(channel_id)}
         },
         {
+            $unwind: "$members_id"
+        },
+        {
             $lookup: {
                 from: 'users',
                 localField: 'members_id.user_id',
@@ -578,7 +581,23 @@ router.get('/get-channel-info/:channel_id', function (req, res) {
             }
         },
         {
-            $project: {members_id: 0, __v: 0, 'members_info.__v': 0, 'members_info.token_id': 0, 'requests_info.__v': 0, 'requests_info.token_id': 0}
+            $group: {
+                _id: '$_id',
+                updatedAt: { $first: '$updatedAt' },
+                createdAt: { $first: '$createdAt' },
+                created_timestamp: { $first: '$created_timestamp' },
+                admin_id: { $first: '$admin_id' },
+                user_id: { $first: '$user_id' },
+                room_type: { $first: '$room_type' },
+                link: { $first: '$link' },
+                channel_type: { $first: '$channel_type' },
+                channel_pic: { $first: '$channel_pic' },
+                channel_description: { $first: '$channel_description' },
+                channel_name: { $first: '$channel_name' },
+                created_timestamp: { $first: '$created_timestamp' },
+                members_info : { $push: { $arrayElemAt: ["$members_info", 0] } },
+                requests_info: {$first: '$requests_info'}
+            }
         }
     ], function (err, channelInfo) {
 
