@@ -88,7 +88,7 @@ module.exports = function (ioTrendingChat) {
             var message_type = jsonData.message_type;
             console.log('send message to channel : ' + channel_id + ' ' + message);
             
-            if(message_type == 'url'){
+            if(false /*message_type == 'url'*/){
                 //jsonData.thumbnail = 'testing';
                 var url_msg = message;
                 var url_parse = url.parse(url_msg);
@@ -96,31 +96,31 @@ module.exports = function (ioTrendingChat) {
                     url_msg = 'http://' + url_msg;
                 }
                 
-                request('https://api.urlmeta.org/?url=' + url_msg, function (error, response, body) {
-                    var body_parse = JSON.parse(body);
-                    if (!error) {
-                        if (body_parse['result']['status'] == 'OK') {
-                            if (body_parse['meta']['image']) {
-                                jsonData.thumbnail = body_parse['meta']['image'];
-                            } else {
-                                jsonData.thumbnail = body_parse['meta']['favicon'];
-                            }
-                            jsonData.message = message + '~' + body_parse['meta']['description'];
-                        }
-                        //console.log('************************ url meta ******************' + body_parse['meta']['image'] + ' ' +body_parse['meta']['favicon']);
-                        channelController.saveMessage(jsonData, socket, function(response){
-                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
-                            
-                            // send message to online user
-                            ioTrendingChat.to(channel_id).emit('get message', response);
-                            
-                            // send message to offline user
-                            
-                            
-                        });
-                    }
-                    
-                });
+//                request('https://api.urlmeta.org/?url=' + url_msg, function (error, response, body) {
+//                    var body_parse = JSON.parse(body);
+//                    if (!error) {
+//                        if (body_parse['result']['status'] == 'OK') {
+//                            if (body_parse['meta']['image']) {
+//                                jsonData.thumbnail = body_parse['meta']['image'];
+//                            } else {
+//                                jsonData.thumbnail = body_parse['meta']['favicon'];
+//                            }
+//                            jsonData.message = message + '~' + body_parse['meta']['description'];
+//                        }
+//                        //console.log('************************ url meta ******************' + body_parse['meta']['image'] + ' ' +body_parse['meta']['favicon']);
+//                        channelController.saveMessage(jsonData, socket, function(response){
+//                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
+//                            
+//                            // send message to online user
+//                            ioTrendingChat.to(channel_id).emit('get message', response);
+//                            
+//                            // send message to offline user
+//                            
+//                            
+//                        });
+//                    }
+//                    
+//                });
                 
                 
             } else {
