@@ -153,6 +153,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
         if(channel){
             console.log('*** case 2 ***');
             if(channel.members_id.length > 0){
+                console.log('*** case 3 ***');
                 var offline_user_ids = channel.members_id.map(function(member){
                     if(member.online_status == false){
                         return member.user_id;
@@ -163,10 +164,10 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                     var sender_name = sender.name;
                     User.find({ _id: { $in: offline_user_ids} }, function(err, users){
                         if(users.length > 0 ){
-                            console.log('*** case 3 ***');
+                            console.log('*** case 4 ***');
                             users.forEach(function(user){
                                 if(user.token_id){
-                                    console.log('*** case 4 ***');
+                                    console.log('*** case 5 ***');
                                     deviceToken = user.token_id;
                                     var room_type = channel.room_type;
                                     var channel_name = channel.channel_name;
