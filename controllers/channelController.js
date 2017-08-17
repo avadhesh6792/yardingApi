@@ -147,13 +147,9 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
     var payload = {
         extra_data: {}
     };
-    console.log('*** case 1 ***');
-    
     Channel.findOne({ '_id': channel_id }, function(err, channel){
         if(channel){
-            console.log('*** case 2 ***');
             if(channel.members_id.length > 0){
-                console.log('*** case 3 ***');
                 var offline_user_ids = channel.members_id.map(function(member){
                     if(member.online_status == false){
                         return member.user_id;
@@ -164,21 +160,18 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                     var sender_name = sender.name;
                     User.find({ _id: { $in: offline_user_ids} }, function(err, users){
                         if(users.length > 0 ){
-                            console.log('*** case 4 ***');
                             users.forEach(function(user){
                                 if(user.token_id){
-                                    console.log('*** case 5 ***');
                                     deviceToken = user.token_id;
                                     var room_type = channel.room_type;
                                     var channel_name = channel.channel_name;
                                     alert = '@'+sender_name+' posted in @'+ channel_name + ' ' + room_type ;
-//                                    if(room_type == 'single'){
-//                                        if(message_type == 'text'){
-//                                            message_type = 'message';
-//                                        }
-//                                        alert = '@'+sender_name+' send you '+ message_type;
-//                                    }
-                                    console.log('*** alert *** '+ alert);
+                                    if(room_type == 'single'){
+                                        if(message_type == 'text'){
+                                            message_type = 'message';
+                                        }
+                                        alert = '@'+sender_name+' send you '+ message_type;
+                                    }
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
                                     Notification.sendAPNotification(deviceToken, alert, payload);
