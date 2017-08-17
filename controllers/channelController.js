@@ -173,6 +173,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                         }
                                         alert = '@'+sender_name+' send you '+ message_type;
                                     }
+                                    console.log('*** alert *** '+ alert);
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
                                     Notification.sendAPNotification(deviceToken, alert, payload);
