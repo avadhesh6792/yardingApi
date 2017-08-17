@@ -142,6 +142,7 @@ module.exports = function (ioTrendingChat) {
                     // send message to online user
                     ioTrendingChat.to(channel_id).emit('get message', response);
                     
+                    console.log('*** channelController.saveMessage response after ***');
                     // send message to offline user
                     channelController.sendMessageToOfflineUser(jsonData, socket, function(response){
                         console.log('channelController.sendMessageToOfflineUser response '+ JSON.stringify(response));
