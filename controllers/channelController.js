@@ -14,6 +14,7 @@ var url = require('url');
 var arrayFind = require('array-find');
 var apn = require('apn');
 var appRoot = require('app-root-path');
+var Notification = require('../functions/notification');
 
 exports.createSingleChannel = function (user_ids, callback) {
     var bind = {};
@@ -168,7 +169,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     alert = '@ '+sender_name+' posted in '+ channel_name + ' ' + room_type ;
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
-                                    sendAPNotification(deviceToken, alert, payload);
+                                    Notification.sendAPNotification(deviceToken, alert, payload);
                                 }
                             });
                         }
@@ -342,29 +343,6 @@ exports.getChannelMessages = function (jsonData, socket, callback) {
     });
 }
 
-function sendAPNotification(deviceToken, alert, payload){
-    var options = {
-        cert: appRoot + "/config/cert.pem",
-        key: appRoot + "/config/key.pem",
-        production: false
-      };
 
-    var apnProvider = new apn.Provider(options);
-    //var deviceToken = "9714BC5CA55696CF6AC89BE9A62277B8F3D1BCF85CB7E65D1937A1B3288284A4";
-    var note = new apn.Notification();
-
-    //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-    //note.badge = 3;
-    //note.sound = "ping.aiff";
-    note.alert = alert;
-    note.payload = payload;
-    note.topic = "com.yardingllc.yarding";
-    
-    apnProvider.send(note, deviceToken).then( function(result) {
-        // see documentation for an explanation of result
-        console.log('notification result '+ JSON.stringify(result));
-        //return res.json(result);
-    });
-}
 
 

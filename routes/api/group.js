@@ -11,6 +11,7 @@ var moment = require('moment');
 var arraySort = require('array-sort');
 var apn = require('apn');
 var appRoot = require('app-root-path');
+var Notification = require('../../functions/notification');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -164,7 +165,7 @@ router.post('/add-member-to-group', function(req, res){
                                         alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
                                         payload.notification_type = 'add-member-to-group';
                                         payload.extra_data.channel_id = group_id;
-                                        sendAPNotification(deviceToken, alert, payload); 
+                                        Notification.sendAPNotification(deviceToken, alert, payload); 
                                     }
                                 }
                             }
@@ -379,7 +380,7 @@ router.post('/remove-user', function(req, res){
                                 alert = 'You are removed from ' + group.channel_name + ' ' + room_type ;
                                 payload.notification_type = 'remove-user';
                                 payload.extra_data.channel_id = group_id;
-                                sendAPNotification(deviceToken, alert, payload); 
+                                Notification.sendAPNotification(deviceToken, alert, payload); 
                             }
                         });
                         
@@ -439,30 +440,6 @@ router.post('/make-group-admin', function(req, res){
     
 });
 
-function sendAPNotification(deviceToken, alert, payload){
-    var options = {
-        cert: appRoot + "/config/cert.pem",
-        key: appRoot + "/config/key.pem",
-        production: false
-      };
-
-    var apnProvider = new apn.Provider(options);
-    //var deviceToken = "9714BC5CA55696CF6AC89BE9A62277B8F3D1BCF85CB7E65D1937A1B3288284A4";
-    var note = new apn.Notification();
-
-    //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-    //note.badge = 3;
-    //note.sound = "ping.aiff";
-    note.alert = alert;
-    note.payload = payload;
-    note.topic = "com.yardingllc.yarding";
-    
-    apnProvider.send(note, deviceToken).then( function(result) {
-        // see documentation for an explanation of result
-        console.log('notification result '+ JSON.stringify(result));
-        //return res.json(result);
-    });
-}
 
 // testing route
 router.get('/testing/:group_id', function(req, res, next){

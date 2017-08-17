@@ -14,6 +14,7 @@ var arrayFind = require('array-find');
 var appRoot = require('app-root-path');
 var ffmpeg = require('fluent-ffmpeg');
 var apn = require('apn');
+var Notification = require('../../functions/notification');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -778,7 +779,7 @@ router.post('/remove-user-from-channel', function (req, res) {
                             alert = 'You are removed from ' + channel.channel_name + ' ' + room_type ;
                             payload.notification_type = 'remove-user-from-channel';
                             payload.extra_data.channel_id = channel_id;
-                            sendAPNotification(deviceToken, alert, payload);
+                            Notification.sendAPNotification(deviceToken, alert, payload);
                         }
                     });
                 }
@@ -903,7 +904,7 @@ router.post('/add-to-channel-request', function(req, res, next){
                                     alert = user.name +' has sent request to ' + channel.channel_name + ' ' + room_type;
                                     payload.notification_type = 'add-to-channel-request';
                                     payload.extra_data.channel_id = channel_id;
-                                    sendAPNotification(deviceToken, alert, payload);
+                                    Notification.sendAPNotification(deviceToken, alert, payload);
                                 }
                             });
                         }
@@ -1002,7 +1003,7 @@ router.post('/accept-reject-channel-request', function(req, res, next){
                     alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request' ;
                     payload.notification_type = 'accept-reject-channel-request';
                     payload.extra_data.channel_id = channel_id;
-                    sendAPNotification(deviceToken, alert, payload);
+                    Notification.sendAPNotification(deviceToken, alert, payload);
                 }
             });
         }
@@ -1086,30 +1087,7 @@ router.get('/get-channel-requests/:channel_id', function(req, res, next){
     });
 });
 
-function sendAPNotification(deviceToken, alert, payload){
-    var options = {
-        cert: appRoot + "/config/cert.pem",
-        key: appRoot + "/config/key.pem",
-        production: false
-      };
 
-    var apnProvider = new apn.Provider(options);
-    //var deviceToken = "9714BC5CA55696CF6AC89BE9A62277B8F3D1BCF85CB7E65D1937A1B3288284A4";
-    var note = new apn.Notification();
-
-    //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-    //note.badge = 3;
-    //note.sound = "ping.aiff";
-    note.alert = alert;
-    note.payload = payload;
-    note.topic = "com.yardingllc.yarding";
-    
-    apnProvider.send(note, deviceToken).then( function(result) {
-        // see documentation for an explanation of result
-        console.log('notification result '+ JSON.stringify(result));
-        //return res.json(result);
-    });
-}
 
 // testing route
 router.get('/testing', function (req, res, next) {
