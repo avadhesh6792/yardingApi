@@ -407,31 +407,10 @@ router.post('/sms', function(req, res, next){
   });
 });
 
-router.get('/testing', function(req, res, next){ 
-    var apn = require('apn');
-    var appRoot = require('app-root-path');
-    var options = {
-        cert: appRoot + "/config/cert.pem",
-        key: appRoot + "/config/key.pem",
-        production: false
-      };
-
-    var apnProvider = new apn.Provider(options);
-    var deviceToken = "9714BC5CA55696CF6AC89BE9A62277B8F3D1BCF85CB7E65D1937A1B3288284A4";
-    var note = new apn.Notification();
-
-    //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-    //note.badge = 3;
-    //note.sound = "ping.aiff";
-    note.alert = "hello, sir how are you?";
-    note.payload = {'messageFrom': 'Ava Appleseed'};
-    note.topic = "com.yardingllc.yarding";
-    
-    apnProvider.send(note, deviceToken).then( function(result) {
-        // see documentation for an explanation of result
-        console.log('notification result '+ JSON.stringify(result));
-        return res.json(result);
-    });
+router.get('/testing', function(req, res, next){
+    var message = '59933031d14b724de1875b05 /shh 59908fc5cd221f01f2bad11e/shh @nickknow yyyyuuuuiii';
+    var user_id = message.substr(0, message.indexOf('/')); 
+    res.json(user_id.trim());
     
 });
 

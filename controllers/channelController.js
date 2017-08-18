@@ -172,9 +172,22 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                         }
                                         alert = '@'+sender_name+' send you '+ message_type;
                                     }
+                                    if(message_type == 'ssh'){
+                                        alert = '@'+sender_name+' send you secret message';
+                                    }
+                                    
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
-                                    Notification.sendAPNotification(deviceToken, alert, payload);
+                                    if(message_type == 'ssh'){
+                                        var receiver_id = message.substr(0, message.indexOf('/')).trim(); 
+                                        if( receiver_id == user._id ){
+                                            Notification.sendAPNotification(deviceToken, alert, payload);
+                                        }
+                                        
+                                    } else {
+                                        Notification.sendAPNotification(deviceToken, alert, payload);
+                                    }
+                                    
                                 }
                             });
                         }
