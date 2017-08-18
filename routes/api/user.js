@@ -407,7 +407,7 @@ router.post('/sms', function(req, res, next){
   });
 });
 
-router.post('/set-user-offline/:user_id', function(req, res, next){
+router.get('/set-user-offline/:user_id', function(req, res, next){
     var user_id = req.params.user_id;
     var bind = {};
     
