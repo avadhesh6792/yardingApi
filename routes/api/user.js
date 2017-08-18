@@ -407,6 +407,33 @@ router.post('/sms', function(req, res, next){
   });
 });
 
+router.post('/set-user-offline', function(req, res, next){
+    var user_id = req.body.user_id;
+    var bind = {};
+    
+    User.findOne({_id: user_id}, function(err, user){
+        if(user){
+            Channel.update({"members_id.user_id": ObjectId(user_id)}, 
+                {$set: {"members_id.$.online_status": false}}, { multi: true }, function(err){
+                    if(err){
+                        bind.status = 0;
+                        bind.message = 'Oops! error occured while setting user offline';
+                        bind.error = err;
+                    } else {
+                        bind.status = 1;
+                        bind.message = 'User was offline successfully';
+                    }
+                    return res.json(bind);
+            });
+        } else {
+            bind.status = 0;
+            bind.message = 'No user found';
+            return res.json(bind);
+        }
+    });
+    
+});
+
 router.get('/testing', function(req, res, next){
     var message = '59933031d14b724de1875b05 /shh 59908fc5cd221f01f2bad11e/shh @nickknow yyyyuuuuiii';
     var user_id = message.substr(0, message.indexOf('/')); 

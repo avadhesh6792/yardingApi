@@ -183,7 +183,6 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                         if( receiver_id == user._id ){
                                             Notification.sendAPNotification(deviceToken, alert, payload);
                                         }
-                                        
                                     } else {
                                         Notification.sendAPNotification(deviceToken, alert, payload);
                                     }
