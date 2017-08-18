@@ -719,7 +719,7 @@ router.post('/make-channel-admin', function (req, res) {
         if (channel) {
             channel.admin_id = ObjectId(user_id);
             //var index = channel.members_id.indexOf(ObjectId(user_id));
-            var index = channel.members_id.findIndex(member_id = > member_id.user_id == user_id);
+            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
             console.log('*** make channel admin : BEFORE ' + JSON.stringify(channel));
             if (index > -1) {
                 channel.members_id.splice(index, 1);
