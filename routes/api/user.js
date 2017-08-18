@@ -407,8 +407,8 @@ router.post('/sms', function(req, res, next){
   });
 });
 
-router.post('/set-user-offline', function(req, res, next){
-    var user_id = req.body.user_id;
+router.post('/set-user-offline/:user_id', function(req, res, next){
+    var user_id = req.params.user_id;
     var bind = {};
     
     User.findOne({_id: user_id}, function(err, user){
