@@ -13,7 +13,7 @@ exports.sendAPNotification = function(deviceToken, alert, payload){
     var note = new apn.Notification();
 
     //note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-    //note.badge = 3;
+    note.badge = 1;
     note.sound = "ping.aiff";
     note.alert = alert;
     note.payload = payload;
