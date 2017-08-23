@@ -167,7 +167,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                         if(users.length > 0 ){
                             users.forEach(function(user){
                                 if(user.token_id){
-                                    var user_id = user._id;
+                                    var offline_user_id = user._id;
                                     deviceToken = user.token_id;
                                     var room_type = channel.room_type;
                                     var channel_name = channel.channel_name;
@@ -187,7 +187,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     
                                     //var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
                                     var find_member = channel.members_id.map(function(member){
-                                        if(member.user_id == user_id || member.user_id == ObjectId(user_id) ){
+                                        if(member.user_id == offline_user_id || member.user_id == ObjectId(offline_user_id) ){
                                             return member;
                                         }
                                     });
