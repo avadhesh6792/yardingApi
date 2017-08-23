@@ -91,7 +91,7 @@ router.post('/create-channel', function (req, res, next) {
                         bind.status = 1;
                         bind.message = 'Channel was created successfully';
                         bind.channel = newChannel;
-                        Channel.update({_id: newChannel._id}, {$push: {members_id: {user_id: ObjectId(user_id), online_status: false}}}, function (err) {});
+                        Channel.update({_id: newChannel._id}, {$push: {members_id: {user_id: ObjectId(user_id), online_status: false, badge: 0}}}, function (err) {});
                     }
                     return res.json(bind);
                 });
@@ -738,7 +738,7 @@ router.post('/make-channel-admin', function (req, res) {
             console.log('*** make channel admin : BEFORE ' + JSON.stringify(channel));
             if (index > -1) {
                 channel.members_id.splice(index, 1);
-                channel.members_id.unshift({user_id: ObjectId(user_id), online_status: false});
+                channel.members_id.unshift({user_id: ObjectId(user_id), online_status: false, badge: 0});
                 channel.save(function (err) {
                     if (err) {
                         bind.status = 0;
@@ -794,7 +794,13 @@ router.post('/remove-user-from-channel', function (req, res) {
                             alert = 'You are removed from ' + channel.channel_name + ' ' + room_type;
                             payload.notification_type = 'remove-user-from-channel';
                             payload.extra_data.channel_id = channel_id;
-                            Notification.sendAPNotification(deviceToken, alert, payload, 1);
+                            
+                            var notification_params = {};
+                            notification_params.deviceToken = deviceToken;
+                            notification_params.alert = alert;
+                            notification_params.payload = payload;
+                            notification_params.badge = 1;
+                            Notification.sendAPNotification(notification_params);
                         }
                     });
                 }
@@ -922,7 +928,12 @@ router.post('/add-to-channel-request', function (req, res, next) {
                                         alert = user.name + ' has sent request to ' + channel.channel_name + ' ' + room_type;
                                         payload.notification_type = 'add-to-channel-request';
                                         payload.extra_data.channel_id = channel_id;
-                                        Notification.sendAPNotification(deviceToken, alert, payload, 1);
+                                        var notification_params = {};
+                                        notification_params.deviceToken = deviceToken;
+                                        notification_params.alert = alert;
+                                        notification_params.payload = payload;
+                                        notification_params.badge = 1;
+                                        Notification.sendAPNotification(notification_params);
                                     }
                                 });
                             }
@@ -951,7 +962,7 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
 
     var update_data = {$pull: {request_users_id: user_id}};
     if (flag == 1) { // accept
-        update_data = {$push: {members_id: {user_id: user_id, online_status: false}}, $pull: {request_users_id: user_id}};
+        update_data = {$push: {members_id: {user_id: user_id, online_status: false, badge: 0}}, $pull: {request_users_id: user_id}};
     }
 
     Channel.findOne({_id: channel_id}, function (err, channel) {
@@ -978,7 +989,12 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                             alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request';
                             payload.notification_type = 'accept-reject-channel-request';
                             payload.extra_data.channel_id = channel_id;
-                            Notification.sendAPNotification(deviceToken, alert, payload, 1);
+                            var notification_params = {};
+                            notification_params.deviceToken = deviceToken;
+                            notification_params.alert = alert;
+                            notification_params.payload = payload;
+                            notification_params.badge = 1;
+                            Notification.sendAPNotification(notification_params);
                         }
                     });
                 }

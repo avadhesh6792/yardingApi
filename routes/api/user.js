@@ -88,7 +88,7 @@ router.post('/sign-up', function (req, res, next) {
                 bind.status     = 1;
                 bind.message    = 'Your are registered successfully';
                 bind.user       = newUser;
-                Channel.update({ channel_name: "Yarding" }, { $push: { members_id: { user_id: ObjectId(newUser._id), online_status: false } } }, function(err){ });
+                Channel.update({ channel_name: "Yarding" }, { $push: { members_id: { user_id: ObjectId(newUser._id), online_status: false, badge: 0 } } }, function(err){ });
             }
             return res.json(bind);
         });

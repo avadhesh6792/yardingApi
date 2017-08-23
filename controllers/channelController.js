@@ -44,7 +44,7 @@ exports.createSingleChannel = function (user_ids, callback) {
                     bind.channel_id = newSingle_channel._id;
                     bind.single_channel = newSingle_channel;
                     var members_id_arr = [];
-                    members_id_arr.push({ user_id: ObjectId(user_id1), online_status: false}, { user_id: ObjectId(user_id2), online_status: false});
+                    members_id_arr.push({ user_id: ObjectId(user_id1), online_status: false, badge: 0}, { user_id: ObjectId(user_id2), online_status: false, badge: 0});
                     Channel.update({ _id: newSingle_channel._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
                         if(err){
                             console.log('*** create single channel error : '+ JSON.stringify(err));
@@ -113,7 +113,7 @@ exports.joinChannel = function (jsonData, socket, callback) {
             
             if (index == -1) {
                 console.log('*** join channel and user id  not exists in the member ids array');
-                channel.members_id.push({user_id: new ObjectId(user_id), online_status: true});
+                channel.members_id.push({user_id: new ObjectId(user_id), online_status: true, badge: 0});
                 channel.save(function (err) {
                     if (err) {
                         bind.status = 0;
@@ -191,6 +191,9 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
 ////                                            return offline_member;
 ////                                        }
 ////                                    });
+
+                                    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(offline_user_id)}, 
+                                        {$set: {"members_id.$.badge": badge}}, function(err){ });
                                     
                                     var find_member = arrayFind(channel.members_id, function (member, index, array) {
                                         return (member.user_id).toString() == offline_user_id.toString();
@@ -205,18 +208,21 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     }
                                     
                                     console.log('**** find_member and after badge *** '+JSON.stringify(find_member) + ' '+badge);
-                                    
+                                    var notification_params = {};
+                                    notification_params.deviceToken = deviceToken;
+                                    notification_params.alert = alert;
+                                    notification_params.payload = payload;
+                                    notification_params.badge = badge;
                                     if(message_type == 'ssh'){
                                         var receiver_id = message.substr(0, message.indexOf('/')).trim(); 
                                         if( receiver_id == user._id ){
-                                            Notification.sendAPNotification(deviceToken, alert, payload, badge);
+                                            Notification.sendAPNotification(notification_params);
                                         }
                                     } else {
-                                        Notification.sendAPNotification(deviceToken, alert, payload, badge);
+                                        Notification.sendAPNotification(notification_params);
                                     }
                                     
-                                    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(offline_user_id)}, 
-                                        {$set: {"members_id.$.badge": badge}}, function(err){ });
+                                    
                                     
                                 }
                             });

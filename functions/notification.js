@@ -2,7 +2,11 @@ var exports = module.exports = {};
 var apn = require('apn');
 var appRoot = require('app-root-path');
 
-exports.sendAPNotification = function(deviceToken, alert, payload, badge){
+exports.sendAPNotification = function(params){
+    var deviceToken = params.deviceToken;
+    var alert = params.alert;
+    var payload = params.payload;
+    var badge = params.badge;
     var options = {
         cert: appRoot + "/config/cert.pem",
         key: appRoot + "/config/key.pem",

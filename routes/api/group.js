@@ -52,11 +52,11 @@ router.post('/create-group', function (req, res, next) {
         newGroup.room_type = 'group';
 
         var members_id_arr = [];
-        members_id_arr.push({ user_id: ObjectId(user_id), online_status: false });
+        members_id_arr.push({ user_id: ObjectId(user_id), online_status: false, badge: 0 });
         for(var i = 0; i< members_id.length ;i++){
             var member_id = members_id[i].trim();
             //newGroup.members_id.push({ user_id: ObjectId(member_id), online_status: false }  );
-            members_id_arr.push({ user_id: ObjectId(member_id), online_status: false });
+            members_id_arr.push({ user_id: ObjectId(member_id), online_status: false, badge: 0 });
         }
         
         newGroup.save(function (err) {
@@ -136,7 +136,7 @@ router.post('/add-member-to-group', function(req, res){
                 for(var i = 0; i< members_id.length ;i++){
                     var member_id = members_id[i].trim();
                     //group.members_id.push({user_id: ObjectId(member_id), online_status: false}  );
-                    members_id_arr.push({user_id: ObjectId(member_id), online_status: false}  );
+                    members_id_arr.push({user_id: ObjectId(member_id), online_status: false, badge: 0}  );
                 }
                 
                 Channel.update({ _id: newGroup._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
@@ -165,7 +165,12 @@ router.post('/add-member-to-group', function(req, res){
                                         alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
                                         payload.notification_type = 'add-member-to-group';
                                         payload.extra_data.channel_id = group_id;
-                                        Notification.sendAPNotification(deviceToken, alert, payload, 1); 
+                                        var notification_params = {};
+                                        notification_params.deviceToken = deviceToken;
+                                        notification_params.alert = alert;
+                                        notification_params.payload = payload;
+                                        notification_params.badge = 1;
+                                        Notification.sendAPNotification(notification_params); 
                                     }
                                 }
                             }
@@ -380,7 +385,12 @@ router.post('/remove-user', function(req, res){
                                 alert = 'You are removed from ' + group.channel_name + ' ' + room_type ;
                                 payload.notification_type = 'remove-user';
                                 payload.extra_data.channel_id = group_id;
-                                Notification.sendAPNotification(deviceToken, alert, payload, 1); 
+                                var notification_params = {};
+                                notification_params.deviceToken = deviceToken;
+                                notification_params.alert = alert;
+                                notification_params.payload = payload;
+                                notification_params.badge = 1;
+                                Notification.sendAPNotification(notification_params); 
                             }
                         });
                         
@@ -415,7 +425,7 @@ router.post('/make-group-admin', function(req, res){
             
             if(index > -1){
                 group.members_id.splice(index, 1);
-                group.members_id.unshift({ user_id : ObjectId(user_id), online_status: false});
+                group.members_id.unshift({ user_id : ObjectId(user_id), online_status: false, badge: 0});
                 group.save(function(err){
                     if(err){
                         bind.status = 0;
