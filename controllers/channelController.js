@@ -192,8 +192,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
 ////                                        }
 ////                                    });
 
-                                    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(offline_user_id)}, 
-                                        {$set: {"members_id.$.badge": badge}}, function(err){ });
+                                    
                                     
                                     var find_member = arrayFind(channel.members_id, function (member, index, array) {
                                         return (member.user_id).toString() == offline_user_id.toString();
@@ -206,6 +205,9 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     } else {
                                         badge = 1;
                                     }
+                                    
+                                    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(offline_user_id)}, 
+                                        {$set: {"members_id.$.badge": badge}}, function(err){ });
                                     
                                     console.log('**** find_member and after badge *** '+JSON.stringify(find_member) + ' '+badge);
                                     var notification_params = {};
