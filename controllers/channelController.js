@@ -188,7 +188,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     var find_member = arrayFind(channel.members_id, function (member, index, array) {
                                         console.log('**** member.user_id *** '+member.user_id + ' '+user_id);
                                         console.log('cond1 '+ (member.user_id == ObjectId(user_id)));
-                                        console.log('cond1 '+ (member.user_id == user_id));
+                                        console.log('cond2 '+ (member.user_id == user_id));
                                         return member.user_id == ObjectId(user_id);
                                     });
                                     console.log('**** find_member *** '+JSON.stringify(find_member));
