@@ -185,20 +185,20 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
                                     
-                                    //var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
-                                    var offline_find_member = channel.members_id.map(function(offline_member){
-                                        if(offline_member.user_id == offline_user_id || offline_member.user_id == ObjectId(offline_user_id) ){
-                                            return offline_member;
-                                        }
-                                    });
+//                                    var index = channel.members_id.findIndex(member_id => ObjectId(member_id.user_id) == ObjectId(offline_user_id));
+////                                    var offline_find_member = channel.members_id.map(function(offline_member){
+////                                        if(offline_member.user_id == offline_user_id || offline_member.user_id == ObjectId(offline_user_id) ){
+////                                            return offline_member;
+////                                        }
+////                                    });
                                     
-//                                    var find_member = arrayFind(channel.members_id, function (member, index, array) {
-//                                        console.log('**** member.user_id *** '+member.user_id + ' '+user_id);
-//                                        console.log('cond1 '+ (member.user_id == ObjectId(user_id)));
-//                                        console.log('cond2 '+ (member.user_id == user_id));
-//                                        return member.user_id == ObjectId(user_id);
-//                                    });
-                                    console.log('**** find_member *** '+JSON.stringify(channel.members_id));
+                                    var find_member = arrayFind(channel.members_id, function (member, index, array) {
+                                        console.log('**** member.user_id *** '+member.user_id + ' '+user_id);
+                                        console.log('cond1 '+ (member.user_id == ObjectId(user_id)));
+                                        console.log('cond2 '+ (member.user_id == user_id));
+                                        return ObjectId(member.user_id) == ObjectId(user_id);
+                                    });
+                                    console.log('**** find_member *** '+JSON.stringify(find_member));
                                     badge = find_member[0].badge;
                                     if(badge){
                                        badge = badge + 1; 
