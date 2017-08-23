@@ -215,7 +215,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                         Notification.sendAPNotification(deviceToken, alert, payload, badge);
                                     }
                                     
-                                    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(user_id)}, 
+                                    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(offline_user_id)}, 
                                         {$set: {"members_id.$.badge": badge}}, function(err){ });
                                     
                                 }
