@@ -193,18 +193,18 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
 ////                                    });
                                     
                                     var find_member = arrayFind(channel.members_id, function (member, index, array) {
-                                        console.log('**** member.user_id *** '+ (member.user_id).toString() + ' '+offline_user_id.toString());
-                                        console.log('cond1 '+ (member.user_id.toString() == ObjectId(offline_user_id)));
-                                        console.log('cond2 '+ ((member.user_id).toString() == offline_user_id.toString()));
                                         return (member.user_id).toString() == offline_user_id.toString();
                                     });
-                                    console.log('**** find_member *** '+JSON.stringify(find_member));
+                                    
                                     badge = find_member.badge;
+                                    console.log('**** find_member and before badge *** '+JSON.stringify(find_member) + ' '+badge);
                                     if(badge){
                                        badge = badge + 1; 
                                     } else {
                                         badge = 1;
                                     }
+                                    
+                                    console.log('**** find_member and after badge *** '+JSON.stringify(find_member) + ' '+badge);
                                     
                                     if(message_type == 'ssh'){
                                         var receiver_id = message.substr(0, message.indexOf('/')).trim(); 
