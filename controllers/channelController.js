@@ -185,7 +185,12 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
                                     
-                                    var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+                                    //var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+                                    var find_member = channel.members_id.map(function(member){
+                                        if(member.user_id == user_id || member.user_id == ObjectId(user_id) ){
+                                            return member;
+                                        }
+                                    });
                                     
 //                                    var find_member = arrayFind(channel.members_id, function (member, index, array) {
 //                                        console.log('**** member.user_id *** '+member.user_id + ' '+user_id);
@@ -193,8 +198,8 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
 //                                        console.log('cond2 '+ (member.user_id == user_id));
 //                                        return member.user_id == ObjectId(user_id);
 //                                    });
-                                    console.log('**** find_member *** '+JSON.stringify(index));
-                                    badge = channel.members_id[index].badge;
+                                    console.log('**** find_member *** '+JSON.stringify(find_member));
+                                    badge = find_member[0].badge;
                                     if(badge){
                                        badge = badge + 1; 
                                     } else {
