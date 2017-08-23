@@ -794,7 +794,7 @@ router.post('/remove-user-from-channel', function (req, res) {
                             alert = 'You are removed from ' + channel.channel_name + ' ' + room_type;
                             payload.notification_type = 'remove-user-from-channel';
                             payload.extra_data.channel_id = channel_id;
-                            Notification.sendAPNotification(deviceToken, alert, payload);
+                            Notification.sendAPNotification(deviceToken, alert, payload, 1);
                         }
                     });
                 }
@@ -922,7 +922,7 @@ router.post('/add-to-channel-request', function (req, res, next) {
                                         alert = user.name + ' has sent request to ' + channel.channel_name + ' ' + room_type;
                                         payload.notification_type = 'add-to-channel-request';
                                         payload.extra_data.channel_id = channel_id;
-                                        Notification.sendAPNotification(deviceToken, alert, payload);
+                                        Notification.sendAPNotification(deviceToken, alert, payload, 1);
                                     }
                                 });
                             }
@@ -978,7 +978,7 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                             alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request';
                             payload.notification_type = 'accept-reject-channel-request';
                             payload.extra_data.channel_id = channel_id;
-                            Notification.sendAPNotification(deviceToken, alert, payload);
+                            Notification.sendAPNotification(deviceToken, alert, payload, 1);
                         }
                     });
                 }

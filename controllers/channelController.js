@@ -64,9 +64,13 @@ exports.setUserOnlineStatus = function(jsonData, socket, callback){
     var channel_id = jsonData.channel_id;
     var online_status = jsonData.online_status;
     var bind = {};
+    var set_data = {"members_id.$.online_status": online_status};
+    if(online_status){
+        set_data = {"members_id.$.online_status": online_status, "members_id.$.badge": 0};
+    }
     
     Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(user_id)}, 
-        {$set: {"members_id.$.online_status": online_status}}, function(err){
+        {$set: set_data}, function(err){
             if(err){
                 bind.status = 0;
                 bind.message = 'Oops! error occured while updating user online status';
@@ -147,6 +151,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
     var payload = {
         extra_data: {}
     };
+    var badge = 0;
     Channel.findOne({ '_id': channel_id }, function(err, channel){
         if(channel){
             if(channel.members_id.length > 0){
@@ -162,6 +167,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                         if(users.length > 0 ){
                             users.forEach(function(user){
                                 if(user.token_id){
+                                    var user_id = user._id;
                                     deviceToken = user.token_id;
                                     var room_type = channel.room_type;
                                     var channel_name = channel.channel_name;
@@ -178,14 +184,27 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
+                                    
+                                    var member = arrayFind(channel.members_id, function (member, index, array) {
+                                        return member.user_id == user_id;
+                                    });
+                                    if(member.badge){
+                                       badge = badge + 1; 
+                                    } else {
+                                        badge = 1;
+                                    }
+                                    
                                     if(message_type == 'ssh'){
                                         var receiver_id = message.substr(0, message.indexOf('/')).trim(); 
                                         if( receiver_id == user._id ){
-                                            Notification.sendAPNotification(deviceToken, alert, payload);
+                                            Notification.sendAPNotification(deviceToken, alert, payload, badge);
                                         }
                                     } else {
-                                        Notification.sendAPNotification(deviceToken, alert, payload);
+                                        Notification.sendAPNotification(deviceToken, alert, payload, badge);
                                     }
+                                    
+                                    Channel.update({"_id": channel_id, "members_id.user_id": ObjectId(user_id)}, 
+                                        {$set: {"members_id.$.badge": badge}}, function(err){ });
                                     
                                 }
                             });

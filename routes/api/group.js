@@ -165,7 +165,7 @@ router.post('/add-member-to-group', function(req, res){
                                         alert = 'You are added to ' + group.channel_name + ' ' + room_type ;
                                         payload.notification_type = 'add-member-to-group';
                                         payload.extra_data.channel_id = group_id;
-                                        Notification.sendAPNotification(deviceToken, alert, payload); 
+                                        Notification.sendAPNotification(deviceToken, alert, payload, 1); 
                                     }
                                 }
                             }
@@ -380,7 +380,7 @@ router.post('/remove-user', function(req, res){
                                 alert = 'You are removed from ' + group.channel_name + ' ' + room_type ;
                                 payload.notification_type = 'remove-user';
                                 payload.extra_data.channel_id = group_id;
-                                Notification.sendAPNotification(deviceToken, alert, payload); 
+                                Notification.sendAPNotification(deviceToken, alert, payload, 1); 
                             }
                         });
                         
