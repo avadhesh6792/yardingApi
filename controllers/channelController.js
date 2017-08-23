@@ -185,14 +185,17 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     payload.notification_type = 'channel_chat';
                                     payload.extra_data.channel_id = channel_id;
                                     
-                                    var find_member = arrayFind(channel.members_id, function (member, index, array) {
-                                        console.log('**** member.user_id *** '+member.user_id + ' '+user_id);
-                                        console.log('cond1 '+ (member.user_id == ObjectId(user_id)));
-                                        console.log('cond2 '+ (member.user_id == user_id));
-                                        return member.user_id == ObjectId(user_id);
-                                    });
-                                    console.log('**** find_member *** '+JSON.stringify(find_member));
-                                    if(find_member.badge){
+                                    var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id);
+                                    
+//                                    var find_member = arrayFind(channel.members_id, function (member, index, array) {
+//                                        console.log('**** member.user_id *** '+member.user_id + ' '+user_id);
+//                                        console.log('cond1 '+ (member.user_id == ObjectId(user_id)));
+//                                        console.log('cond2 '+ (member.user_id == user_id));
+//                                        return member.user_id == ObjectId(user_id);
+//                                    });
+                                    console.log('**** find_member *** '+JSON.stringify(index));
+                                    badge = channel.members_id[index].badge;
+                                    if(badge){
                                        badge = badge + 1; 
                                     } else {
                                         badge = 1;
