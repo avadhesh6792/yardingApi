@@ -186,8 +186,9 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     payload.extra_data.channel_id = channel_id;
                                     
                                     var member = arrayFind(channel.members_id, function (member, index, array) {
-                                        return member.user_id == user_id;
+                                        return member.user_id == ObjectId(user_id);
                                     });
+                                    console.log('**** member *** '+JSON.stringify(member));
                                     if(member.badge){
                                        badge = badge + 1; 
                                     } else {
