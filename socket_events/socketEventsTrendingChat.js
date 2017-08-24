@@ -102,7 +102,7 @@ module.exports = function (ioTrendingChat) {
                 var request_url = 'http://api.linkpreview.net/?key='+api_key+'&q='+url_msg;
                 request(request_url, function (error, response, body) {
 //                    //console.log('******** juicer.herokuapp.com/api *********** '+body);
-//                    var body_parse = JSON.parse(body);
+                    var body_parse = JSON.parse(body);
 ////                    if (!error) {
 ////                        if (body_parse['result']['status'] == 'OK') {
 ////                            if (body_parse['meta']['image']) {
