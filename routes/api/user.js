@@ -435,9 +435,15 @@ router.get('/set-user-offline/:user_id', function(req, res, next){
 });
 
 router.get('/testing', function(req, res, next){
-    var message = '59933031d14b724de1875b05 /shh 59908fc5cd221f01f2bad11e/shh @nickknow yyyyuuuuiii';
-    var user_id = message.substr(0, message.indexOf('/')); 
-    res.json(user_id.trim());
+    var unirest = require('unirest');
+    var url = 'https://www.facebook.com/';
+    unirest.get("https://proclink.p.mashape.com/oembed?url="+url)
+        .header("X-Mashape-Key", "l13YnUBzUSmshFYz7DYnVJcDXEVpp1Bngdxjsn2wjmiixMexow")
+        .header("Accept", "application/json")
+        .end(function (result) {
+          console.log(result.status, result.headers, result.body);
+          return res.json(result);
+    });
     
 });
 
