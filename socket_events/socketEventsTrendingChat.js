@@ -1,6 +1,7 @@
 var channelController = require('../controllers/channelController');
 var url = require('url');
 var request = require('request');
+var config = require('../config/config');
 
 module.exports = function (ioTrendingChat) {
     console.log('ioTrendingChat :: inside this file');
@@ -90,15 +91,17 @@ module.exports = function (ioTrendingChat) {
             
             if(message_type == 'url'){
                 //jsonData.thumbnail = 'testing';
+                var api_key = config.key;
                 var url_msg = message;
                 var url_parse = url.parse(url_msg);
                 if (!url_parse['protocol']) {
                     url_msg = 'http://' + url_msg;
                 }
                 
-                request('http://juicer.herokuapp.com/api/article?url=' + url_msg, function (error, response, body) {
+                var request_url = 'http://api.linkpreview.net/?key='+api_key+'&q='+url_msg;
+                request(request_url, function (error, response, body) {
                     //console.log('******** juicer.herokuapp.com/api *********** '+body);
-                    var body_parse = JSON.parse(body);
+                    //var body_parse = JSON.parse(body);
 //                    if (!error) {
 //                        if (body_parse['result']['status'] == 'OK') {
 //                            if (body_parse['meta']['image']) {
@@ -120,18 +123,32 @@ module.exports = function (ioTrendingChat) {
 //                            
 //                        });
 //                    }
-                      if(!error){
-                          if(body_parse['article']['image']){
-                              jsonData.thumbnail = body_parse['article']['image']['src'];
-                          }
-                          jsonData.message = message + '~' + body_parse['article']['description'];
-                          channelController.saveMessage(jsonData, socket, function(response){
-                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
-                            // send message to online user
-                            ioTrendingChat.to(channel_id).emit('get message', response);
-                            // send message to offline user
-                        });
-                      }
+//                      if(!error){
+//                          if(body_parse['article']['image']){
+//                              jsonData.thumbnail = body_parse['article']['image']['src'];
+//                          }
+//                          jsonData.message = message + '~' + body_parse['article']['description'];
+//                          channelController.saveMessage(jsonData, socket, function(response){
+//                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
+//                            // send message to online user
+//                            ioTrendingChat.to(channel_id).emit('get message', response);
+//                            // send message to offline user
+//                        });
+//                      }
+
+                        if(!error){
+                            if(body.image){
+                                jsonData.thumbnail = body.image;
+                            }
+                            jsonData.message = message + '~' + body.description;
+                            channelController.saveMessage(jsonData, socket, function(response){
+                              console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                              // send message to online user
+                              ioTrendingChat.to(channel_id).emit('get message', response);
+                              // send message to offline user
+                          });
+                        }
+                        
                 });
                 
                 
