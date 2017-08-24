@@ -101,7 +101,7 @@ module.exports = function (ioTrendingChat) {
                 var request_url = 'http://api.linkpreview.net/?key='+api_key+'&q='+url_msg;
                 request(request_url, function (error, response, body) {
                     //console.log('******** juicer.herokuapp.com/api *********** '+body);
-                    //var body_parse = JSON.parse(body);
+                    var body_parse = JSON.parse(body);
 //                    if (!error) {
 //                        if (body_parse['result']['status'] == 'OK') {
 //                            if (body_parse['meta']['image']) {
@@ -137,10 +137,10 @@ module.exports = function (ioTrendingChat) {
 //                      }
 
                         if(!error){
-                            if(body.image){
-                                jsonData.thumbnail = body.image;
+                            if(body_parse.image){
+                                jsonData.thumbnail = body_parse.image;
                             }
-                            jsonData.message = message + '~' + body.description;
+                            jsonData.message = message + '~' + body_parse.description;
                             channelController.saveMessage(jsonData, socket, function(response){
                               console.log('channelController.saveMessage response '+ JSON.stringify(response));
                               // send message to online user
