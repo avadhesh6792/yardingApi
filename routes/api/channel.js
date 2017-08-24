@@ -262,7 +262,8 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 channel_name: {$first: '$channel_name'},
                 created_timestamp: {$first: '$created_timestamp'},
                 members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
-                latest_chat: {$first: '$latest_chat'}
+                latest_chat: {$first: '$latest_chat'},
+                badge: {$first: '$members_id.badge'}
             }
         }
 
