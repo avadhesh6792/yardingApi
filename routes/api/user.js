@@ -438,6 +438,9 @@ router.get('/testing', function(req, res, next){
     Channel.aggregate([
         { 
             $match: { 'members_id.user_id': ObjectId('599e2adf7a430d7b3b360c83') }
+        },
+        {
+            $unwind: '$members_id'
         }
     ], function(err, result){
         return (err) ? res.json(err) : res.json(result);
