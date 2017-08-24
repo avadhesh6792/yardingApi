@@ -2,6 +2,7 @@ var channelController = require('../controllers/channelController');
 var url = require('url');
 var request = require('request');
 var config = require('../config/config');
+var unirest = require('unirest');
 
 module.exports = function (ioTrendingChat) {
     console.log('ioTrendingChat :: inside this file');
@@ -98,49 +99,71 @@ module.exports = function (ioTrendingChat) {
                     url_msg = 'http://' + url_msg;
                 }
                 
-                var request_url = 'http://api.linkpreview.net/?key='+api_key+'&q='+url_msg;
-                request(request_url, function (error, response, body) {
-                    //console.log('******** juicer.herokuapp.com/api *********** '+body);
-                    var body_parse = JSON.parse(body);
-//                    if (!error) {
-//                        if (body_parse['result']['status'] == 'OK') {
-//                            if (body_parse['meta']['image']) {
-//                                jsonData.thumbnail = body_parse['meta']['image'];
-//                            } else {
-//                                jsonData.thumbnail = body_parse['meta']['favicon'];
+                //var request_url = 'http://api.linkpreview.net/?key='+api_key+'&q='+url_msg;
+//                request(request_url, function (error, response, body) {
+//                    //console.log('******** juicer.herokuapp.com/api *********** '+body);
+//                    var body_parse = JSON.parse(body);
+////                    if (!error) {
+////                        if (body_parse['result']['status'] == 'OK') {
+////                            if (body_parse['meta']['image']) {
+////                                jsonData.thumbnail = body_parse['meta']['image'];
+////                            } else {
+////                                jsonData.thumbnail = body_parse['meta']['favicon'];
+////                            }
+////                            jsonData.message = message + '~' + body_parse['meta']['description'];
+////                        }
+////                        //console.log('************************ url meta ******************' + body_parse['meta']['image'] + ' ' +body_parse['meta']['favicon']);
+////                        channelController.saveMessage(jsonData, socket, function(response){
+////                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
+////                            
+////                            // send message to online user
+////                            ioTrendingChat.to(channel_id).emit('get message', response);
+////                            
+////                            // send message to offline user
+////                            
+////                            
+////                        });
+////                    }
+////                      if(!error){
+////                          if(body_parse['article']['image']){
+////                              jsonData.thumbnail = body_parse['article']['image']['src'];
+////                          }
+////                          jsonData.message = message + '~' + body_parse['article']['description'];
+////                          channelController.saveMessage(jsonData, socket, function(response){
+////                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
+////                            // send message to online user
+////                            ioTrendingChat.to(channel_id).emit('get message', response);
+////                            // send message to offline user
+////                        });
+////                      }
+//
+//                        if(!error){
+//                            if(body_parse.image){
+//                                jsonData.thumbnail = body_parse.image;
 //                            }
-//                            jsonData.message = message + '~' + body_parse['meta']['description'];
+//                            jsonData.message = message + '~' + body_parse.description;
+//                            channelController.saveMessage(jsonData, socket, function(response){
+//                              console.log('channelController.saveMessage response '+ JSON.stringify(response));
+//                              // send message to online user
+//                              ioTrendingChat.to(channel_id).emit('get message', response);
+//                              // send message to offline user
+//                          });
 //                        }
-//                        //console.log('************************ url meta ******************' + body_parse['meta']['image'] + ' ' +body_parse['meta']['favicon']);
-//                        channelController.saveMessage(jsonData, socket, function(response){
-//                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
-//                            
-//                            // send message to online user
-//                            ioTrendingChat.to(channel_id).emit('get message', response);
-//                            
-//                            // send message to offline user
-//                            
-//                            
-//                        });
-//                    }
-//                      if(!error){
-//                          if(body_parse['article']['image']){
-//                              jsonData.thumbnail = body_parse['article']['image']['src'];
-//                          }
-//                          jsonData.message = message + '~' + body_parse['article']['description'];
-//                          channelController.saveMessage(jsonData, socket, function(response){
-//                            console.log('channelController.saveMessage response '+ JSON.stringify(response));
-//                            // send message to online user
-//                            ioTrendingChat.to(channel_id).emit('get message', response);
-//                            // send message to offline user
-//                        });
-//                      }
-
-                        if(!error){
-                            if(body_parse.image){
-                                jsonData.thumbnail = body_parse.image;
+//                        
+//                });
+                
+                    var request_url = "https://proclink.p.mashape.com/oembed?url="+url_msg;
+                    unirest.get(request_url)
+                        .header("X-Mashape-Key", config.mashape_key)
+                        .header("Accept", "application/json")
+                        .end(function (result) {
+                          console.log(result.status, result.headers, result.body);
+                          //return res.json(result);
+                          if(result.status == 200){
+                            if(result.body.thumbnail_url){
+                                jsonData.thumbnail = result.body.thumbnail_url;
                             }
-                            jsonData.message = message + '~' + body_parse.description;
+                            jsonData.message = message + '~' + result.body.description;
                             channelController.saveMessage(jsonData, socket, function(response){
                               console.log('channelController.saveMessage response '+ JSON.stringify(response));
                               // send message to online user
@@ -148,8 +171,7 @@ module.exports = function (ioTrendingChat) {
                               // send message to offline user
                           });
                         }
-                        
-                });
+                    });
                 
                 
             } else {
