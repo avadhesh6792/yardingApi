@@ -296,6 +296,15 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
 
 
                 }
+                var badge = 0;
+                if(channels[index].badge.length){
+                   channels[index].badge.map(function(b){
+                        if(b){
+                            badge = b;
+                        }
+                    }); 
+                }
+                channels[index].badge = badge;
                 //channels[index].members_info = undefined;
             });
 
