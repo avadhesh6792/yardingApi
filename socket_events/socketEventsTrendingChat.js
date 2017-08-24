@@ -140,38 +140,41 @@ module.exports = function (ioTrendingChat) {
                         if(!error){
                             if(body_parse.image){
                                 jsonData.thumbnail = body_parse.image;
+                                jsonData.message = message + '~' + body_parse.description;
+                                channelController.saveMessage(jsonData, socket, function(response){
+                                    console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                                    // send message to online user
+                                    ioTrendingChat.to(channel_id).emit('get message', response);
+                                    // send message to offline user
+                                });
+                            } else {
+                                var request_url = "https://proclink.p.mashape.com/oembed?url="+url_msg;
+                                    unirest.get(request_url)
+                                        .header("X-Mashape-Key", config.mashape_key)
+                                        .header("Accept", "application/json")
+                                        .end(function (result) {
+                                          console.log(result.status, result.headers, result.body);
+                                          //return res.json(result);
+                                          if(result.status == 200){
+                                            if(result.body.thumbnail_url){
+                                                jsonData.thumbnail = result.body.thumbnail_url;
+                                            }
+                                            jsonData.message = message + '~' + result.body.description;
+                                            channelController.saveMessage(jsonData, socket, function(response){
+                                              console.log('channelController.saveMessage response '+ JSON.stringify(response));
+                                              // send message to online user
+                                              ioTrendingChat.to(channel_id).emit('get message', response);
+                                              // send message to offline user
+                                          });
+                                        }
+                                    });
                             }
-                            jsonData.message = message + '~' + body_parse.description;
-                            channelController.saveMessage(jsonData, socket, function(response){
-                              console.log('channelController.saveMessage response '+ JSON.stringify(response));
-                              // send message to online user
-                              ioTrendingChat.to(channel_id).emit('get message', response);
-                              // send message to offline user
-                          });
+                            
                         }
 //                        
                 });
                 
-//                    var request_url = "https://proclink.p.mashape.com/oembed?url="+url_msg;
-//                    unirest.get(request_url)
-//                        .header("X-Mashape-Key", config.mashape_key)
-//                        .header("Accept", "application/json")
-//                        .end(function (result) {
-//                          console.log(result.status, result.headers, result.body);
-//                          //return res.json(result);
-//                          if(result.status == 200){
-//                            if(result.body.thumbnail_url){
-//                                jsonData.thumbnail = result.body.thumbnail_url;
-//                            }
-//                            jsonData.message = message + '~' + result.body.description;
-//                            channelController.saveMessage(jsonData, socket, function(response){
-//                              console.log('channelController.saveMessage response '+ JSON.stringify(response));
-//                              // send message to online user
-//                              ioTrendingChat.to(channel_id).emit('get message', response);
-//                              // send message to offline user
-//                          });
-//                        }
-//                    });
+                    
                 
                 
             } else {
