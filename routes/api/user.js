@@ -435,14 +435,12 @@ router.get('/set-user-offline/:user_id', function(req, res, next){
 });
 
 router.get('/testing', function(req, res, next){
-    var unirest = require('unirest');
-    var url = 'https://www.facebook.com/';
-    unirest.get("https://proclink.p.mashape.com/oembed?url="+url)
-        .header("X-Mashape-Key", "l13YnUBzUSmshFYz7DYnVJcDXEVpp1Bngdxjsn2wjmiixMexow")
-        .header("Accept", "application/json")
-        .end(function (result) {
-          console.log(result.status, result.headers, result.body);
-          return res.json(result);
+    Channel.aggregate([
+        { 
+            $match: { 'members_id.user_id': '599e2adf7a430d7b3b360c83' }
+        }
+    ], function(err, result){
+        return (err) ? res.json(err) : res.json(result);
     });
     
 });
