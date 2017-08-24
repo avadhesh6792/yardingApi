@@ -176,10 +176,10 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                         if(message_type == 'text'){
                                             message_type = 'message';
                                         }
-                                        alert = '@'+sender_name+' send you '+ message_type;
+                                        alert = '@'+sender_name+' sent you '+ message_type;
                                     }
                                     if(message_type == 'ssh'){
-                                        alert = '@'+sender_name+' send you secret message';
+                                        alert = '@'+sender_name+' sent you secret message';
                                     }
                                     
                                     payload.notification_type = 'channel_chat';
