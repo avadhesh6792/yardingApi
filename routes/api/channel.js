@@ -590,9 +590,10 @@ router.post('/upload-chat-media', function (req, res, next) {
 });
 
 
-router.get('/get-channel-info/:channel_id', function (req, res) {
+router.get('/get-channel-info/:channel_id/:user_id', function (req, res) {
     var bind = {};
     var channel_id = req.params.channel_id;
+    var user_id = req.params.user_id;
     Channel.aggregate([
         {
             $match: {_id: ObjectId(channel_id)}
@@ -633,7 +634,8 @@ router.get('/get-channel-info/:channel_id', function (req, res) {
                 channel_name: {$first: '$channel_name'},
                 created_timestamp: {$first: '$created_timestamp'},
                 members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
-                requests_info: {$first: '$requests_info'}
+                requests_info: {$first: '$requests_info'},
+                members_id: {$first: '$members_id'}
             }
         }
     ], function (err, channelInfo) {
@@ -644,6 +646,15 @@ router.get('/get-channel-info/:channel_id', function (req, res) {
             bind.error = err;
         } else if (channelInfo.length > 0) {
             bind.status = 1;
+            
+            var badge = 0;
+            arrayFind(channelInfo[0].members_id, function (member, index) {
+                if(member.user_id == user_id){
+                    badge = member.badge;
+                }
+            });
+            channelInfo[0].badge = badge;
+            channelInfo[0].members_id = undefined;
             bind.channelInfo = channelInfo[0];
         } else {
             bind.status = 0;
