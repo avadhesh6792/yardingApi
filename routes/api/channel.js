@@ -403,8 +403,9 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
 });
 
 // get all channels
-router.get('/get-all-channels', function (req, res, next) {
+router.get('/get-all-channels/:user_id', function (req, res, next) {
     var bind = {};
+    var user_id = ObjectId(req.params.user_id);
     Channel.aggregate([
         {
             $match: {room_type: 'channel'}
@@ -447,7 +448,8 @@ router.get('/get-all-channels', function (req, res, next) {
                 channel_name: {$first: '$channel_name'},
                 created_timestamp: {$first: '$created_timestamp'},
                 members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
-                latest_chat: {$first: '$latest_chat'}
+                latest_chat: {$first: '$latest_chat'},
+                badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
         }
     ], function (err, channels) {
@@ -465,6 +467,15 @@ router.get('/get-all-channels', function (req, res, next) {
                     var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
                     channels[index].latest_chat = sort_array[0];
                 }
+                var badge = 0;
+                if(channels[index].badge.length){
+                   channels[index].badge.map(function(b){
+                        if(b){
+                            badge = b;
+                        }
+                    }); 
+                }
+                channels[index].badge = badge;
 
             });
 
