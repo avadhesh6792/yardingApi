@@ -647,13 +647,13 @@ router.get('/get-channel-info/:channel_id/:user_id', function (req, res) {
         } else if (channelInfo.length > 0) {
             bind.status = 1;
             
-            var badge = 0;
-            var current_member = arrayFind(channelInfo[0].members_id, function (member, index) {
-                return member.user_id == user_id;
-            });
-            badge = current_member.badge;
-            channelInfo[0].badge = badge;
-            channelInfo[0].members_id = undefined;
+//            var badge = 0;
+//            var current_member = arrayFind(channelInfo[0].members_id, function (member, index) {
+//                return member.user_id == user_id;
+//            });
+//            badge = current_member.badge;
+//            channelInfo[0].badge = badge;
+//            channelInfo[0].members_id = undefined;
             bind.channelInfo = channelInfo[0];
         } else {
             bind.status = 0;
