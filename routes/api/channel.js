@@ -648,11 +648,10 @@ router.get('/get-channel-info/:channel_id/:user_id', function (req, res) {
             bind.status = 1;
             
             var badge = 0;
-            arrayFind(channelInfo[0].members_id, function (member, index) {
-                if(member.user_id == user_id){
-                    badge = member.badge;
-                }
+            var current_member = arrayFind(channelInfo[0].members_id, function (member, index) {
+                return member.user_id == user_id;
             });
+            badge = current_member.badge;
             channelInfo[0].badge = badge;
             channelInfo[0].members_id = undefined;
             bind.channelInfo = channelInfo[0];
