@@ -214,14 +214,35 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                     notification_params.deviceToken = deviceToken;
                                     notification_params.alert = alert;
                                     notification_params.payload = payload;
-                                    notification_params.badge = badge;
+                                    //notification_params.badge = badge;
                                     if(message_type == 'ssh'){
                                         var receiver_id = message.substr(0, message.indexOf('/')).trim(); 
-                                        if( receiver_id == user._id ){
-                                            Notification.sendAPNotification(notification_params);
+                                        if( receiver_id == offline_user_id ){
+                                            
+                                            Channel.aggregate([
+                                                {$match: { 'members_id.user_id': ObjectId(offline_user_id) }},
+                                                {$unwind: '$members_id'},
+                                                {$match: { 'members_id.user_id': ObjectId(offline_user_id) }},
+                                                {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
+                                            ],function(err, result){
+                                                if(!err && result.length > 0){
+                                                    notification_params.badge = result[0].total_badge;
+                                                    Notification.sendAPNotification(notification_params);
+                                                }
+                                            });
                                         }
                                     } else {
-                                        Notification.sendAPNotification(notification_params);
+                                        Channel.aggregate([
+                                            {$match: { 'members_id.user_id': ObjectId(offline_user_id) }},
+                                            {$unwind: '$members_id'},
+                                            {$match: { 'members_id.user_id': ObjectId(offline_user_id) }},
+                                            {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
+                                        ],function(err, result){
+                                            if(!err && result.length > 0){
+                                                notification_params.badge = result[0].total_badge;
+                                                Notification.sendAPNotification(notification_params);
+                                            }
+                                        });
                                     }
                                     
                                     
