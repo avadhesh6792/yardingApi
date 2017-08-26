@@ -1031,7 +1031,7 @@ router.post('/add-to-channel-request', function (req, res, next) {
                         
                         var channel_admin_id = channel.admin_id;
                         // increment badge count in user document
-                        User.update({ id: channel_admin_id},{ $inc: {badge: 1}}, function(err){ });
+                        User.update({ _id: channel_admin_id},{ $inc: {badge: 1}}, function(err){ });
 
                         // send notification to channel admin
                         var deviceToken = '';
@@ -1116,7 +1116,7 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                     var channel_admin_id = channel.admin_id;
                     
                     // decrement badge count in user document
-                    User.update({ id: channel_admin_id, badge: {$gt: 0}},{ $inc: {badge: -1}}, function(err){ });
+                    User.update({ _id: channel_admin_id, badge: {$gt: 0}},{ $inc: {badge: -1}}, function(err){ });
 
                     // send notification to user
                     var deviceToken = '';
