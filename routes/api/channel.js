@@ -222,6 +222,7 @@ router.post('/delete-from-chat-channels', function (req, res, next) {
 router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
     var bind = {};
     var user_id = ObjectId(req.params.user_id);
+    User.update({ _id: user_id},{ $set: {badge: 0}}, function(err){ }); // set user's badge to 0
     Channel.aggregate([
         {
             $match: {'members_id.user_id': user_id}
@@ -424,6 +425,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
 router.get('/get-all-channels/:user_id', function (req, res, next) {
     var bind = {};
     var user_id = ObjectId(req.params.user_id);
+    User.update({ _id: user_id},{ $set: {badge: 0}}, function(err){ }); // set user's badge to 0
     Channel.aggregate([
         {
             $match: {room_type: 'channel'}
