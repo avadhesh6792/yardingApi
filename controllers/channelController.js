@@ -226,7 +226,8 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                                 {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
                                             ],function(err, result){
                                                 if(!err && result.length > 0){
-                                                    notification_params.badge = result[0].total_badge;
+                                                    var total_badge = result[0].total_badge + user.badge;
+                                                    notification_params.badge = total_badge;
                                                     Notification.sendAPNotification(notification_params);
                                                 }
                                             });
@@ -239,7 +240,8 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                             {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
                                         ],function(err, result){
                                             if(!err && result.length > 0){
-                                                notification_params.badge = result[0].total_badge;
+                                                var total_badge = result[0].total_badge + user.badge;
+                                                notification_params.badge = total_badge;
                                                 Notification.sendAPNotification(notification_params);
                                             }
                                         });

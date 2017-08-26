@@ -1028,6 +1028,10 @@ router.post('/add-to-channel-request', function (req, res, next) {
                     } else {
                         bind.status = 1;
                         bind.message = 'Your request was sent successfully';
+                        
+                        var channel_admin_id = channel.admin_id;
+                        // increment badge count in user document
+                        User.update({ id: channel_admin_id},{ $inc: {badge: 1}}, function(err){ });
 
                         // send notification to channel admin
                         var deviceToken = '';
@@ -1035,12 +1039,13 @@ router.post('/add-to-channel-request', function (req, res, next) {
                         var payload = {
                             extra_data: {}
                         };
-                        var channel_admin_id = channel.admin_id;
+                        
 
                         User.findOne({_id: channel_admin_id}, function (err, admin_user) {
                             if (admin_user && admin_user.token_id) {
                                 User.findOne({_id: user_id}, function (err, user) {
                                     if (user) {
+                                        var admin_id = admin_user._id;
                                         deviceToken = admin_user.token_id;
                                         var room_type = channel.room_type;
                                         alert = user.name + ' has sent request to ' + channel.channel_name + ' ' + room_type;
@@ -1050,8 +1055,22 @@ router.post('/add-to-channel-request', function (req, res, next) {
                                         notification_params.deviceToken = deviceToken;
                                         notification_params.alert = alert;
                                         notification_params.payload = payload;
-                                        notification_params.badge = 1;
-                                        Notification.sendAPNotification(notification_params);
+                                        //notification_params.badge = 1;
+                                        
+                                        Channel.aggregate([
+                                            {$match: { 'members_id.user_id': ObjectId(admin_id) }},
+                                            {$unwind: '$members_id'},
+                                            {$match: { 'members_id.user_id': ObjectId(admin_id) }},
+                                            {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
+                                        ],function(err, result){
+                                            if(!err && result.length > 0){
+                                                var total_badge = result[0].total_badge + user.badge;
+                                                notification_params.badge = total_badge;
+                                                Notification.sendAPNotification(notification_params);
+                                            }
+                                        });
+                                        
+                                        
                                     }
                                 });
                             }
@@ -1093,6 +1112,11 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                 } else {
                     bind.status = 1;
                     bind.message = flag == 1 ? 'Request was accepted successfully' : 'Request was rejected successfully';
+                    
+                    var channel_admin_id = channel.admin_id;
+                    
+                    // decrement badge count in user document
+                    User.update({ id: channel_admin_id, badge: {$gt: 0}},{ $inc: {badge: -1}}, function(err){ });
 
                     // send notification to user
                     var deviceToken = '';
@@ -1102,6 +1126,7 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                     };
                     User.findOne({_id: user_id}, function (err, user) {
                         if (user && user.token_id) {
+                            var user_id = user._id;
                             deviceToken = user.token_id;
                             var room_type = channel.room_type;
                             alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request';
@@ -1111,8 +1136,20 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                             notification_params.deviceToken = deviceToken;
                             notification_params.alert = alert;
                             notification_params.payload = payload;
-                            notification_params.badge = 1;
-                            Notification.sendAPNotification(notification_params);
+                            //notification_params.badge = 1;
+                            
+                            Channel.aggregate([
+                                {$match: { 'members_id.user_id': ObjectId(user_id) }},
+                                {$unwind: '$members_id'},
+                                {$match: { 'members_id.user_id': ObjectId(user_id) }},
+                                {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
+                            ],function(err, result){
+                                if(!err && result.length > 0){
+                                    var total_badge = result[0].total_badge + user.badge;
+                                    notification_params.badge = total_badge;
+                                    Notification.sendAPNotification(notification_params);
+                                }
+                            });
                         }
                     });
                 }
