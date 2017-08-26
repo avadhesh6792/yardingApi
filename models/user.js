@@ -8,7 +8,8 @@ var User = new Schema({
     display_pic : {type: String, default: ''},
     cover_pic   : {type: String, default: ''},
     phone_no    : {type: String, default: ''},
-    token_id    : {type: String, default: ''}
+    token_id    : {type: String, default: ''},
+    badge       : {type: Number, default: 0}    
 });
 
 module.exports = mongoose.model('User', User);

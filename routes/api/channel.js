@@ -326,15 +326,10 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
     var pattern = new RegExp(search_term, 'i');
     Channel.aggregate([
         {
-            $match: {'members_id.user_id': user_id}
+            $match: {'members_id.user_id': user_id, channel_name: {$regex: pattern}}
         },
         {
-            $lookup: {
-                from: 'channel_chats',
-                localField: '_id',
-                foreignField: 'channel_id',
-                as: 'latest_chat'
-            }
+            $unwind: "$members_id"
         },
         {
             $lookup: {
@@ -346,22 +341,41 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
             }
         },
         {
-            $sort: {'latest_chat.createdAt': -1}
+            $lookup: {
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
         },
         {
-            //$project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1, members_id: 1, channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: {"$arrayElemAt": ["$latest_chat", 0]}}
-            $project: {updatedAt: 1, createdAt: 1, admin_id: 1, user_id: 1, created_timestamp: 1, link: 1,
-                'members_info._id': 1, 'members_info.name': 1, 'members_info.display_pic': 1, 'members_info.status': 1,
-                channel_type: 1, channel_pic: 1, channel_description: 1, channel_name: 1, latest_chat: 1,
-                room_type: 1}
+            $group: {
+                _id: '$_id',
+                updatedAt: {$first: '$updatedAt'},
+                createdAt: {$first: '$createdAt'},
+                created_timestamp: {$first: '$created_timestamp'},
+                admin_id: {$first: '$admin_id'},
+                user_id: {$first: '$user_id'},
+                room_type: {$first: '$room_type'},
+                link: {$first: '$link'},
+                channel_type: {$first: '$channel_type'},
+                channel_pic: {$first: '$channel_pic'},
+                channel_description: {$first: '$channel_description'},
+                channel_name: {$first: '$channel_name'},
+                created_timestamp: {$first: '$created_timestamp'},
+                members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
+                latest_chat: {$first: '$latest_chat'},
+                badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
+            }
         }
+
     ], function (err, channels) {
         if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all chat channels';
             bind.err = err;
         } else if (channels.length > 0) {
-            var search_channels = [];
+            bind.status = 1;
 
 
             channels.forEach(function (item, index) {
@@ -375,24 +389,28 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
                         return info._id != req.params.user_id;
                     });
 
-                    //channels[index].members_info_index = members_info_index;
-                    channels[index].channel_name = other_member_info.name;
-                    channels[index].channel_pic = other_member_info.display_pic;
-                    channels[index].channel_description = other_member_info.status;
+                    if (other_member_info) {
+                        //channels[index].members_info_index = members_info_index;
+                        channels[index].channel_name = other_member_info.name;
+                        channels[index].channel_pic = other_member_info.display_pic;
+                        channels[index].channel_description = other_member_info.status;
+                    }
+
+
                 }
-                channels[index].members_info = undefined;
-                if (pattern.test(channels[index].channel_name)) {
-                    search_channels.push(item);
+                var badge = 0;
+                if(channels[index].badge.length){
+                   channels[index].badge.map(function(b){
+                        if(b){
+                            badge = b;
+                        }
+                    }); 
                 }
+                channels[index].badge = badge;
+                //channels[index].members_info = undefined;
             });
 
-            if (search_channels.length > 0) {
-                bind.status = 1;
-                bind.channels = search_channels;
-            } else {
-                bind.status = 0;
-                bind.message = 'No chat channels found';
-            }
+            bind.channels = channels;
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
@@ -490,24 +508,92 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
 });
 
 // search channel
-router.get('/search-channel/:term', function (req, res, next) {
+router.get('/search-channel/:term/:user_id', function (req, res, next) {
     var bind = {};
     var term = req.param('term');
     var pattern = new RegExp(term, 'i');
+    var user_id = ObjectId(req.params.user_id);
 
-    Channel.find({channel_name: {$regex: pattern}, room_type: 'channel'}, function (err, channels) {
+    Channel.aggregate([
+        {
+            $match: {channel_name: {$regex: pattern}, room_type: 'channel'}
+        },
+        {
+            $unwind: "$members_id"
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'members_id.user_id',
+                foreignField: '_id',
+                as: 'members_info'
+
+            }
+        },
+        {
+            $lookup: {
+                from: 'channel_chats',
+                localField: '_id',
+                foreignField: 'channel_id',
+                as: 'latest_chat'
+            }
+        },
+        {
+            $sort: {'latest_chat.createdAt': -1}
+        },
+        {
+            $group: {
+                _id: '$_id',
+                updatedAt: {$first: '$updatedAt'},
+                createdAt: {$first: '$createdAt'},
+                admin_id: {$first: '$admin_id'},
+                user_id: {$first: '$user_id'},
+                room_type: {$first: '$room_type'},
+                link: {$first: '$link'},
+                channel_type: {$first: '$channel_type'},
+                channel_pic: {$first: '$channel_pic'},
+                channel_description: {$first: '$channel_description'},
+                channel_name: {$first: '$channel_name'},
+                created_timestamp: {$first: '$created_timestamp'},
+                members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
+                latest_chat: {$first: '$latest_chat'},
+                badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
+            }
+        }
+    ], function (err, channels) {
         if (err) {
             bind.status = 0;
             bind.message = 'Oops! error occur while fetching all channels';
             bind.err = err;
         } else if (channels.length > 0) {
             bind.status = 1;
+
+
+            channels.forEach(function (item, index) {
+                if (item.latest_chat) {
+
+                    var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
+                    channels[index].latest_chat = sort_array[0];
+                }
+                var badge = 0;
+                if(channels[index].badge.length){
+                   channels[index].badge.map(function(b){
+                        if(b){
+                            badge = b;
+                        }
+                    }); 
+                }
+                channels[index].badge = badge;
+
+            });
+
             bind.channels = channels;
         } else {
             bind.status = 0;
             bind.message = 'No channels found';
         }
         return res.json(bind);
+
     });
 
 
