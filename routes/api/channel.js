@@ -1031,47 +1031,49 @@ router.post('/add-to-channel-request', function (req, res, next) {
                         
                         var channel_admin_id = channel.admin_id;
                         // increment badge count in user document
-                        User.update({ _id: channel_admin_id},{ $inc: {badge: 1}}, function(err){
-                            // send notification to channel admin
-                            var deviceToken = '';
-                            var alert = '';
-                            var payload = {
-                                extra_data: {}
-                            };
-                            User.findOne({_id: channel_admin_id}, function (err, admin_user) {
-                                if (admin_user && admin_user.token_id) {
-                                    User.findOne({_id: user_id}, function (err, user) {
-                                        if (user) {
-                                            var admin_id = admin_user._id;
-                                            deviceToken = admin_user.token_id;
-                                            var room_type = channel.room_type;
-                                            alert = user.name + ' has sent request to ' + channel.channel_name + ' ' + room_type;
-                                            payload.notification_type = 'add-to-channel-request';
-                                            payload.extra_data.channel_id = channel_id;
-                                            var notification_params = {};
-                                            notification_params.deviceToken = deviceToken;
-                                            notification_params.alert = alert;
-                                            notification_params.payload = payload;
-                                            //notification_params.badge = 1;
+                        User.update({ id: channel_admin_id},{ $inc: {badge: 1}}, function(err){ });
 
-                                            Channel.aggregate([
-                                                {$match: { 'members_id.user_id': ObjectId(admin_id) }},
-                                                {$unwind: '$members_id'},
-                                                {$match: { 'members_id.user_id': ObjectId(admin_id) }},
-                                                {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
-                                            ],function(err, result){
-                                                if(!err && result.length > 0){
-                                                    var total_badge = result[0].total_badge + user.badge;
-                                                    notification_params.badge = total_badge;
-                                                    Notification.sendAPNotification(notification_params);
-                                                }
-                                            });
+                        // send notification to channel admin
+                        var deviceToken = '';
+                        var alert = '';
+                        var payload = {
+                            extra_data: {}
+                        };
+                        
 
-
-                                        }
-                                    });
-                                }
-                            });
+                        User.findOne({_id: channel_admin_id}, function (err, admin_user) {
+                            if (admin_user && admin_user.token_id) {
+                                User.findOne({_id: user_id}, function (err, user) {
+                                    if (user) {
+                                        var admin_id = admin_user._id;
+                                        deviceToken = admin_user.token_id;
+                                        var room_type = channel.room_type;
+                                        alert = user.name + ' has sent request to ' + channel.channel_name + ' ' + room_type;
+                                        payload.notification_type = 'add-to-channel-request';
+                                        payload.extra_data.channel_id = channel_id;
+                                        var notification_params = {};
+                                        notification_params.deviceToken = deviceToken;
+                                        notification_params.alert = alert;
+                                        notification_params.payload = payload;
+                                        //notification_params.badge = 1;
+                                        
+                                        Channel.aggregate([
+                                            {$match: { 'members_id.user_id': ObjectId(admin_id) }},
+                                            {$unwind: '$members_id'},
+                                            {$match: { 'members_id.user_id': ObjectId(admin_id) }},
+                                            {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
+                                        ],function(err, result){
+                                            if(!err && result.length > 0){
+                                                var total_badge = result[0].total_badge + admin_user.badge;
+                                                notification_params.badge = total_badge;
+                                                Notification.sendAPNotification(notification_params);
+                                            }
+                                        });
+                                        
+                                        
+                                    }
+                                });
+                            }
                         });
                     }
                     return res.json(bind);
@@ -1114,41 +1116,41 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                     var channel_admin_id = channel.admin_id;
                     
                     // decrement badge count in user document
-                    User.update({ _id: channel_admin_id, badge: {$gt: 0}},{ $inc: {badge: -1}}, function(err){
-                        // send notification to user
-                        var deviceToken = '';
-                        var alert = '';
-                        var payload = {
-                            extra_data: {}
-                        };
-                        User.findOne({_id: user_id}, function (err, user) {
-                            if (user && user.token_id) {
-                                var user_id = user._id;
-                                deviceToken = user.token_id;
-                                var room_type = channel.room_type;
-                                alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request';
-                                payload.notification_type = 'accept-reject-channel-request';
-                                payload.extra_data.channel_id = channel_id;
-                                var notification_params = {};
-                                notification_params.deviceToken = deviceToken;
-                                notification_params.alert = alert;
-                                notification_params.payload = payload;
-                                //notification_params.badge = 1;
+                    User.update({ id: channel_admin_id, badge: {$gt: 0}},{ $inc: {badge: -1}}, function(err){ });
 
-                                Channel.aggregate([
-                                    {$match: { 'members_id.user_id': ObjectId(user_id) }},
-                                    {$unwind: '$members_id'},
-                                    {$match: { 'members_id.user_id': ObjectId(user_id) }},
-                                    {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
-                                ],function(err, result){
-                                    if(!err && result.length > 0){
-                                        var total_badge = result[0].total_badge + user.badge;
-                                        notification_params.badge = total_badge;
-                                        Notification.sendAPNotification(notification_params);
-                                    }
-                                });
-                            }
-                        });
+                    // send notification to user
+                    var deviceToken = '';
+                    var alert = '';
+                    var payload = {
+                        extra_data: {}
+                    };
+                    User.findOne({_id: user_id}, function (err, user) {
+                        if (user && user.token_id) {
+                            var user_id = user._id;
+                            deviceToken = user.token_id;
+                            var room_type = channel.room_type;
+                            alert = channel.channel_name + ' ' + room_type + ' has' + (flag == 1 ? ' accepted' : ' rejected') + ' your request';
+                            payload.notification_type = 'accept-reject-channel-request';
+                            payload.extra_data.channel_id = channel_id;
+                            var notification_params = {};
+                            notification_params.deviceToken = deviceToken;
+                            notification_params.alert = alert;
+                            notification_params.payload = payload;
+                            //notification_params.badge = 1;
+                            
+                            Channel.aggregate([
+                                {$match: { 'members_id.user_id': ObjectId(user_id) }},
+                                {$unwind: '$members_id'},
+                                {$match: { 'members_id.user_id': ObjectId(user_id) }},
+                                {$group: {_id:null, total_badge: {$sum: '$members_id.badge'}}}
+                            ],function(err, result){
+                                if(!err && result.length > 0){
+                                    var total_badge = result[0].total_badge + user.badge;
+                                    notification_params.badge = total_badge;
+                                    Notification.sendAPNotification(notification_params);
+                                }
+                            });
+                        }
                     });
                 }
                 return res.json(bind);
