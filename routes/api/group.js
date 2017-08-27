@@ -139,7 +139,7 @@ router.post('/add-member-to-group', function(req, res){
                     members_id_arr.push({user_id: ObjectId(member_id), online_status: false, badge: 0}  );
                 }
                 
-                Channel.update({ _id: newGroup._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
+                Channel.update({ _id: group_id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
                     if (err) {
                         bind.status = 0;
                         bind.message = 'Oops! error occur while adding participants';
