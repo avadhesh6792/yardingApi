@@ -6,8 +6,7 @@
 
 var config = module.exports = {};
 
-// linkpreview credentials
-config.key = '599c68a3c365367a00e4d31786c71df7d83c4eba5b3cf';
+config.key = '599c68a3c365367a00e4d31786c71df7d83c4eba5b3cf'; // linkpreview credentials
 config.mashape_key = 'l13YnUBzUSmshFYz7DYnVJcDXEVpp1Bngdxjsn2wjmiixMexow'; // mashape proclink api key
 
 

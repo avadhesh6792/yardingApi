@@ -35,29 +35,26 @@ exports.createSingleChannel = function (user_ids, callback) {
             //newSingle_channel.members_id.push({ user_id: ObjectId(user_id1), online_status: true}, { user_id: ObjectId(user_id2), online_status: false});
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
-            //newSingle_channel.channel_name = user_id1 + '_' + user_id2;
-            User.find({ $or: [{_id: user_id1}, { _id:user_id2}] }, {'name': 1}, function(users){
-                newSingle_channel.channel_name = users[0].name + '_' + users[1].name;
-                newSingle_channel.save(function (err) {
-                    if (err) {
-                        bind.channel_id = '';
-                    } else {
-                        bind.channel_id = newSingle_channel._id;
-                        bind.single_channel = newSingle_channel;
-                        var members_id_arr = [];
-                        members_id_arr.push({ user_id: ObjectId(user_id1), online_status: false, badge: 0}, { user_id: ObjectId(user_id2), online_status: false, badge: 0});
-                        Channel.update({ _id: newSingle_channel._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
-                            if(err){
-                                console.log('*** create single channel error : '+ JSON.stringify(err));
-                            } else {
-                                console.log('*** create single channel success : ');
-                            }
-                        });
-                    }
-                    callback(bind);
-                });
-            });
+            newSingle_channel.channel_name = user_id1 + '_' + user_id2;
 
+            newSingle_channel.save(function (err) {
+                if (err) {
+                    bind.channel_id = '';
+                } else {
+                    bind.channel_id = newSingle_channel._id;
+                    bind.single_channel = newSingle_channel;
+                    var members_id_arr = [];
+                    members_id_arr.push({ user_id: ObjectId(user_id1), online_status: false, badge: 0}, { user_id: ObjectId(user_id2), online_status: false, badge: 0});
+                    Channel.update({ _id: newSingle_channel._id }, { $push: { members_id: { $each: members_id_arr }} }, function(err){
+                        if(err){
+                            console.log('*** create single channel error : '+ JSON.stringify(err));
+                        } else {
+                            console.log('*** create single channel success : ');
+                        }
+                    });
+                }
+                callback(bind);
+            });
         }
     });
 };
