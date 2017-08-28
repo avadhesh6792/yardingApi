@@ -36,7 +36,7 @@ exports.createSingleChannel = function (user_ids, callback) {
             newSingle_channel.created_timestamp = moment().unix();
             newSingle_channel.room_type = 'single';
             //newSingle_channel.channel_name = user_id1 + '_' + user_id2;
-            User.find({ $or: [{_id: ObjectId(user_id1)}, { _id: ObjectId(user_id2)}] }, {'name': 1}, function(users){
+            User.find({ $or: [{_id: user_id1}, { _id: user_id2}] }, {'name': 1}, function(err, users){
                 console.log('*** users ***' + JSON.stringify(users));
                 newSingle_channel.channel_name = users[0].name + '_' + users[1].name;
                 newSingle_channel.save(function (err) {
