@@ -222,9 +222,9 @@ module.exports = function (ioTrendingChat) {
          * }
          */
         socket.on('set-user-offline', function(jsonData){
-            var user_id = jsonData.user_id;
+            console.log('before channelController.setUserOffline response ');
             channelController.setUserOffline(jsonData, socket, function(response){
-                console.log('channelController.setUserOffline response '+ JSON.stringify(response));
+                console.log('Inside channelController.setUserOffline response '+ JSON.stringify(response));
             });
         });
         
