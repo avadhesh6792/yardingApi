@@ -212,6 +212,18 @@ module.exports = function (ioTrendingChat) {
             socket.leave(channel_id);
             // set user offline
             channelController.setUserOnlineStatus(jsonData, socket, function(response){
+                console.log('channelController.setUserOnlineStatus set offline response '+ JSON.stringify(response));
+            });
+        });
+        
+        /** set user offline
+         * jsonData = {
+         *  user_id
+         * }
+         */
+        socket.on('set-user-offline', function(jsonData){
+            var user_id = jsonData.user_id;
+            channelController.setUserOffline(jsonData, socket, function(response){
                 console.log('channelController.setUserOffline response '+ JSON.stringify(response));
             });
         });

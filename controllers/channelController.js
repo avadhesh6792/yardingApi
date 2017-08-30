@@ -63,6 +63,24 @@ exports.createSingleChannel = function (user_ids, callback) {
     });
 };
 
+exports.setUserOffline = function(jsonData, socket, callback){
+    var user_id = jsonData.user_id;
+    var bind = {};
+    
+    Channel.update({"members_id.user_id": ObjectId(user_id)}, 
+        {$set: {"members_id.$.online_status": false}}, { multi: true }, function(err){
+            if(err){
+                bind.status = 0;
+                bind.message = 'Oops! error occured while setting user offline';
+                bind.error = err;
+            } else {
+                bind.status = 1;
+                bind.message = 'User was offline successfully';
+            }
+            callback(bind);
+    });
+} 
+
 exports.setUserOnlineStatus = function(jsonData, socket, callback){
     var user_id = jsonData.user_id;
     var channel_id = jsonData.channel_id;
