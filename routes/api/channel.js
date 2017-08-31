@@ -268,7 +268,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
             }
         },
         {
-            $sort: { 'latest_chat.createdAt': 1 }
+            $sort: { 'latest_chat.createdAt': -1 }
         }
 
     ], function (err, channels) {
