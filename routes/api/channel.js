@@ -371,6 +371,9 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
                 latest_chat: {$first: '$latest_chat'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
+        },
+        {
+            $sort: { 'latest_chat.createdAt': -1 }
         }
 
     ], function (err, channels) {
@@ -474,6 +477,9 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
                 latest_chat: {$first: '$latest_chat'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
+        },
+        {
+            $sort: { 'latest_chat.createdAt': -1 }
         }
     ], function (err, channels) {
         if (err) {
@@ -564,6 +570,9 @@ router.get('/search-channel/:term/:user_id', function (req, res, next) {
                 latest_chat: {$first: '$latest_chat'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
+        },
+        {
+            $sort: { 'latest_chat.createdAt': -1 }
         }
     ], function (err, channels) {
         if (err) {
