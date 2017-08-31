@@ -312,11 +312,6 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
             });
             
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
-//            channels.sort(function(a, b){
-//                console.log('//////////// a is '+ JSON.stringify(a));
-//                console.log('***** a.latest_chat '+JSON.stringify(a.latest_chat));
-//                return b.created_timestamp - a.created_timestamp
-//            });
             bind.channels = sort_channel;
         } else {
             bind.status = 0;
@@ -391,10 +386,11 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
 
 
             channels.forEach(function (item, index) {
-                if (item.latest_chat) {
-
+                if (item.latest_chat.length) {
                     var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
                     channels[index].latest_chat = sort_array[0];
+                } else {
+                    item.latest_chat = {created_timestamp: 0};
                 }
                 if (item.room_type == 'single') {
                     var other_member_info = arrayFind(item.members_info, function (info, index) {
@@ -422,7 +418,8 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
                 //channels[index].members_info = undefined;
             });
 
-            bind.channels = channels;
+            var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
+            bind.channels = sort_channel;
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
@@ -496,10 +493,11 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
 
 
             channels.forEach(function (item, index) {
-                if (item.latest_chat) {
-
+                if (item.latest_chat.length) {
                     var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
                     channels[index].latest_chat = sort_array[0];
+                } else {
+                    item.latest_chat = {created_timestamp: 0};
                 }
                 var badge = 0;
                 if(channels[index].badge.length){
@@ -513,7 +511,8 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
 
             });
 
-            bind.channels = channels;
+            var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
+            bind.channels = sort_channel;
         } else {
             bind.status = 0;
             bind.message = 'No channels found';
@@ -589,10 +588,11 @@ router.get('/search-channel/:term/:user_id', function (req, res, next) {
 
 
             channels.forEach(function (item, index) {
-                if (item.latest_chat) {
-
+                if (item.latest_chat.length) {
                     var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
                     channels[index].latest_chat = sort_array[0];
+                } else {
+                    item.latest_chat = {created_timestamp: 0};
                 }
                 var badge = 0;
                 if(channels[index].badge.length){
@@ -606,7 +606,8 @@ router.get('/search-channel/:term/:user_id', function (req, res, next) {
 
             });
 
-            bind.channels = channels;
+            var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
+            bind.channels = sort_channel;
         } else {
             bind.status = 0;
             bind.message = 'No channels found';
