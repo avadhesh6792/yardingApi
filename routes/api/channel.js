@@ -266,6 +266,9 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 latest_chat: {$first: '$latest_chat'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
+        },
+        {
+            $sort: { 'latest_chat.createdAt': -1 }
         }
 
     ], function (err, channels) {
