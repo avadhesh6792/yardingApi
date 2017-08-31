@@ -309,7 +309,10 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
             });
             
             //var sort_channel = arraySort(channels, 'latest_chat.createdAt', {reverse: true});
-            channels.sort(function(a, b){return b.created_timestamp - a.created_timestamp});
+            channels.sort(function(a, b){
+                console.log('*** '+b.created_timestamp +' - '+ a.created_timestamp +' '+ b.created_timestamp - a.created_timestamp);
+                return b.created_timestamp - a.created_timestamp
+            });
             bind.channels = channels;
         } else {
             bind.status = 0;
