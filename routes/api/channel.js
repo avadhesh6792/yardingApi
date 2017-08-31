@@ -277,13 +277,14 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
 
 
             channels.forEach(function (item, index) {
-                channels[index].myvar = 'ava';
+                
                 if (item.latest_chat) {
                     var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
                     channels[index].latest_chat = sort_array[0];
                 } else {
                     item.latest_chat = {created_timestamp: 0};
                     channels[index] = item.latest_chat;
+                    channels[index].myvar = 'ava';
                 }
                 
                 if (item.room_type == 'single') {
