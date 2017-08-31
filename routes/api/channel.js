@@ -310,9 +310,9 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
             
             //var sort_channel = arraySort(channels, 'latest_chat.createdAt', {reverse: true});
             channels.sort(function(a, b){
-                console.log('*** '+b.created_timestamp +' - '+ a.created_timestamp);
-                console.log(b.created_timestamp - a.created_timestamp);
-                return b.created_timestamp - a.created_timestamp
+                console.log('*** '+b.latest_chat.created_timestamp +' - '+ a.latest_chat.created_timestamp);
+                console.log(b.latest_chat.created_timestamp - a.latest_chat.created_timestamp);
+                return b.latest_chat.created_timestamp - a.latest_chat.created_timestamp
             });
             bind.channels = channels;
         } else {
