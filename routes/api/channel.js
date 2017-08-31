@@ -266,11 +266,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 latest_chat: {$first: '$latest_chat'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
-        },
-        {
-            $sort: { '$latest_chat.createdAt': -1 }
         }
-
     ], function (err, channels) {
         if (err) {
             bind.status = 0;
@@ -311,8 +307,9 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 channels[index].badge = badge;
                 //channels[index].members_info = undefined;
             });
-
-            bind.channels = channels;
+            
+            var sort_channel = arraySort(channels, 'latest_chat.createdAt', {reverse: true});
+            bind.channels = sort_channel;
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
