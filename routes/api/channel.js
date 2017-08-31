@@ -308,8 +308,9 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 //channels[index].members_info = undefined;
             });
             
-            var sort_channel = arraySort(channels, 'latest_chat.createdAt', {reverse: true});
-            bind.channels = sort_channel;
+            //var sort_channel = arraySort(channels, 'latest_chat.createdAt', {reverse: true});
+            channels.sort(function(a, b){return b.created_timestamp - a.created_timestamp});
+            bind.channels = channels;
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
