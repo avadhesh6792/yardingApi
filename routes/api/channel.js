@@ -311,13 +311,13 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 //channels[index].members_info = undefined;
             });
             
-            //var sort_channel = arraySort(channels, 'latest_chat.createdAt', {reverse: true});
-            channels.sort(function(a, b){
-                console.log('//////////// a is '+ JSON.stringify(a));
-                console.log('***** a.latest_chat '+JSON.stringify(a.latest_chat));
-                return b.created_timestamp - a.created_timestamp
-            });
-            bind.channels = channels;
+            var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
+//            channels.sort(function(a, b){
+//                console.log('//////////// a is '+ JSON.stringify(a));
+//                console.log('***** a.latest_chat '+JSON.stringify(a.latest_chat));
+//                return b.created_timestamp - a.created_timestamp
+//            });
+            bind.channels = sort_channel;
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
