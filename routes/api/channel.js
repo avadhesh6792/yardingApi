@@ -268,7 +268,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
             }
         },
         {
-            $sort: { 'latest_chat.createdAt': -1 }
+            $sort: { 'latest_chat.created_timestamp': -1 }
         }
 
     ], function (err, channels) {
@@ -373,7 +373,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
             }
         },
         {
-            $sort: { 'latest_chat.createdAt': -1 }
+            $sort: { 'latest_chat.created_timestamp': -1 }
         }
 
     ], function (err, channels) {
@@ -479,7 +479,7 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
             }
         },
         {
-            $sort: { 'latest_chat.createdAt': -1 }
+            $sort: { 'latest_chat.created_timestamp': -1 }
         }
     ], function (err, channels) {
         if (err) {
@@ -572,7 +572,7 @@ router.get('/search-channel/:term/:user_id', function (req, res, next) {
             }
         },
         {
-            $sort: { 'latest_chat.createdAt': -1 }
+            $sort: { 'latest_chat.created_timestamp': -1 }
         }
     ], function (err, channels) {
         if (err) {
