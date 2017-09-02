@@ -228,6 +228,36 @@ module.exports = function (ioTrendingChat) {
             });
         });
         
+        /** start type
+         * jsonData = {
+         *  user_id, channel_id
+         * }
+         */
+        
+        socket.on('Start_type', function(jsonData){
+            var channel_id = jsonData.channel_id;
+            var user_id = jsonData.user_id;
+            channelController.getUserById(user_id, socket, function(response){
+                var username = response.name;
+                socket.broadcast.to(channel_id).emit('Update_Typing_type', {username: username, channel_id: channel_id, status: 'start'});
+            });
+        });
+        
+        /** end type
+         * jsonData = {
+         *  user_id, channel_id
+         * }
+         */
+        
+        socket.on('End_type', function(jsonData){
+            var channel_id = jsonData.channel_id;
+            var user_id = jsonData.user_id;
+            channelController.getUserById(user_id, socket, function(response){
+                var username = response.name;
+                socket.broadcast.to(channel_id).emit('Update_Typing_type', {username: username, channel_id: channel_id, status: 'end'});
+            });
+        });
+        
     });
 };
 

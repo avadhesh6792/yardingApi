@@ -16,6 +16,14 @@ var apn = require('apn');
 var appRoot = require('app-root-path');
 var Notification = require('../functions/notification');
 
+exports.getUserById = function(user_id, socket, callback){
+    var bind = {};
+    User.findOne({_id: user_id}, {name: 1}, function(err, user){
+        bind = user;
+        callback(bind);
+    });
+}
+
 exports.createSingleChannel = function (user_ids, callback) {
     var bind = {};
     var user_id1 = user_ids.user_id1;
