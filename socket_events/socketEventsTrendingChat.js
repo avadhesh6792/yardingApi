@@ -88,7 +88,7 @@ module.exports = function (ioTrendingChat) {
             var message = jsonData.message;
             var user_id = jsonData.user_id;
             var message_type = jsonData.message_type;
-            console.log('send message to channel : ' + channel_id + ' ' + message);
+            console.log('send message to channel : ' + channel_id + ' ' + message + ' '+message_type);
             
             if(message_type == 'url'){
                 //jsonData.thumbnail = 'testing';
