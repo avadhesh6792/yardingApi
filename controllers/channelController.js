@@ -206,7 +206,7 @@ exports.sendMessageToOfflineUser = function(jsonData, socket, callback){
                                         if(message_type == 'text'){
                                             message_type = 'message';
                                         }
-                                        alert = '@'+sender_name+' sent you '+ message_type;
+                                        alert = '@'+sender_name+' sent a '+ message_type;
                                     }
                                     if(message_type == 'ssh'){
                                         alert = '@'+sender_name+' sent you secret message';
