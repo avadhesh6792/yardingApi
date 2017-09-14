@@ -71,6 +71,25 @@ exports.createSingleChannel = function (user_ids, callback) {
     });
 };
 
+exports.setUserOnline = function(jsonData, socket, callback){
+    var user_id = jsonData.user_id;
+    var channel_id = jsonData.channel_id;
+    var bind = {};
+    
+    Channel.update({_id: ObjectId(channel_id), "members_id.user_id": ObjectId(user_id)}, 
+        {$set: {"members_id.$.online_status": false}}, function(err){
+            if(err){
+                bind.status = 0;
+                bind.message = 'Oops! error occured while setting user online';
+                bind.error = err;
+            } else {
+                bind.status = 1;
+                bind.message = 'User was online successfully';
+            }
+            callback(bind);
+    });
+}
+
 exports.setUserOffline = function(jsonData, socket, callback){
     var user_id = jsonData.user_id;
     var bind = {};

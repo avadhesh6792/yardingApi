@@ -228,6 +228,18 @@ module.exports = function (ioTrendingChat) {
             });
         });
         
+        /** set user online
+         * jsonData = {
+         *  user_id, channel_id
+         * }
+         */
+        socket.on('set-user-online', function(jsonData){
+            //console.log('before channelController.setUserOffline response ');
+            channelController.setUserOnline(jsonData, socket, function(response){
+                console.log('Inside channelController.setUserOnline response '+ JSON.stringify(response));
+            });
+        });
+        
         /** start type
          * jsonData = {
          *  user_id, channel_id
