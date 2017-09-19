@@ -8,9 +8,11 @@ exports.sendAPNotification = function(params){
     var payload = params.payload;
     var badge = params.badge;
     var options = {
-        cert: appRoot + "/config/cert.pem",
-        key: appRoot + "/config/key.pem",
-        production: false
+//        cert: appRoot + "/config/cert.pem",
+//        key: appRoot + "/config/key.pem",
+        cert: appRoot + "/config/YardingllcPush.pem",
+        key: appRoot + "/config/YardinllcPushKey.pem",
+        production: true
       };
 
     var apnProvider = new apn.Provider(options);
@@ -24,7 +26,8 @@ exports.sendAPNotification = function(params){
     note.sound = "ping.aiff";
     note.alert = alert;
     note.payload = payload;
-    note.topic = "com.yardingllc.yarding";
+    //note.topic = "com.yardingllc.yarding";
+    note.topic = "com.Yardingllc.YardingApp";
     
     apnProvider.send(note, deviceToken).then( function(result) {
         // see documentation for an explanation of result
