@@ -15,6 +15,7 @@ var appRoot = require('app-root-path');
 var ffmpeg = require('fluent-ffmpeg');
 var apn = require('apn');
 var Notification = require('../../functions/notification');
+var Functions = require('../../functions');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -183,11 +184,11 @@ router.post('/delete-from-chat-channels', function (req, res, next) {
 
 //    Channel.findOne({ _id: channel_id }, function(err, channel){
 //        if(channel){
-//            
+//
 //            var index = channel.members_id.findIndex(member_id => member_id.user_id == user_id_normal);
 //            if (index > -1) {
 //                channel.members_id.splice(index, 1);
-//                
+//
 //                if(channel.admin_id == user_id){
 //                    var admin_id = channel.members_id[Math.floor(Math.random()*channel.members_id.length)].user_id;
 //                    channel.admin_id = admin_id;
@@ -203,13 +204,13 @@ router.post('/delete-from-chat-channels', function (req, res, next) {
 //                    }
 //                    return res.json(bind);
 //                });
-//                
+//
 //            } else{
 //                bind.status = 0;
 //                bind.message = 'You are not member of this channel';
 //                res.json(bind);
 //            }
-//            
+//
 //        } else{
 //            bind.status = 0;
 //            bind.message = 'No chat channel found';
@@ -277,14 +278,14 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
 
 
             channels.forEach(function (item, index) {
-                
+
                 if (item.latest_chat.length) {
                     var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
                     channels[index].latest_chat = sort_array[0];
                 } else {
                     item.latest_chat = {created_timestamp: 0};
                 }
-                
+
                 if (item.room_type == 'single') {
                     var other_member_info = arrayFind(item.members_info, function (info, index) {
                         return info._id != req.params.user_id;
@@ -305,12 +306,12 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                         if(b){
                             badge = b;
                         }
-                    }); 
+                    });
                 }
                 channels[index].badge = badge;
                 //channels[index].members_info = undefined;
             });
-            
+
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
         } else {
@@ -412,7 +413,7 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
                         if(b){
                             badge = b;
                         }
-                    }); 
+                    });
                 }
                 channels[index].badge = badge;
                 //channels[index].members_info = undefined;
@@ -505,7 +506,7 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
                         if(b){
                             badge = b;
                         }
-                    }); 
+                    });
                 }
                 channels[index].badge = badge;
 
@@ -600,7 +601,7 @@ router.get('/search-channel/:term/:user_id', function (req, res, next) {
                         if(b){
                             badge = b;
                         }
-                    }); 
+                    });
                 }
                 channels[index].badge = badge;
 
@@ -752,7 +753,7 @@ router.get('/get-channel-info/:channel_id/:user_id', function (req, res) {
             bind.error = err;
         } else if (channelInfo.length > 0) {
             bind.status = 1;
-            
+
             var badge = 0;
             arrayFind(channelInfo[0].members_id, function (member, index) {
                 if(member.user_id == user_id){
@@ -932,7 +933,7 @@ router.post('/remove-user-from-channel', function (req, res) {
                             alert = 'You are removed from ' + channel.channel_name + ' ' + room_type;
                             payload.notification_type = 'remove-user-from-channel';
                             payload.extra_data.channel_id = channel_id;
-                            
+
                             var notification_params = {};
                             notification_params.deviceToken = deviceToken;
                             notification_params.alert = alert;
@@ -991,7 +992,7 @@ router.post('/remove-user-from-channel', function (req, res) {
 //                bind.message = 'User is not a member of channel';
 //                return res.json(bind);
 //            }
-//            
+//
 //        } else {
 //            bind.status = 0;
 //            bind.message = 'No channel found';
@@ -1048,7 +1049,7 @@ router.post('/add-to-channel-request', function (req, res, next) {
                     } else {
                         bind.status = 1;
                         bind.message = 'Your request was sent successfully';
-                        
+
                         var channel_admin_id = channel.admin_id;
                         // increment badge count in user document
                         User.update({ _id: channel_admin_id},{ $inc: {badge: 1}}, function(err){ });
@@ -1059,7 +1060,7 @@ router.post('/add-to-channel-request', function (req, res, next) {
                         var payload = {
                             extra_data: {}
                         };
-                        
+
 
                         User.findOne({_id: channel_admin_id}, function (err, admin_user) {
                             if (admin_user && admin_user.token_id) {
@@ -1076,7 +1077,7 @@ router.post('/add-to-channel-request', function (req, res, next) {
                                         notification_params.alert = alert;
                                         notification_params.payload = payload;
                                         //notification_params.badge = 1;
-                                        
+
                                         Channel.aggregate([
                                             {$match: { 'members_id.user_id': ObjectId(admin_id) }},
                                             {$unwind: '$members_id'},
@@ -1089,8 +1090,8 @@ router.post('/add-to-channel-request', function (req, res, next) {
                                                 Notification.sendAPNotification(notification_params);
                                             }
                                         });
-                                        
-                                        
+
+
                                     }
                                 });
                             }
@@ -1132,9 +1133,9 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                 } else {
                     bind.status = 1;
                     bind.message = flag == 1 ? 'Request was accepted successfully' : 'Request was rejected successfully';
-                    
+
                     var channel_admin_id = channel.admin_id;
-                    
+
                     // decrement badge count in user document
                     User.update({ _id: channel_admin_id, badge: {$gt: 0}},{ $inc: {badge: -1}}, function(err){ });
 
@@ -1157,7 +1158,7 @@ router.post('/accept-reject-channel-request', function (req, res, next) {
                             notification_params.alert = alert;
                             notification_params.payload = payload;
                             //notification_params.badge = 1;
-                            
+
                             Channel.aggregate([
                                 {$match: { 'members_id.user_id': ObjectId(user_id) }},
                                 {$unwind: '$members_id'},
@@ -1218,92 +1219,20 @@ router.get('/get-channel-requests/:channel_id', function (req, res, next) {
 // testing route
 router.get('/testing', function (req, res, next) {
 
-    var bind = {};
-    var user_id = ObjectId('59908a76f236b37d22dd0dac');
-    Channel.aggregate([
-        {
-            $match: {'members_id.user_id': user_id}
-        },
-        {
-            $unwind: "$members_id"
-        },
-        {
-            $lookup: {
-                from: 'users',
-                localField: 'members_id.user_id',
-                foreignField: '_id',
-                as: 'members_info'
+  let body = '';
+  body += '<p>Hello Admin,</p>';
+  body += '<p>Chat with id 987 from channel/group id : 543 has some content with objection.<br/>';
+  body += 'Please view this user\'s post </p>';
+  body += 'Thank you,<br/>';
+  body += 'Laylah';
 
-            }
-        },
-        {
-            $lookup: {
-                from: 'channel_chats',
-                localField: '_id',
-                foreignField: 'channel_id',
-                as: 'latest_chat'
-            }
-        },
-        {
-            $group: {
-                _id: '$_id',
-                updatedAt: {$first: '$updatedAt'},
-                createdAt: {$first: '$createdAt'},
-                created_timestamp: {$first: '$created_timestamp'},
-                admin_id: {$first: '$admin_id'},
-                user_id: {$first: '$user_id'},
-                room_type: {$first: '$room_type'},
-                link: {$first: '$link'},
-                channel_type: {$first: '$channel_type'},
-                channel_pic: {$first: '$channel_pic'},
-                channel_description: {$first: '$channel_description'},
-                channel_name: {$first: '$channel_name'},
-                created_timestamp: {$first: '$created_timestamp'},
-                members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
-                latest_chat: {$first: '$latest_chat'}
-            }
-        }
-    ], function (err, channels) {
+  let receivers = ['avadheshbhatt92@gmail.com'];
+  let subject = 'Flag Raised';
 
-        if (err) {
-            bind.status = 0;
-            bind.message = 'Oops! error occur while fetching all chat channels';
-            bind.err = err;
-        } else if (channels.length > 0) {
-            bind.status = 1;
+  Functions.send_email({receivers, subject, body}, function(response){
+    res.json(response);
+  });
 
-
-            channels.forEach(function (item, index) {
-                if (item.latest_chat) {
-
-                    var sort_array = arraySort(item.latest_chat, 'createdAt', {reverse: true});
-                    channels[index].latest_chat = sort_array[0];
-                }
-                if (item.room_type == 'single') {
-                    var other_member_info = arrayFind(item.members_info, function (info, index) {
-                        return info._id != req.params.user_id;
-                    });
-
-                    if (other_member_info) {
-                        //channels[index].members_info_index = members_info_index;
-                        channels[index].channel_name = other_member_info.name;
-                        channels[index].channel_pic = other_member_info.display_pic;
-                        channels[index].channel_description = other_member_info.status;
-                    }
-
-
-                }
-                //channels[index].members_info = undefined;
-            });
-
-            bind.channels = channels;
-        } else {
-            bind.status = 0;
-            bind.message = 'No chat channels found';
-        }
-        return res.json(bind);
-
-    });
 
 });
 
