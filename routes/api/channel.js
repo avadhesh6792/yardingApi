@@ -1218,7 +1218,7 @@ router.get('/get-channel-requests/:channel_id', function (req, res, next) {
 router.post('/flag', function(req, res){
   let channel_id = req.body.channel_id;
   let message_id = req.body.message_id;
-  let user_id = req.params.user_id;
+  let user_id = req.body.user_id;
   let bind = {};
 
   let body = '';
