@@ -16,6 +16,7 @@ var ffmpeg = require('fluent-ffmpeg');
 var apn = require('apn');
 var Notification = require('../../functions/notification');
 var Functions = require('../../functions');
+var Config = require('../../config/config');
 
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -1214,7 +1215,34 @@ router.get('/get-channel-requests/:channel_id', function (req, res, next) {
     });
 });
 
+router.post('/flag', function(req, res){
+  let channel_id = req.params.channel_id;
+  let message_id = req.params.message_id;
+  let user_id = req.params.user_id;
+  let bind = {};
 
+  let body = '';
+  body += '<p>Hello Admin,</p>';
+  body += '<p>Chat with id '+message_id+' from channel/group id : '+channel_id+' has some content with objection.<br/>';
+  body += 'Please view this user\'s post </p>';
+  body += 'Thank you,<br/>';
+  body += 'Laylah';
+
+  let receivers = [Config.yarding_admin_email];
+  let subject = 'Flag Raised';
+
+  Functions.send_email({receivers, subject, body}, function(response){
+    if(response.status){
+        bind.status = 1;
+        bind.message = 'Your report was sent successfully';
+    } else {
+      bind.status = 0;
+      bind.message = 'Oops! error occured while sending report, please try after sometime';
+    }
+    res.json(bind);
+  });
+
+});
 
 // testing route
 router.get('/testing', function (req, res, next) {

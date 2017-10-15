@@ -1,6 +1,7 @@
 var exports = module.exports = {};
 
 var nodemailer = require("nodemailer");
+let Config = require('../config/config');
 
 exports.send_email = function({receivers, subject, body}, callback){
   let bind = {};
@@ -9,8 +10,8 @@ exports.send_email = function({receivers, subject, body}, callback){
       port: 587,
       secure: false, // upgrade later with STARTTLS
       auth: {
-          user: 'avadheshbhatt92@gmail.com',
-          pass: 'Vimla67@'
+          user: Config.smtp_user,
+          pass: Config.smtp_pass
       }
   };
   let transporter = nodemailer.createTransport(smtpConfig);
