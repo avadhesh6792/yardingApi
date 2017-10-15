@@ -28,10 +28,11 @@ exports.send_email = function({receivers, subject, body}, callback){
         bind.status = 0;
         bind.message = 'Oops! error occured while sending email';
         bind.error = error;
+      } else{
+        bind.status = 1;
+        bind.message = 'Email was sent successfully';
+        bind.data = info;
       }
-      bind.status = 1;
-      bind.message = 'Email was sent successfully';
-      bind.data = info;
       callback(bind)
       return res.json('Message sent: %s', info.messageId);
   });
