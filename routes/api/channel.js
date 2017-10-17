@@ -111,6 +111,51 @@ router.post('/create-channel', function (req, res, next) {
     });
 });
 
+// block unblock a user
+router.post('/block-unblock-user', function(req, res){
+  var bind = {};
+  var block_by = req.body.block_by;
+  var block_to = req.body.block_to;
+  var action = req.body.action; // block, unblock
+  var channel_id = req.body.channel_id;
+
+  Channel.findOne({ _id: channel_id}, function(err, channel){
+    if(err){
+      bind.status = 0;
+      bind.message = 'Oops! error occured while fetching channel';
+      bind.error = err;
+      return res.json(bind);
+    }
+    if(channel){
+      let update_data = {};
+      if(action == 'block'){ // block a user
+        update_data = {$push: { block_users_id: {block_by: ObjectId(block_by), block_to: ObjectId(block_to) }}};
+      } else { // unblock a user
+        update_data = { $pull: { block_users_id: {block_by: ObjectId(block_by), block_to: ObjectId(block_to) }} };
+      }
+      Channel.update({_id: channel._id}, update_data, function (err) {
+        if(err){
+          bind.status = 0;
+          bind.message = 'Oops! error occured while saving, please try after sometime';
+          bind.error = err;
+        } else {
+          bind.status = 1;
+          bind.message = 'User was '+(action == 'block' ? 'blocked' : 'unblocked')+' successfully';
+        }
+        return res.json(bind);
+      });
+    } else {
+      bind.status = 0;
+      bind.message = 'No channel found';
+      return res.json(bind);
+    }
+
+  });
+
+
+
+});
+
 // get all single channel
 router.get('/get-all-single-channels/:user_id', function (req, res, next) {
     var bind = {};
@@ -266,6 +311,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 created_timestamp: {$first: '$created_timestamp'},
                 members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
                 latest_chat: {$first: '$latest_chat'},
+                block_users_id: {$first: '$block_users_id'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
         }
@@ -1254,7 +1300,7 @@ router.get('/testing', function (req, res, next) {
   body += 'Thank you,<br/>';
   body += 'Laylah';
 
-  let receivers = ['avadheshbhatt92@gmail.com'];
+  let receivers = [Config.yarding_admin_email];
   let subject = 'Flag Raised';
 
   Functions.send_email({receivers, subject, body}, function(response){

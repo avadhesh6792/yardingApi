@@ -34,8 +34,7 @@ exports.send_email = function({receivers, subject, body}, callback){
         bind.message = 'Email was sent successfully';
         bind.data = info;
       }
-      callback(bind)
-      return res.json('Message sent: %s', info.messageId);
+      return callback(bind)
   });
 
 }
