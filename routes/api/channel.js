@@ -117,9 +117,10 @@ router.post('/block-unblock-user', function(req, res){
   var block_by = req.body.block_by;
   var block_to = req.body.block_to;
   var action = req.body.action; // block, unblock
-  var channel_id = req.body.channel_id;
+  //var channel_id = req.body.channel_id;
 
-  Channel.findOne({ _id: channel_id}, function(err, channel){
+  //Channel.findOne({ _id: channel_id}, function(err, channel){
+  Channel.findOne({ $and: [{'members_id.user_id': ObjectId(block_by)}, {'members_id.user_id': ObjectId(block_to)}, {room_type: 'single'}] }, function(err, channel){
     if(err){
       bind.status = 0;
       bind.message = 'Oops! error occured while fetching channel';
