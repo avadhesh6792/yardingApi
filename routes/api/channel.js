@@ -362,7 +362,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
                 created_timestamp: {$first: '$created_timestamp'},
                 members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
                 latest_chat: {$first: '$latest_chat'},
-                block_users_id: {$first: '$block_users_id'},
+                //block_users_id: {$first: '$block_users_id'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
         }
@@ -419,8 +419,9 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
+            return res.json(bind);
         }
-        return res.json(bind);
+
 
     });
 });
@@ -580,7 +581,7 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
                 created_timestamp: {$first: '$created_timestamp'},
                 members_info: {$push: {$arrayElemAt: ["$members_info", 0]}},
                 latest_chat: {$first: '$latest_chat'},
-                block_users_id: {$first: '$block_users_id'},
+                //block_users_id: {$first: '$block_users_id'},
                 badge: {$push: { $cond: {if: { $eq: ['$members_id.user_id', user_id]}, then: '$members_id.badge', else: null}  }}
             }
         },
@@ -624,8 +625,9 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
         } else {
             bind.status = 0;
             bind.message = 'No channels found';
+            return res.json(bind);
         }
-        return res.json(bind);
+
 
     });
 });
