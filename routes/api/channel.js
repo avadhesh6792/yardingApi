@@ -412,8 +412,14 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
+            let block_users_arr = [];
             Block_user.find({ block_by: user_id}, { block_to: 1, _id: 0 }, function(err, block_users){
-              bind.block_users = block_users;
+              if(block_users.length){
+                block_users.forEach(function(item, index){
+                    block_users_arr.push(item.block_to);
+                });
+              }
+              bind.block_users = block_users_arr;
               return res.json(bind);
             });
         } else {
@@ -524,11 +530,22 @@ router.get('/search-all-chat-channels/:user_id/:search_term', function (req, res
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
+            let block_users_arr = [];
+            Block_user.find({ block_by: user_id}, { block_to: 1, _id: 0 }, function(err, block_users){
+              if(block_users.length){
+                block_users.forEach(function(item, index){
+                    block_users_arr.push(item.block_to);
+                });
+              }
+              bind.block_users = block_users_arr;
+              return res.json(bind);
+            });
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
+            return res.json(bind);
         }
-        return res.json(bind);
+
 
     });
 });
@@ -618,8 +635,14 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
+            let block_users_arr = [];
             Block_user.find({ block_by: user_id}, { block_to: 1, _id: 0 }, function(err, block_users){
-              bind.block_users = block_users;
+              if(block_users.length){
+                block_users.forEach(function(item, index){
+                    block_users_arr.push(item.block_to);
+                });
+              }
+              bind.block_users = block_users_arr;
               return res.json(bind);
             });
         } else {
@@ -718,12 +741,20 @@ router.get('/search-channel/:term/:user_id', function (req, res, next) {
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
+            let block_users_arr = [];
+            Block_user.find({ block_by: user_id}, { block_to: 1, _id: 0 }, function(err, block_users){
+              if(block_users.length){
+                block_users.forEach(function(item, index){
+                    block_users_arr.push(item.block_to);
+                });
+              }
+              bind.block_users = block_users_arr;
+              return res.json(bind);
         } else {
             bind.status = 0;
             bind.message = 'No channels found';
+            return res.json(bind);
         }
-        return res.json(bind);
-
     });
 
 
