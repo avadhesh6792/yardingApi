@@ -412,7 +412,7 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
-            Block_user.find({ block_by: user_id}, { block_to: 1 }, function(err, block_users){
+            Block_user.find({ block_by: user_id}, { block_to: 1, _id: 0 }, function(err, block_users){
               bind.block_users = block_users;
               return res.json(bind);
             });
@@ -618,7 +618,7 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
-            Block_user.find({ block_by: user_id}, function(err, block_users){
+            Block_user.find({ block_by: user_id}, { block_to: 1, _id: 0 }, function(err, block_users){
               bind.block_users = block_users;
               return res.json(bind);
             });
