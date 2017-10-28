@@ -7,6 +7,7 @@ var ObjectId = Mongoose.Types.ObjectId;
 var Clear_chat = require('../../models/clear_chat');
 var Channel_chat = require('../../models/channel_chat');
 var Channel_request = require('../../models/channel_request');
+var Block_user = require('../../models/block_user');
 var User = require('../../models/user');
 var moment = require('moment');
 var arraySort = require('array-sort');
@@ -111,51 +112,100 @@ router.post('/create-channel', function (req, res, next) {
     });
 });
 
-// block unblock a user
+// block unblock a user Block_user
 router.post('/block-unblock-user', function(req, res){
   var bind = {};
   var block_by = req.body.block_by;
   var block_to = req.body.block_to;
   var action = req.body.action; // block, unblock
-  //var channel_id = req.body.channel_id;
-
-  //Channel.findOne({ _id: channel_id}, function(err, channel){
-  Channel.findOne({ $and: [{'members_id.user_id': ObjectId(block_by)}, {'members_id.user_id': ObjectId(block_to)}, {room_type: 'single'}] }, function(err, channel){
-    if(err){
-      bind.status = 0;
-      bind.message = 'Oops! error occured while fetching channel';
-      bind.error = err;
-      return res.json(bind);
-    }
-    if(channel){
-      let update_data = {};
-      if(action == 'block'){ // block a user
-        update_data = {$push: { block_users_id: {block_by: ObjectId(block_by), block_to: ObjectId(block_to) }}};
-      } else { // unblock a user
-        update_data = { $pull: { block_users_id: {block_by: ObjectId(block_by), block_to: ObjectId(block_to) }} };
-      }
-      Channel.update({_id: channel._id}, update_data, function (err) {
-        if(err){
+  Block_user.findOne({block_by: block_by, block_to: block_to}, function(err, block_user){
+      if(block_user){
+        if(action == 'block'){
           bind.status = 0;
-          bind.message = 'Oops! error occured while saving, please try after sometime';
-          bind.error = err;
+          bind.message = 'You have already blocked this user';
+          return res.json(bind);
         } else {
-          bind.status = 1;
-          bind.message = 'User was '+(action == 'block' ? 'blocked' : 'unblocked')+' successfully';
+          block_user.remove(function(err){
+            if(err){
+              bind.status = 0;
+              bind.message = 'Oops! error occured while unblocking user';
+              bind.error = err;
+              return res.json(bind);
+            }
+              bind.status = 1;
+              bind.message = 'User was unblocked successfully'
+              return res.json(bind);
+          });
         }
-        return res.json(bind);
-      });
-    } else {
-      bind.status = 0;
-      bind.message = 'No channel found';
-      return res.json(bind);
-    }
-
+      } else {
+        if(action == 'block'){
+          let new_block_user = new Block_user;
+          new_block_user.block_by = ObjectId(block_by);
+          new_block_user.block_to = ObjectId(block_to);
+          new_block_user.save(function(err){
+            if(err){
+              bind.status = 0;
+              bind.message = 'Oops! error occured while blocking user'
+              bind.error = err;
+              return res.json(bind);
+            }
+            bind.status = 1;
+            bind.message = 'User was blocked successfully'
+            return res.json(bind);
+          });
+        } else {
+          bind.status = 0;
+          bind.message = 'No block user found'
+          return res.json(bind);
+        }
+      }
   });
-
-
-
 });
+
+// router.post('/block-unblock-user', function(req, res){
+//   var bind = {};
+//   var block_by = req.body.block_by;
+//   var block_to = req.body.block_to;
+//   var action = req.body.action; // block, unblock
+//   //var channel_id = req.body.channel_id;
+//
+//   //Channel.findOne({ _id: channel_id}, function(err, channel){
+//   Channel.findOne({ $and: [{'members_id.user_id': ObjectId(block_by)}, {'members_id.user_id': ObjectId(block_to)}, {room_type: 'single'}] }, function(err, channel){
+//     if(err){
+//       bind.status = 0;
+//       bind.message = 'Oops! error occured while fetching channel';
+//       bind.error = err;
+//       return res.json(bind);
+//     }
+//     if(channel){
+//       let update_data = {};
+//       if(action == 'block'){ // block a user
+//         update_data = {$push: { block_users_id: {block_by: ObjectId(block_by), block_to: ObjectId(block_to) }}};
+//       } else { // unblock a user
+//         update_data = { $pull: { block_users_id: {block_by: ObjectId(block_by), block_to: ObjectId(block_to) }} };
+//       }
+//       Channel.update({_id: channel._id}, update_data, function (err) {
+//         if(err){
+//           bind.status = 0;
+//           bind.message = 'Oops! error occured while saving, please try after sometime';
+//           bind.error = err;
+//         } else {
+//           bind.status = 1;
+//           bind.message = 'User was '+(action == 'block' ? 'blocked' : 'unblocked')+' successfully';
+//         }
+//         return res.json(bind);
+//       });
+//     } else {
+//       bind.status = 0;
+//       bind.message = 'No channel found';
+//       return res.json(bind);
+//     }
+//
+//   });
+//
+//
+//
+// });
 
 // get all single channel
 router.get('/get-all-single-channels/:user_id', function (req, res, next) {
