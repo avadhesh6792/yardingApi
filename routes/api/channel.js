@@ -112,7 +112,7 @@ router.post('/create-channel', function (req, res, next) {
     });
 });
 
-// block unblock a user Block_user
+// block unblock a user
 router.post('/block-unblock-user', function(req, res){
   var bind = {};
   var block_by = req.body.block_by;
@@ -412,6 +412,10 @@ router.get('/get-all-chat-channels/:user_id', function (req, res, next) {
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
+            Block_user.find({ block_by: user_id}, function(err, block_users){
+              bind.block_users = block_users;
+              return res.json(bind);
+            });
         } else {
             bind.status = 0;
             bind.message = 'No chat channels found';
@@ -613,6 +617,10 @@ router.get('/get-all-channels/:user_id', function (req, res, next) {
 
             var sort_channel = arraySort(channels, 'latest_chat.created_timestamp', {reverse: true});
             bind.channels = sort_channel;
+            Block_user.find({ block_by: user_id}, function(err, block_users){
+              bind.block_users = block_users;
+              return res.json(bind);
+            });
         } else {
             bind.status = 0;
             bind.message = 'No channels found';
