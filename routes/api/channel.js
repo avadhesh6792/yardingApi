@@ -750,6 +750,7 @@ router.get('/search-channel/:term/:user_id', function (req, res, next) {
               }
               bind.block_users = block_users_arr;
               return res.json(bind);
+            });
         } else {
             bind.status = 0;
             bind.message = 'No channels found';
